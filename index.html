@@ -6,7 +6,7 @@
 <title>二中·集</title>  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  
 <style>  
-@font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.ttf') format('truetype'); }  
+@font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.ttf') format('truetype'); font-display: swap; }  
 * { margin: 0; padding: 0; box-sizing: border-box; }  
 html { height: 100%; overflow: hidden; }  
 body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; display: flex; justify-content: center; padding: 40px 20px; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }  
@@ -29,11 +29,6 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .side-text.right p:first-child { margin-top: -20px; }  
 .side-text.right p:last-child { margin-top: 60px; }  
 .side-text.left p, .side-text.right p { -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); }  
-.loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fafafa; transition: opacity 0.6s ease; }  
-.loading-screen.fade-out { opacity: 0; pointer-events: none; }  
-.loading-image { width: 180px; height: 180px; border-radius: 50%; margin-bottom: 20px; background: radial-gradient(ellipse, #f0f0f0 40%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse, black 40%, transparent 70%); mask-image: radial-gradient(ellipse, black 40%, transparent 70%); }  
-.loading-title { font-size: 32px; letter-spacing: 6px; color: #8b1a1a; font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; }  
-.loading-text { position: absolute; bottom: 60px; font-size: 12px; color: #bbb; letter-spacing: 2px; }  
 .header { text-align: center; margin-bottom: 20px; }  
 .header-icon { font-size: 36px; margin-bottom: 12px; }  
 .header h1 { font-size: 22px; font-weight: 300; letter-spacing: 6px; color: #1a1a1a; margin-bottom: 10px; }  
@@ -139,11 +134,6 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 </style>  
 </head>  
 <body>  
-<div class="loading-screen" id="loadingScreen">  
-    <div class="loading-image"></div>  
-    <div class="loading-title">二中·集</div>  
-    <div class="loading-text">正在进入···</div>  
-</div>  
 <div class="side-text left">  
     <p>二十一世紀 人類依然需要擁抱 理解 以及愛</p>  
     <p>我要發呆、靜坐、咀嚼、散步、看天、把所有沒有意義的事鄭重其事做一遍</p>  
@@ -336,10 +326,6 @@ function showWelcomeToast() {
     document.body.appendChild(welcome);  
     setTimeout(function() { welcome.style.opacity = '0'; welcome.style.transition = 'opacity 0.5s'; setTimeout(function() { welcome.remove(); }, 500); }, 2000);  
 }  
-setTimeout(function() {  
-    var loadingScreen = document.getElementById('loadingScreen');  
-    if (loadingScreen) { loadingScreen.classList.add('fade-out'); setTimeout(function() { loadingScreen.remove(); }, 600); }  
-}, 100);  
 function switchMode(mode) {  
     document.getElementById('postSection').style.display = 'none';  
     document.getElementById('foodSection').style.display = 'none';  
@@ -519,7 +505,7 @@ function showAbout() {
 function showUpdate() {  
     var overlay = document.createElement('div');  
     overlay.className = 'modal-overlay';  
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v3.0（当前版本）</div><div class="update-item">· 数据库接入（帖子互通）</div><div class="update-item">· 管理员删帖功能</div><div class="update-item">· 自动登录+欢迎弹窗</div><div class="update-item">· 注册昵称系统</div><div class="update-item">· 敏感词过滤</div><div class="update-item">· 非管理员禁发链接</div><div class="update-item">· 两侧竖版文案装饰</div><div class="update-item">· 顶部磨砂固定栏</div><div class="update-item">· 管理员口令认证</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';  
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v3.1（当前版本）</div><div class="update-item">· 数据库接入（帖子互通）</div><div class="update-item">· 管理员删帖功能</div><div class="update-item">· 自动登录+欢迎弹窗</div><div class="update-item">· 注册昵称系统</div><div class="update-item">· 敏感词过滤</div><div class="update-item">· 非管理员禁发链接</div><div class="update-item">· 两侧竖版文案装饰</div><div class="update-item">· 顶部磨砂固定栏</div><div class="update-item">· 管理员口令认证</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';  
     document.body.appendChild(overlay);  
 }  
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }  
