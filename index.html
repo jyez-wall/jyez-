@@ -14,14 +14,12 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
-.music-player { max-width: 220px; overflow: hidden; }
 .top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
 .register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; display: block; margin-left: auto; }
 .register-btn.logged-in { color: #6a8cc9; }
 .register-btn.logged-in.admin { color: #b8860b; }
 .top-btns-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
-.top-btn { border: 1px solid #ddd; background: none; color: #999; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 10px; border-radius: 2px; }
-.side-text { position: fixed; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none; }
+.top-btn { border: 1px solid #ddd; background: none; color: #999; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 10px; border-radius: 2px; }.side-text { position: fixed; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none; }
 .side-text.left { left: 0; padding-left: 8px; }
 .side-text.right { right: 0; padding-right: 8px; }
 .side-text p { font-size: 12px; color: #ddd; letter-spacing: 4px; line-height: 2.2; writing-mode: vertical-rl; text-align: center; margin-bottom: 20px; max-height: 300px; }
@@ -43,8 +41,7 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .stats-bar { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; font-size: 11px; color: #bbb; letter-spacing: 1px; }
 .mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
 .mode-btn { border: none; background: none; font-size: 12px; letter-spacing: 1px; color: #bbb; cursor: pointer; padding: 8px 10px; font-family: inherit; border-bottom: 2px solid transparent; }
-.mode-btn.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
-.input-area { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 24px; margin-bottom: 20px; }
+.mode-btn.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }.input-area { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 24px; margin-bottom: 20px; }
 .categories { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .category-btn { border: 1px solid #ddd; background: none; color: #999; padding: 5px 14px; font-size: 12px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }
 .category-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
@@ -53,7 +50,8 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .identity-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
 textarea, input[type="text"], input[type="password"], .chat-input { font-size: 16px !important; }
 textarea { width: 100%; border: none; outline: none; resize: none; line-height: 1.8; color: #333; font-family: inherit; min-height: 60px; }
-textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { display: flex; flex-direction: column; gap: 10px; }
+textarea::placeholder { color: #ccc; letter-spacing: 1px; }
+.food-inputs { display: flex; flex-direction: column; gap: 10px; }
 .food-inputs input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; }
 .food-inputs textarea { border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; min-height: 50px; }
 .food-select-group { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -62,8 +60,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
 .food-select-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
 .input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
 .anonymous { font-size: 12px; color: #bbb; letter-spacing: 1px; }
-.publish-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 28px; font-size: 13px; letter-spacing: 3px; cursor: pointer; font-family: inherit; border-radius: 2px; }
-.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.publish-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 28px; font-size: 13px; letter-spacing: 3px; cursor: pointer; font-family: inherit; border-radius: 2px; }.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .filter-btn { border: none; background: none; color: #bbb; padding: 4px 10px; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; }
 .filter-btn.active { color: #1a1a1a; font-weight: 600; }
 .posts-list, .food-list { display: flex; flex-direction: column; gap: 14px; }
@@ -88,8 +85,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
 .post-author.admin { color: #b8860b; }
 .admin-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
 .admin-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
-.admin-btn.delete { color: #d4677a; border-color: #f0c0c8; }
-.food-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+.admin-btn.delete { color: #d4677a; border-color: #f0c0c8; }.food-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
 .food-detail { font-size: 13px; color: #666; line-height: 1.8; margin-bottom: 4px; }
 .food-comment { font-size: 13px; color: #888; line-height: 1.8; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
 .post-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
@@ -107,8 +103,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
 .welcome-toast .welcome-icon { font-size: 28px; margin-bottom: 12px; }
 .welcome-toast .welcome-title { font-size: 14px; color: #999; letter-spacing: 2px; margin-bottom: 6px; }
 .welcome-toast .welcome-name { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; }
-.welcome-toast .welcome-uid { font-size: 11px; color: #ccc; letter-spacing: 1px; margin-top: 6px; }
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.welcome-toast .welcome-uid { font-size: 11px; color: #ccc; letter-spacing: 1px; margin-top: 6px; }.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
 .modal { background: #fff; border-radius: 8px; padding: 28px 24px; max-width: 350px; width: 90%; text-align: center; max-height: 80vh; overflow-y: auto; }
 .modal h3 { font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8e8e8; }
 .modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }
@@ -141,7 +136,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
 <body><div class="loading-screen" id="loadingScreen">
     <div class="loading-image"></div>
     <div class="loading-title">二中·集</div>
-    <div class="loading-text" id="loadingText">正在进入</div>
+    <div class="loading-text">正在进入···</div>
 </div>
 
 <div class="side-text left">
@@ -157,9 +152,6 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
     <div class="top-bar">
         <div class="top-left">
             <div class="site-title">二中·集</div>
-            <div class="music-player">
-                <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="66" src="https://music.163.com/outchain/player?type=0&amp;id=110231&amp;auto=1&amp;height=66"></iframe>
-            </div>
         </div>
         <div class="top-right">
             <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
@@ -169,27 +161,22 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
             </div>
         </div>
     </div>
-    
     <div class="header">
         <div class="header-icon" id="headerIcon">📮</div>
         <h1 id="headerTitle">二中心事箱</h1>
         <div class="line"></div>
         <p class="subtitle" id="headerSubtitle">把不敢说的话，悄悄放进这里</p >
     </div>
-    
     <div class="stats-bar">
         <span>📮 小纸条 <span id="postCount">0</span> 张</span>
         <span>·</span>
         <span>🍜 美食 <span id="foodCount">0</span> 家</span>
     </div>
-    
     <div class="mode-switch">
         <button class="mode-btn active" data-mode="post" onclick="switchMode('post')">📮 心事箱</button>
         <button class="mode-btn" data-mode="food" onclick="switchMode('food')">🍜 必吃榜</button>
         <button class="mode-btn" data-mode="chat" onclick="switchMode('chat')">💬 小茶馆</button>
-    </div>
-    
-    <div id="postSection">
+    </div><div id="postSection">
         <div class="input-area">
             <div class="categories" id="categories">
                 <button class="category-btn active" data-tag="表白">♥ 表白</button>
@@ -226,7 +213,6 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
             </div>
         </div>
     </div>
-    
     <div id="foodSection" style="display:none;">
         <div class="input-area">
             <div class="food-inputs">
@@ -261,9 +247,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
             </div>
         </div>
         <div class="food-spacer"></div>
-    </div>
-    
-    <div id="chatSection" style="display:none;">
+    </div><div id="chatSection" style="display:none;">
         <div id="teaRoomList">
             <div class="tea-room-grid">
                 <div class="tea-room-card" onclick="enterRoom('八卦桌')">
@@ -304,7 +288,6 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }.food-inputs { displa
             <div class="chat-spacer"></div>
         </div>
     </div>
-    
     <div class="footer">
         <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p >
     </div>
@@ -313,7 +296,6 @@ const supabase = window.supabase.createClient(
     'https://byokxdqvxtdshsdoagtm.supabase.co',
     'sb_publishable_nadYCZZneDKNjFTb5edh2A_Q3tS18h4'
 );
-
 var selectedTag = '表白';
 var currentFilter = '全部';
 var allPosts = [];
@@ -327,82 +309,34 @@ var userNickname = '';
 var userPassword = '';
 var isAdmin = false;
 var userUid = '';
-
 var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','(^-^)','(｡•̀ᴗ•́｡)','(◍•ᴗ•◍)','(´｡✪ω✪｡`)'];
 var chatMessages = {};
-
 var bannedWords = ['傻逼','垃圾','去死','滚蛋','废物','白痴','智障','脑残','操你','妈的','他妈','尼玛','fuck','shit','sb','cnm','nmsl'];
 var linkPatterns = ['http','www','.com','.cn','.net','.org','.xyz','.top','.vip','.cc'];
-
-function stripSymbols(text) {
-    return text.replace(/[\s·._\-*#@!？?。，,、:：;；()（）\[\]【】'"<>~]/g, '');
-}
-
-function containsBanned(content) {
-    var cleaned = stripSymbols(content).toLowerCase();
-    for (var i = 0; i < bannedWords.length; i++) {
-        if (cleaned.indexOf(bannedWords[i]) !== -1) return true;
-    }
-    return false;
-}
-
-function containsLink(content) {
-    var cleaned = content.toLowerCase();
-    for (var i = 0; i < linkPatterns.length; i++) {
-        if (cleaned.indexOf(linkPatterns[i]) !== -1) return true;
-    }
-    return false;
-}
-
-function showToast(icon, text) {
+function stripSymbols(text) { return text.replace(/[\s·._\-*#@!？?。，,、:：;；()（）\[\]【】'"<>~]/g, ''); }
+function containsBanned(content) { var cleaned = stripSymbols(content).toLowerCase(); for (var i = 0; i < bannedWords.length; i++) { if (cleaned.indexOf(bannedWords[i]) !== -1) return true; } return false; }
+function containsLink(content) { var cleaned = content.toLowerCase(); for (var i = 0; i < linkPatterns.length; i++) { if (cleaned.indexOf(linkPatterns[i]) !== -1) return true; } return false; }function showToast(icon, text) {
     var oldToast = document.querySelector('.toast');
     if (oldToast) oldToast.remove();
     var toast = document.createElement('div');
     toast.className = 'toast';
     toast.innerHTML = '<div class="toast-icon">' + icon + '</div><div class="toast-text">' + text + '</div>';
     document.body.appendChild(toast);
-    setTimeout(function() {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.4s';
-        setTimeout(function() { toast.remove(); }, 400);
-    }, 1800);
+    setTimeout(function() { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.4s'; setTimeout(function() { toast.remove(); }, 400); }, 1800);
 }
-
 function showWelcomeToast() {
     var welcome = document.createElement('div');
     welcome.className = 'welcome-toast';
-    welcome.innerHTML = '<div class="welcome-icon">(｡•̀ᴗ-)✧</div>' +
-        '<div class="welcome-title">欢迎回来</div>' +
-        '<div class="welcome-name">' + userNickname + (isAdmin ? ' ⭐' : '') + '</div>' +
-        '<div class="welcome-uid">UID: ' + userUid + '</div>';
+    welcome.innerHTML = '<div class="welcome-icon">(｡•̀ᴗ-)✧</div><div class="welcome-title">欢迎回来</div><div class="welcome-name">' + userNickname + (isAdmin ? ' ⭐' : '') + '</div><div class="welcome-uid">UID: ' + userUid + '</div>';
     document.body.appendChild(welcome);
-    setTimeout(function() {
-        welcome.style.opacity = '0';
-        welcome.style.transition = 'opacity 0.5s';
-        setTimeout(function() { welcome.remove(); }, 500);
-    }, 2000);
-}
-
-setTimeout(function() {
+    setTimeout(function() { welcome.style.opacity = '0'; welcome.style.transition = 'opacity 0.5s'; setTimeout(function() { welcome.remove(); }, 500); }, 2000);
+}setTimeout(function() {
     var loadingScreen = document.getElementById('loadingScreen');
     if (loadingScreen) {
         loadingScreen.classList.add('fade-out');
         setTimeout(function() { loadingScreen.remove(); }, 600);
     }
-}, 100);
-
-var dotCount = 0;
-function updateDots() {
-    dotCount = (dotCount + 1) % 4;
-    var dots = '';
-    for (var i = 0; i < dotCount; i++) dots += '·';
-    var loadingText = document.getElementById('loadingText');
-    if (loadingText) loadingText.textContent = '正在进入' + dots;
-    setTimeout(updateDots, 400);
-}
-updateDots();
-
-function switchMode(mode) {
+}, 100);function switchMode(mode) {
     document.getElementById('postSection').style.display = 'none';
     document.getElementById('foodSection').style.display = 'none';
     document.getElementById('chatSection').style.display = 'none';
@@ -427,9 +361,7 @@ function switchMode(mode) {
         document.getElementById('headerTitle').textContent = '二中小茶馆';
         document.getElementById('headerSubtitle').textContent = '找个桌位，坐下聊聊';
     }
-}
-
-var categoryBtns = document.querySelectorAll('.category-btn');
+}var categoryBtns = document.querySelectorAll('.category-btn');
 categoryBtns.forEach(function(btn) {
     btn.addEventListener('click', function() {
         categoryBtns.forEach(function(b) { b.classList.remove('active'); });
@@ -455,9 +387,7 @@ identityBtns.forEach(function(btn) {
             }
         }
     });
-});
-
-var filterBtns = document.querySelectorAll('.filter-btn');
+});var filterBtns = document.querySelectorAll('.filter-btn');
 filterBtns.forEach(function(btn) {
     btn.addEventListener('click', function() {
         filterBtns.forEach(function(b) { b.classList.remove('active'); });
@@ -483,9 +413,7 @@ ratingBtns.forEach(function(btn) {
         btn.classList.add('active');
         selectedRating = btn.getAttribute('data-rating');
     });
-});
-
-async function submitPost() {
+});async function submitPost() {
     var content = document.getElementById('postContent').value.trim();
     if (!content) { showToast('(´･ω･`)', '写点什么再送出去吧'); return; }
     if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
@@ -499,31 +427,29 @@ async function submitPost() {
         author = userNickname + (isAdmin ? ' ⭐' : '');
         authorClass = isAdmin ? 'admin' : 'nickname';
     }
-    var { data, error } = await supabase.from('posts').insert([
+    var result = await supabase.from('posts').insert([
         { content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr }
     ]);
-    if (error) { showToast('(｡•́︿•̀｡)', '发布失败，请重试'); return; }
+    if (result.error) { showToast('(｡•́︿•̀｡)', '发布失败'); return; }
     document.getElementById('postContent').value = '';
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '已经悄悄送出啦');
-}
-
-async function loadPosts() {
-    var { data, error } = await supabase
+}async function loadPosts() {
+    var result = await supabase
         .from('posts')
         .select('*')
         .order('id', { ascending: false })
         .limit(100);
-    if (data) {
-        allPosts = data.map(function(p) {
+    if (result.data) {
+        allPosts = result.data.map(function(p) {
             return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time };
         });
         updateStats();
         renderPosts();
     }
 }async function deletePost(id) {
-    var { error } = await supabase.from('posts').delete().eq('id', id);
-    if (!error) {
+    var result = await supabase.from('posts').delete().eq('id', id);
+    if (!result.error) {
         await loadPosts();
         showToast('(｡•̀ᴗ-)✧', '已删除');
     }
@@ -545,9 +471,7 @@ function submitFood() {
     updateStats();
     renderFoods();
     showToast('(｡•̀ᴗ-)✧', '推荐成功！');
-}
-
-function updateStats() {
+}function updateStats() {
     document.getElementById('postCount').textContent = allPosts.length;
     document.getElementById('foodCount').textContent = allFoods.length;
 }
@@ -575,9 +499,7 @@ function renderPosts() {
         }
         postsList.appendChild(card);
     });
-}
-
-function renderFoods() {
+}function renderFoods() {
     var foodList = document.getElementById('foodList');
     foodList.innerHTML = '';
     if (allFoods.length === 0) {
@@ -596,9 +518,7 @@ function renderFoods() {
             '<div class="post-meta"><span class="post-time">' + food.time + '</span><span class="post-number">#' + String(food.number).padStart(3, '0') + '</span></div>';
         foodList.appendChild(card);
     });
-}
-
-function enterRoom(name) {
+}function enterRoom(name) {
     currentRoom = name;
     if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];
     document.getElementById('teaRoomList').style.display = 'none';
@@ -632,21 +552,14 @@ function sendChat() {
     chatMessages[currentRoom].push({ name: displayName, text: text, time: timeStr });
     input.value = '';
     enterRoom(currentRoom);
-}
-
-function handleRegisterClick() {
-    if (userNickname) {
-        showLogin();
-    } else {
-        showRegister();
-    }
+}function handleRegisterClick() {
+    if (userNickname) { showLogin(); } else { showRegister(); }
 }
 
 function showRegister() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal">' +
-        '<h3>✏️ 注册</h3>' +
+    overlay.innerHTML = '<div class="modal"><h3>✏️ 注册</h3>' +
         '<input type="text" id="nicknameInput" placeholder="输入昵称...">' +
         '<input type="password" id="passwordInput" placeholder="设置密码...">' +
         '<input type="password" id="koulingInput" placeholder="口令（选填）">' +
@@ -659,16 +572,13 @@ function showUidLogin() {
     closeModal();
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal">' +
-        '<h3>🔑 UID登录</h3>' +
+    overlay.innerHTML = '<div class="modal"><h3>🔑 UID登录</h3>' +
         '<input type="text" id="uidInput" placeholder="输入UID...">' +
         '<input type="password" id="uidPasswordInput" placeholder="输入密码...">' +
         '<button class="close-btn" onclick="verifyUidLogin()">登录</button>' +
         '<button class="link-btn" onclick="showRegister()">没有账号？去注册 →</button></div>';
     document.body.appendChild(overlay);
-}
-
-function verifyUidLogin() {
+}function verifyUidLogin() {
     var uid = document.getElementById('uidInput').value.trim();
     var password = document.getElementById('uidPasswordInput').value.trim();
     if (!uid || !password) { showToast('(´･ω･`)', '请输入UID和密码'); return; }
@@ -681,12 +591,12 @@ function verifyUidLogin() {
     } else {
         showToast('(｡•́︿•̀｡)', 'UID或密码错误');
     }
-}function showLogin() {
+}
+
+function showLogin() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal">' +
-        '<h3>🔑 登录</h3>' +
-        '<p>欢迎回来，' + userNickname + '</p >' +
+    overlay.innerHTML = '<div class="modal"><h3>🔑 登录</h3><p>欢迎回来，' + userNickname + '</p >' +
         '<input type="password" id="loginPasswordInput" placeholder="输入密码...">' +
         '<button class="close-btn" onclick="verifyLogin()">登录</button></div>';
     document.body.appendChild(overlay);
@@ -703,9 +613,7 @@ function verifyLogin() {
     } else {
         showToast('(｡•́︿•̀｡)', '密码错误');
     }
-}
-
-function saveNickname() {
+}function saveNickname() {
     var nickname = document.getElementById('nicknameInput').value.trim();
     var password = document.getElementById('passwordInput').value.trim();
     var kouling = document.getElementById('koulingInput').value.trim();
@@ -714,10 +622,7 @@ function saveNickname() {
     userNickname = nickname;
     userPassword = password;
     userUid = '1000000';
-    if (kouling === '1900') {
-        isAdmin = true;
-        showToast('⭐', '口令正确！你已成为管理员');
-    }
+    if (kouling === '1900') { isAdmin = true; showToast('⭐', '口令正确！你已成为管理员'); }
     localStorage.setItem('erzhong_nickname', nickname);
     localStorage.setItem('erzhong_password', password);
     localStorage.setItem('erzhong_uid', userUid);
@@ -725,9 +630,7 @@ function saveNickname() {
     closeModal();
     updateRegisterBtn();
     var label = document.getElementById('currentIdentityLabel');
-    if (identityMode === 'nickname') {
-        label.textContent = '✏️ ' + userNickname + (isAdmin ? ' ⭐' : '');
-    }
+    if (identityMode === 'nickname') { label.textContent = '✏️ ' + userNickname + (isAdmin ? ' ⭐' : ''); }
     showWelcomeToast();
 }
 
@@ -742,24 +645,12 @@ function updateRegisterBtn() {
         btn.classList.remove('logged-in');
         btn.classList.remove('admin');
     }
-}
-
-function showAbout() {
+}function showAbout() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal">' +
-        '<h3>📮 关于二中心事箱</h3>' +
-        '<p>这里是一个匿名的小天地</p >' +
-        '<p>你可以：<br>' +
-        '♥ 表白 — 说出你的心意<br>' +
-        '! 吐槽 — 发泄你的情绪<br>' +
-        '✦ 祝福 — 送上你的祝愿<br>' +
-        '◌ 树洞 — 倾诉你的秘密<br>' +
-        '? 寻人 — 寻找那个TA<br>' +
-        '· 其他 — 分享任何事</p >' +
-        '<p>🍜 必吃榜 — 推荐学校周围的美食</p >' +
-        '<p>💬 小茶馆 — 找个桌位，坐下聊聊</p >' +
-        '<p>所有内容均为匿名发布<br>请文明发言，传递温暖</p >' +
+    overlay.innerHTML = '<div class="modal"><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p ><p>你可以：<br>' +
+        '♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>· 其他 — 分享任何事</p >' +
+        '<p>🍜 必吃榜 — 推荐学校周围的美食</p ><p>💬 小茶馆 — 找个桌位，坐下聊聊</p ><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p >' +
         '<button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
@@ -767,8 +658,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log">' +
-        '<h3>📢 更新日志</h3>' +
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3>' +
         '<div class="update-version">v3.0（当前版本）</div>' +
         '<div class="update-item">· 数据库接入（帖子互通）</div>' +
         '<div class="update-item">· 管理员删帖功能</div>' +
@@ -783,17 +673,14 @@ function showUpdate() {
         '<div class="update-item">· 心事箱分类发帖</div>' +
         '<div class="update-item">· 必吃榜美食推荐</div>' +
         '<div class="update-item">· 小茶馆多桌聊天</div>' +
-        '</div>' +
-        '<button class="close-btn" onclick="closeModal()">知道了</button></div>';
+        '</div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 
 function closeModal() {
     var overlay = document.querySelector('.modal-overlay');
     if (overlay) overlay.remove();
-}
-
-var savedNickname = localStorage.getItem('erzhong_nickname');
+}var savedNickname = localStorage.getItem('erzhong_nickname');
 var savedPassword = localStorage.getItem('erzhong_password');
 var savedUid = localStorage.getItem('erzhong_uid');
 var savedAdmin = localStorage.getItem('erzhong_admin');
@@ -803,9 +690,7 @@ if (savedNickname) {
     userUid = savedUid || '1000000';
     isAdmin = savedAdmin === '1';
     updateRegisterBtn();
-    setTimeout(function() {
-        showWelcomeToast();
-    }, 1500);
+    setTimeout(function() { showWelcomeToast(); }, 1500);
 }
 
 loadPosts();
