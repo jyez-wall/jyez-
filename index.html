@@ -1,797 +1,818 @@
-<!DOCTYPE html>  
-<html lang="zh-CN">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-<title>二中·集</title>  
-<style>  
-@font-face {  
-    font-family: 'ZhiMangXing';  
-    src: url('zhimangxing.ttf') format('truetype');  
-}  
-  
-* { margin: 0; padding: 0; box-sizing: border-box; }  
-html { height: 100%; overflow: hidden; }  
-body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; display: flex; justify-content: center; padding: 40px 20px; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }  
-.container { width: 100%; max-width: 480px; position: relative; }  
-  
-.top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }  
-.top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }  
-.site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }  
-.music-player { max-width: 220px; overflow: hidden; }  
-.top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }  
-.register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; display: block; margin-left: auto; }  
-.register-btn.logged-in { color: #6a8cc9; }  
-.register-btn.logged-in.admin { color: #b8860b; }  
-.top-btns-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }  
-.top-btn { border: 1px solid #ddd; background: none; color: #999; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 10px; border-radius: 2px; }  
-  
-.side-text { position: fixed; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none; }  
-.side-text.left { left: 0; padding-left: 8px; }  
-.side-text.right { right: 0; padding-right: 8px; }  
-.side-text p { font-size: 12px; color: #ddd; letter-spacing: 4px; line-height: 2.2; writing-mode: vertical-rl; text-align: center; margin-bottom: 20px; max-height: 300px; }  
-.side-text.left p:first-child { margin-top: -60px; }  
-.side-text.left p:last-child { margin-top: 40px; }  
-.side-text.right p:first-child { margin-top: -20px; }  
-.side-text.right p:last-child { margin-top: 60px; }  
-.side-text.left p, .side-text.right p { -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); }  
-  
-.loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fafafa; transition: opacity 0.6s ease; }  
-.loading-screen.fade-out { opacity: 0; pointer-events: none; }  
-.loading-image { width: 180px; height: 180px; border-radius: 50%; margin-bottom: 20px; background: radial-gradient(ellipse, #f0f0f0 40%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse, black 40%, transparent 70%); mask-image: radial-gradient(ellipse, black 40%, transparent 70%); }  
-.loading-title { font-size: 32px; letter-spacing: 6px; color: #8b1a1a; font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; }  
-.loading-text { position: absolute; bottom: 60px; font-size: 12px; color: #bbb; letter-spacing: 2px; }  
-  
-.header { text-align: center; margin-bottom: 20px; }  
-.header-icon { font-size: 36px; margin-bottom: 12px; }  
-.header h1 { font-size: 22px; font-weight: 300; letter-spacing: 6px; color: #1a1a1a; margin-bottom: 10px; }  
-.header .line { width: 24px; height: 1px; background: #1a1a1a; margin: 0 auto 12px; }  
-.header .subtitle { font-size: 12px; color: #999; letter-spacing: 2px; }  
-.stats-bar { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; font-size: 11px; color: #bbb; letter-spacing: 1px; }  
-.mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }  
-.mode-btn { border: none; background: none; font-size: 12px; letter-spacing: 1px; color: #bbb; cursor: pointer; padding: 8px 10px; font-family: inherit; border-bottom: 2px solid transparent; }  
-.mode-btn.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }  
-.input-area { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 24px; margin-bottom: 20px; }  
-.categories { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }  
-.category-btn { border: 1px solid #ddd; background: none; color: #999; padding: 5px 14px; font-size: 12px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }  
-.category-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }  
-.identity-switch { display: flex; gap: 8px; margin-bottom: 10px; }  
-.identity-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 12px; font-size: 11px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }  
-.identity-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }  
-textarea, input[type="text"], input[type="password"], .chat-input { font-size: 16px !important; }  
-textarea { width: 100%; border: none; outline: none; resize: none; line-height: 1.8; color: #333; font-family: inherit; min-height: 60px; }  
-textarea::placeholder { color: #ccc; letter-spacing: 1px; }  
-.food-inputs { display: flex; flex-direction: column; gap: 10px; }  
-.food-inputs input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; }  
-.food-inputs textarea { border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; min-height: 50px; }  
-.food-select-group { display: flex; flex-wrap: wrap; gap: 8px; }  
-.food-select-label { font-size: 11px; color: #999; letter-spacing: 1px; width: 100%; margin-bottom: 2px; }  
-.food-select-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 12px; font-size: 11px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }  
-.food-select-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }  
-.input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }  
-.anonymous { font-size: 12px; color: #bbb; letter-spacing: 1px; }  
-.publish-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 28px; font-size: 13px; letter-spacing: 3px; cursor: pointer; font-family: inherit; border-radius: 2px; }  
-.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }  
-.filter-btn { border: none; background: none; color: #bbb; padding: 4px 10px; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; }  
-.filter-btn.active { color: #1a1a1a; font-weight: 600; }  
-.posts-list, .food-list { display: flex; flex-direction: column; gap: 14px; }  
-.post-card, .food-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 18px 22px; animation: fadeIn 0.4s ease; }  
-.post-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; }  
-.tag-表白 { background: #fff0f0; color: #d4677a; }  
-.tag-吐槽 { background: #f0f0f0; color: #888; }  
-.tag-祝福 { background: #fff8e8; color: #c9a44a; }  
-.tag-树洞 { background: #f0f5ff; color: #6a8cc9; }  
-.tag-寻人 { background: #f0fff4; color: #5aa86a; }  
-.tag-其他 { background: #f5f0ff; color: #9a7ac9; }  
-.food-badge { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; background: #fff5e8; color: #c98a4a; }  
-.food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }  
-.food-tag { font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: #f5f5f5; color: #888; }  
-.food-tag.distance { background: #f0f5ff; color: #6a8cc9; }  
-.food-tag.rating { background: #fff8e8; color: #c9a44a; }  
-.post-emoji { font-size: 13px; color: #ccc; margin-bottom: 8px; }  
-.post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }  
-.post-author { font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; }  
-.post-author.nickname { color: #6a8cc9; }  
-.post-author.anon { color: #ccc; }  
-.post-author.admin { color: #b8860b; }  
-.food-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }  
-.food-detail { font-size: 13px; color: #666; line-height: 1.8; margin-bottom: 4px; }  
-.food-comment { font-size: 13px; color: #888; line-height: 1.8; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f5f5f5; }  
-.post-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid #f5f5f5; }  
-.post-time { font-size: 11px; color: #ccc; letter-spacing: 1px; }  
-.post-number { font-size: 11px; color: #ddd; letter-spacing: 1px; }  
-.empty-state { text-align: center; padding: 40px 20px; color: #ccc; }  
-.empty-icon { font-size: 15px; margin-bottom: 12px; letter-spacing: 2px; }  
-.empty-state p { font-size: 13px; letter-spacing: 2px; }  
-.empty-state .empty-sub { font-size: 11px; color: #ddd; margin-top: 6px; letter-spacing: 1px; }  
-.footer { text-align: center; margin-top: 30px; font-size: 11px; color: #ccc; letter-spacing: 2px; }  
-.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid #e8e8e8; border-radius: 12px; padding: 24px 32px; text-align: center; z-index: 2000; animation: fadeIn 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }  
-.toast .toast-icon { font-size: 20px; margin-bottom: 8px; }  
-.toast .toast-text { font-size: 13px; color: #666; letter-spacing: 1px; }  
-.welcome-toast { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid #e8e8e8; border-radius: 16px; padding: 32px 40px; text-align: center; z-index: 3000; animation: fadeIn 0.5s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }  
-.welcome-toast .welcome-icon { font-size: 28px; margin-bottom: 12px; }  
-.welcome-toast .welcome-title { font-size: 14px; color: #999; letter-spacing: 2px; margin-bottom: 6px; }  
-.welcome-toast .welcome-name { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; }  
-.welcome-toast .welcome-uid { font-size: 11px; color: #ccc; letter-spacing: 1px; margin-top: 6px; }  
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }  
-.modal { background: #fff; border-radius: 8px; padding: 28px 24px; max-width: 350px; width: 90%; text-align: center; max-height: 80vh; overflow-y: auto; }  
-.modal h3 { font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8e8e8; }  
-.modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }  
-.modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }  
-.modal input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; }  
-.modal .link-btn { border: none; background: none; color: #8ecae6; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; margin-top: 8px; }  
-.update-log { text-align: left; }  
-.update-version { font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 1px; margin: 12px 0 6px; }  
-.update-item { font-size: 12px; color: #888; line-height: 2; letter-spacing: 1px; padding-left: 12px; }  
-.tea-room-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }  
-.tea-room-card { flex: 1 1 45%; background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 16px; text-align: center; cursor: pointer; }  
-.tea-room-icon { font-size: 28px; margin-bottom: 8px; }  
-.tea-room-name { font-size: 14px; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 4px; }  
-.tea-room-desc { font-size: 11px; color: #bbb; letter-spacing: 1px; }  
-.chat-box { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; margin-bottom: 12px; min-height: 150px; }  
-.chat-message { animation: fadeIn 0.3s ease; }  
-.chat-name { font-size: 11px; color: #999; letter-spacing: 1px; }  
-.chat-name.admin { color: #b8860b; }  
-.chat-text { font-size: 13px; color: #333; line-height: 1.6; word-break: break-word; }  
-.chat-time { font-size: 10px; color: #ddd; }  
-.chat-input-row { display: flex; gap: 8px; }  
-.chat-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; }  
-.chat-send-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 18px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }  
-.back-link { font-size: 12px; color: #bbb; letter-spacing: 1px; cursor: pointer; margin-bottom: 12px; display: inline-block; }  
-.chat-spacer { height: 250px; }  
-.food-spacer { height: 150px; }  
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }  
-</style>  
-</head>  
-<body>  
-  
-<div class="loading-screen" id="loadingScreen">  
-    <div class="loading-image"></div>  
-    <div class="loading-title">二中·集</div>  
-    <div class="loading-text" id="loadingText">正在进入</div>  
-</div>  
-  
-<div class="side-text left">  
-    <p>二十一世紀 人類依然需要擁抱 理解 以及愛</p>  
-    <p>我要發呆、靜坐、咀嚼、散步、看天、把所有沒有意義的事鄭重其事做一遍</p>  
-</div>  
-<div class="side-text right">  
-    <p>人們傳頌勇氣 而我可不可以 愛你哭泣的心</p>  
-    <p>我們不要在這裡 跟我回去十八歲 躲到台大校園杜鵑花叢下 不要被命運找到</p>  
-</div>  
-  
-<div class="container">  
-    <div class="top-bar">  
-        <div class="top-left">  
-            <div class="site-title">二中·集</div>  
-            <div class="music-player">  
-                <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="66" src="https://music.163.com/outchain/player?type=0&amp;id=110231&amp;auto=1&amp;height=66"></iframe>  
-            </div>  
-        </div>  
-        <div class="top-right">  
-            <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>  
-            <div class="top-btns-row">  
-                <button class="top-btn" onclick="showUpdate()">📢 更新</button>  
-                <button class="top-btn" onclick="showAbout()">关于</button>  
-            </div>  
-        </div>  
-    </div>  
-      
-    <div class="header">  
-        <div class="header-icon" id="headerIcon">📮</div>  
-        <h1 id="headerTitle">二中心事箱</h1>  
-        <div class="line"></div>  
-        <p class="subtitle" id="headerSubtitle">把不敢说的话，悄悄放进这里</p>  
-    </div>  
-      
-    <div class="stats-bar">  
-        <span>📮 小纸条 <span id="postCount">0</span> 张</span>  
-        <span>·</span>  
-        <span>🍜 美食 <span id="foodCount">0</span> 家</span>  
-    </div>  
-      
-    <div class="mode-switch">  
-        <button class="mode-btn active" data-mode="post" onclick="switchMode('post')">📮 心事箱</button>  
-        <button class="mode-btn" data-mode="food" onclick="switchMode('food')">🍜 必吃榜</button>  
-        <button class="mode-btn" data-mode="chat" onclick="switchMode('chat')">💬 小茶馆</button>  
-    </div>  
-      
-    <div id="postSection">  
-        <div class="input-area">  
-            <div class="categories" id="categories">  
-                <button class="category-btn active" data-tag="表白">♥ 表白</button>  
-                <button class="category-btn" data-tag="吐槽">! 吐槽</button>  
-                <button class="category-btn" data-tag="祝福">✦ 祝福</button>  
-                <button class="category-btn" data-tag="树洞">◌ 树洞</button>  
-                <button class="category-btn" data-tag="寻人">? 寻人</button>  
-                <button class="category-btn" data-tag="其他">· 其他</button>  
-            </div>  
-            <div class="identity-switch" id="identitySwitch">  
-                <button class="identity-btn active" data-identity="anon">🕊️ 匿名</button>  
-                <button class="identity-btn" data-identity="nickname">✏️ 昵称</button>  
-            </div>  
-            <textarea id="postContent" placeholder="说点什么... 勇敢一点！" maxlength="500"></textarea>  
-            <div class="input-footer">  
-                <span class="anonymous" id="currentIdentityLabel">🕊️ 匿名发布</span>  
-                <button class="publish-btn" onclick="submitPost()">悄悄送出</button>  
-            </div>  
-        </div>  
-        <div class="filter-bar" id="filterBar">  
-            <button class="filter-btn active" data-filter="全部">全部</button>  
-            <button class="filter-btn" data-filter="表白">♥ 表白</button>  
-            <button class="filter-btn" data-filter="吐槽">! 吐槽</button>  
-            <button class="filter-btn" data-filter="祝福">✦ 祝福</button>  
-            <button class="filter-btn" data-filter="树洞">◌ 树洞</button>  
-            <button class="filter-btn" data-filter="寻人">? 寻人</button>  
-            <button class="filter-btn" data-filter="其他">· 其他</button>  
-        </div>  
-        <div class="posts-list" id="postsList">  
-            <div class="empty-state">  
-                <div class="empty-icon">(´･ω･`)</div>  
-                <p>还没有小纸条</p>  
-                <p class="empty-sub">来做第一个勇敢的人吧！</p>  
-            </div>  
-        </div>  
-    </div>  
-      
-    <div id="foodSection" style="display:none;">  
-        <div class="input-area">  
-            <div class="food-inputs">  
-                <input type="text" id="foodName" placeholder="🏪 店名（比如：老王麻辣烫）">  
-                <input type="text" id="foodRecommend" placeholder="⭐ 推荐菜（比如：招牌麻辣烫）">  
-                <input type="text" id="foodPrice" placeholder="💰 人均（比如：15元）">  
-                <span class="food-select-label">🚶 距离</span>  
-                <div class="food-select-group" id="distanceGroup">  
-                    <button class="food-select-btn active" data-distance="校门口">校门口</button>  
-                    <button class="food-select-btn" data-distance="步行5分钟">步行5分钟</button>  
-                    <button class="food-select-btn" data-distance="骑车10分钟">骑车10分钟</button>  
-                    <button class="food-select-btn" data-distance="稍远但值得">稍远但值得</button>  
-                </div>  
-                <span class="food-select-label">⭐ 推荐度</span>  
-                <div class="food-select-group" id="ratingGroup">  
-                    <button class="food-select-btn active" data-rating="必吃">必吃</button>  
-                    <button class="food-select-btn" data-rating="不错">不错</button>  
-                    <button class="food-select-btn" data-rating="还行">还行</button>  
-                </div>  
-                <textarea id="foodComment" placeholder="📝 评价一下...好吃吗？"></textarea>  
-            </div>  
-            <div class="input-footer">  
-                <span class="anonymous">🍜 美食推荐</span>  
-                <button class="publish-btn" onclick="submitFood()">推荐</button>  
-            </div>  
-        </div>  
-        <div class="food-list" id="foodList">  
-            <div class="empty-state">  
-                <div class="empty-icon">(´･ω･`)</div>  
-                <p>还没有美食推荐</p>  
-                <p class="empty-sub">快来推荐你爱的店吧！</p>  
-            </div>  
-        </div>  
-        <div class="food-spacer"></div>  
-    </div>  
-      
-    <div id="chatSection" style="display:none;">  
-        <div id="teaRoomList">  
-            <div class="tea-room-grid">  
-                <div class="tea-room-card" onclick="enterRoom('八卦桌')">  
-                    <div class="tea-room-icon">🍵</div>  
-                    <div class="tea-room-name">八卦桌</div>  
-                    <div class="tea-room-desc">东家长西家短</div>  
-                </div>  
-                <div class="tea-room-card" onclick="enterRoom('学习桌')">  
-                    <div class="tea-room-icon">📚</div>  
-                    <div class="tea-room-name">学习桌</div>  
-                    <div class="tea-room-desc">讨论作业考试</div>  
-                </div>  
-                <div class="tea-room-card" onclick="enterRoom('游戏桌')">  
-                    <div class="tea-room-icon">🎮</div>  
-                    <div class="tea-room-name">游戏桌</div>  
-                    <div class="tea-room-desc">开黑组队</div>  
-                </div>  
-                <div class="tea-room-card" onclick="enterRoom('音乐桌')">  
-                    <div class="tea-room-icon">🎵</div>  
-                    <div class="tea-room-name">音乐桌</div>  
-                    <div class="tea-room-desc">分享歌曲</div>  
-                </div>  
-                <div class="tea-room-card" onclick="enterRoom('深夜桌')">  
-                    <div class="tea-room-icon">🌙</div>  
-                    <div class="tea-room-name">深夜桌</div>  
-                    <div class="tea-room-desc">睡不着来聊</div>  
-                </div>  
-            </div>  
-            <div class="chat-spacer"></div>  
-        </div>  
-        <div id="chatRoom" style="display:none;">  
-            <span class="back-link" onclick="backToRooms()">← 返回小茶馆</span>  
-            <div class="chat-box" id="chatBox"></div>  
-            <div class="chat-input-row">  
-                <input type="text" class="chat-input" id="chatInput" placeholder="说点什么...">  
-                <button class="chat-send-btn" onclick="sendChat()">发送</button>  
-            </div>  
-            <div class="chat-spacer"></div>  
-        </div>  
-    </div>  
-      
-    <div class="footer">  
-        <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p>  
-    </div>  
-</div>  
-  
-<script>  
-var selectedTag = '表白';  
-var currentFilter = '全部';  
-var allPosts = [];  
-var allFoods = [];  
-var selectedDistance = '校门口';  
-var selectedRating = '必吃';  
-var currentRoom = '';  
-var myChatName = '';  
-var identityMode = 'anon';  
-var userNickname = '';  
-var userPassword = '';  
-var isAdmin = false;  
-var userUid = '';  
-  
-var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','(^-^)','(｡•̀ᴗ•́｡)','(◍•ᴗ•◍)','(´｡✪ω✪｡`)'];  
-var chatMessages = {};  
-  
-var bannedWords = ['傻逼','垃圾','去死','滚蛋','废物','白痴','智障','脑残','操你','妈的','他妈','尼玛','fuck','shit','sb','cnm','nmsl'];  
-var linkPatterns = ['http','www','.com','.cn','.net','.org','.xyz','.top','.vip','.cc'];  
-  
-function stripSymbols(text) {  
-    return text.replace(/[\s·._\-*#@!？?。，,、:：;；()（）\[\]【】'"<>~]/g, '');  
-}  
-  
-function containsBanned(content) {  
-    var cleaned = stripSymbols(content).toLowerCase();  
-    for (var i = 0; i < bannedWords.length; i++) {  
-        if (cleaned.indexOf(bannedWords[i]) !== -1) return true;  
-    }  
-    return false;  
-}  
-  
-function containsLink(content) {  
-    var cleaned = content.toLowerCase();  
-    for (var i = 0; i < linkPatterns.length; i++) {  
-        if (cleaned.indexOf(linkPatterns[i]) !== -1) return true;  
-    }  
-    return false;  
-}  
-  
-function showToast(icon, text) {  
-    var oldToast = document.querySelector('.toast');  
-    if (oldToast) oldToast.remove();  
-    var toast = document.createElement('div');  
-    toast.className = 'toast';  
-    toast.innerHTML = '<div class="toast-icon">' + icon + '</div><div class="toast-text">' + text + '</div>';  
-    document.body.appendChild(toast);  
-    setTimeout(function() {  
-        toast.style.opacity = '0';  
-        toast.style.transition = 'opacity 0.4s';  
-        setTimeout(function() { toast.remove(); }, 400);  
-    }, 1800);  
-}  
-  
-function showWelcomeToast() {  
-    var welcome = document.createElement('div');  
-    welcome.className = 'welcome-toast';  
-    welcome.innerHTML = '<div class="welcome-icon">(｡•̀ᴗ-)✧</div>' +  
-        '<div class="welcome-title">欢迎回来</div>' +  
-        '<div class="welcome-name">' + userNickname + (isAdmin ? ' ⭐' : '') + '</div>' +  
-        '<div class="welcome-uid">UID: ' + userUid + '</div>';  
-    document.body.appendChild(welcome);  
-    setTimeout(function() {  
-        welcome.style.opacity = '0';  
-        welcome.style.transition = 'opacity 0.5s';  
-        setTimeout(function() { welcome.remove(); }, 500);  
-    }, 2000);  
-}  
-  
-setTimeout(function() {  
-    var loadingScreen = document.getElementById('loadingScreen');  
-    if (loadingScreen) {  
-        loadingScreen.classList.add('fade-out');  
-        setTimeout(function() { loadingScreen.remove(); }, 600);  
-    }  
-}, 3000);  
-  
-var dotCount = 0;  
-function updateDots() {  
-    dotCount = (dotCount + 1) % 4;  
-    var dots = '';  
-    for (var i = 0; i < dotCount; i++) dots += '·';  
-    var loadingText = document.getElementById('loadingText');  
-    if (loadingText) loadingText.textContent = '正在进入' + dots;  
-    setTimeout(updateDots, 400);  
-}  
-updateDots();  
-  
-function switchMode(mode) {  
-    document.getElementById('postSection').style.display = 'none';  
-    document.getElementById('foodSection').style.display = 'none';  
-    document.getElementById('chatSection').style.display = 'none';  
-    var modeBtns = document.querySelectorAll('.mode-btn');  
-    modeBtns.forEach(function(btn) {  
-        btn.classList.remove('active');  
-        if (btn.getAttribute('data-mode') === mode) btn.classList.add('active');  
-    });  
-    if (mode === 'post') {  
-        document.getElementById('postSection').style.display = '';  
-        document.getElementById('headerIcon').textContent = '📮';  
-        document.getElementById('headerTitle').textContent = '二中心事箱';  
-        document.getElementById('headerSubtitle').textContent = '把不敢说的话，悄悄放进这里';  
-    } else if (mode === 'food') {  
-        document.getElementById('foodSection').style.display = '';  
-        document.getElementById('headerIcon').textContent = '🍜';  
-        document.getElementById('headerTitle').textContent = '二中必吃榜';  
-        document.getElementById('headerSubtitle').textContent = '学校周围的美食指南';  
-    } else {  
-        document.getElementById('chatSection').style.display = '';  
-        document.getElementById('headerIcon').textContent = '💬';  
-        document.getElementById('headerTitle').textContent = '二中小茶馆';  
-        document.getElementById('headerSubtitle').textContent = '找个桌位，坐下聊聊';  
-    }  
-}  
-  
-var categoryBtns = document.querySelectorAll('.category-btn');  
-categoryBtns.forEach(function(btn) {  
-    btn.addEventListener('click', function() {  
-        categoryBtns.forEach(function(b) { b.classList.remove('active'); });  
-        btn.classList.add('active');  
-        selectedTag = btn.getAttribute('data-tag');  
-    });  
-});  
-  
-var identityBtns = document.querySelectorAll('.identity-btn');  
-identityBtns.forEach(function(btn) {  
-    btn.addEventListener('click', function() {  
-        identityBtns.forEach(function(b) { b.classList.remove('active'); });  
-        btn.classList.add('active');  
-        identityMode = btn.getAttribute('data-identity');  
-        var label = document.getElementById('currentIdentityLabel');  
-        if (identityMode === 'anon') {  
-            label.textContent = '🕊️ 匿名发布';  
-        } else {  
-            if (userNickname) {  
-                label.textContent = '✏️ ' + userNickname + (isAdmin ? ' ⭐' : '');  
-            } else {  
-                label.textContent = '✏️ 昵称发布（点右上角注册）';  
-            }  
-        }  
-    });  
-});  
-  
-var filterBtns = document.querySelectorAll('.filter-btn');  
-filterBtns.forEach(function(btn) {  
-    btn.addEventListener('click', function() {  
-        filterBtns.forEach(function(b) { b.classList.remove('active'); });  
-        btn.classList.add('active');  
-        currentFilter = btn.getAttribute('data-filter');  
-        renderPosts();  
-    });  
-});  
-  
-var distanceBtns = document.querySelectorAll('#distanceGroup .food-select-btn');  
-distanceBtns.forEach(function(btn) {  
-    btn.addEventListener('click', function() {  
-        distanceBtns.forEach(function(b) { b.classList.remove('active'); });  
-        btn.classList.add('active');  
-        selectedDistance = btn.getAttribute('data-distance');  
-    });  
-});  
-  
-var ratingBtns = document.querySelectorAll('#ratingGroup .food-select-btn');  
-ratingBtns.forEach(function(btn) {  
-    btn.addEventListener('click', function() {  
-        ratingBtns.forEach(function(b) { b.classList.remove('active'); });  
-        btn.classList.add('active');  
-        selectedRating = btn.getAttribute('data-rating');  
-    });  
-});  
-  
-function submitPost() {  
-    var content = document.getElementById('postContent').value.trim();  
-    if (!content) { showToast('(´･ω･`)', '写点什么再送出去吧'); return; }  
-    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }  
-    if (!isAdmin && containsLink(content)) { showToast('(｡•́︿•̀｡)', '非管理员不能发链接'); return; }  
-    var now = new Date();  
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');  
-    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];  
-    var author = randomEmoji;  
-    var authorClass = 'anon';  
-    if (identityMode === 'nickname' && userNickname) {  
-        author = userNickname + (isAdmin ? ' ⭐' : '');  
-        authorClass = isAdmin ? 'admin' : 'nickname';  
-    }  
-    allPosts.unshift({ tag: selectedTag, author: author, authorClass: authorClass, content: content, time: timeStr, number: allPosts.length + 1 });  
-    document.getElementById('postContent').value = '';  
-    updateStats();  
-    renderPosts();  
-    showToast('(｡•̀ᴗ-)✧', '已经悄悄送出啦');  
-}  
-  
-function submitFood() {  
-    var name = document.getElementById('foodName').value.trim();  
-    var recommend = document.getElementById('foodRecommend').value.trim();  
-    var price = document.getElementById('foodPrice').value.trim();  
-    var comment = document.getElementById('foodComment').value.trim();  
-    if (!name || !recommend) { showToast('(´･ω･`)', '至少填店名和推荐菜'); return; }  
-    var now = new Date();  
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');  
-    allFoods.unshift({ name: name, recommend: recommend, price: price || '未知', comment: comment || '暂无评价', distance: selectedDistance, rating: selectedRating, time: timeStr, number: allFoods.length + 1 });  
-    document.getElementById('foodName').value = '';  
-    document.getElementById('foodRecommend').value = '';  
-    document.getElementById('foodPrice').value = '';  
-    document.getElementById('foodComment').value = '';  
-    updateStats();  
-    renderFoods();  
-    showToast('(｡•̀ᴗ-)✧', '推荐成功！');  
-}  
-  
-function updateStats() {  
-    document.getElementById('postCount').textContent = allPosts.length;  
-    document.getElementById('foodCount').textContent = allFoods.length;  
-}  
-  
-function renderPosts() {  
-    var postsList = document.getElementById('postsList');  
-    postsList.innerHTML = '';  
-    var filteredPosts = allPosts.filter(function(post) {  
-        if (currentFilter === '全部') return true;  
-        return post.tag === currentFilter;  
-    });  
-    if (filteredPosts.length === 0) {  
-        postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>';  
-        return;  
-    }  
-    filteredPosts.forEach(function(post) {  
-        var card = document.createElement('div');  
-        card.className = 'post-card';  
-        card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + post.tag + '</span>' +  
-            '<div class="post-author ' + post.authorClass + '">' + post.author + '</div>' +  
-            '<div class="post-content">' + post.content + '</div>' +  
-            '<div class="post-meta"><span class="post-time">' + post.time + '</span><span class="post-number">#' + String(post.number).padStart(3, '0') + '</span></div>';  
-        postsList.appendChild(card);  
-    });  
-}  
-  
-function renderFoods() {  
-    var foodList = document.getElementById('foodList');  
-    foodList.innerHTML = '';  
-    if (allFoods.length === 0) {  
-        foodList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有美食推荐</p><p class="empty-sub">快来推荐你爱的店吧！</p></div>';  
-        return;  
-    }  
-    allFoods.forEach(function(food) {  
-        var card = document.createElement('div');  
-        card.className = 'food-card';  
-        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span>' +  
-            '<div class="food-name">' + food.name + '</div>' +  
-            '<div class="food-detail">⭐ ' + food.recommend + '</div>' +  
-            '<div class="food-detail">💰 ' + food.price + '</div>' +  
-            '<div class="food-tags"><span class="food-tag distance">🚶 ' + food.distance + '</span><span class="food-tag rating">⭐ ' + food.rating + '</span></div>' +  
-            '<div class="food-comment">📝 ' + food.comment + '</div>' +  
-            '<div class="post-meta"><span class="post-time">' + food.time + '</span><span class="post-number">#' + String(food.number).padStart(3, '0') + '</span></div>';  
-        foodList.appendChild(card);  
-    });  
-}  
-  
-function enterRoom(name) {  
-    currentRoom = name;  
-    if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];  
-    document.getElementById('teaRoomList').style.display = 'none';  
-    document.getElementById('chatRoom').style.display = '';  
-    var chatBox = document.getElementById('chatBox');  
-    chatBox.innerHTML = '';  
-    var msgs = chatMessages[currentRoom] || [];  
-    msgs.forEach(function(msg) {  
-        var div = document.createElement('div');  
-        div.className = 'chat-message';  
-        div.innerHTML = '<span class="chat-name">' + msg.name + '</span> <span class="chat-text">' + msg.text + '</span> <span class="chat-time">' + msg.time + '</span>';  
-        chatBox.appendChild(div);  
-    });  
-    chatBox.scrollTop = chatBox.scrollHeight;  
-}  
-  
-function backToRooms() {  
-    document.getElementById('teaRoomList').style.display = '';  
-    document.getElementById('chatRoom').style.display = 'none';  
-}  
-  
-function sendChat() {  
-    var input = document.getElementById('chatInput');  
-    var text = input.value.trim();  
-    if (!text) return;  
-    if (!currentRoom) return;  
-    var now = new Date();  
-    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');  
-    if (!chatMessages[currentRoom]) chatMessages[currentRoom] = [];  
-    var displayName = userNickname ? userNickname + (isAdmin ? ' ⭐' : '') : myChatName;  
-    chatMessages[currentRoom].push({ name: displayName, text: text, time: timeStr });  
-    input.value = '';  
-    enterRoom(currentRoom);  
-}  
-  
-function handleRegisterClick() {  
-    if (userNickname) {  
-        showLogin();  
-    } else {  
-        showRegister();  
-    }  
-}  
-  
-function showRegister() {  
-    var overlay = document.createElement('div');  
-    overlay.className = 'modal-overlay';  
-    overlay.innerHTML = '<div class="modal">' +  
-        '<h3>✏️ 注册</h3>' +  
-        '<input type="text" id="nicknameInput" placeholder="输入昵称...">' +  
-        '<input type="password" id="passwordInput" placeholder="设置密码...">' +  
-        '<input type="password" id="koulingInput" placeholder="口令（选填）">' +  
-        '<button class="close-btn" onclick="saveNickname()">完成注册</button>' +  
-        '<button class="link-btn" onclick="showUidLogin()">已有账号？用UID登录 →</button></div>';  
-    document.body.appendChild(overlay);  
-}  
-  
-function showUidLogin() {  
-    closeModal();  
-    var overlay = document.createElement('div');  
-    overlay.className = 'modal-overlay';  
-    overlay.innerHTML = '<div class="modal">' +  
-        '<h3>🔑 UID登录</h3>' +  
-        '<input type="text" id="uidInput" placeholder="输入UID...">' +  
-        '<input type="password" id="uidPasswordInput" placeholder="输入密码...">' +  
-        '<button class="close-btn" onclick="verifyUidLogin()">登录</button>' +  
-        '<button class="link-btn" onclick="showRegister()">没有账号？去注册 →</button></div>';  
-    document.body.appendChild(overlay);  
-}  
-  
-function verifyUidLogin() {  
-    var uid = document.getElementById('uidInput').value.trim();  
-    var password = document.getElementById('uidPasswordInput').value.trim();  
-    if (!uid || !password) { showToast('(´･ω･`)', '请输入UID和密码'); return; }  
-    var savedUid = localStorage.getItem('erzhong_uid');  
-    var savedPassword = localStorage.getItem('erzhong_password');  
-    if (uid === savedUid && password === savedPassword) {  
-        closeModal();  
-        showToast('(｡•̀ᴗ-)✧', '登录成功！');  
-        showWelcomeToast();  
-    } else {  
-        showToast('(｡•́︿•̀｡)', 'UID或密码错误');  
-    }  
-}  
-  
-function showLogin() {  
-    var overlay = document.createElement('div');  
-    overlay.className = 'modal-overlay';  
-    overlay.innerHTML = '<div class="modal">' +  
-        '<h3>🔑 登录</h3>' +  
-        '<p>欢迎回来，' + userNickname + '</p>' +  
-        '<input type="password" id="loginPasswordInput" placeholder="输入密码...">' +  
-        '<button class="close-btn" onclick="verifyLogin()">登录</button></div>';  
-    document.body.appendChild(overlay);  
-}  
-  
-function verifyLogin() {  
-    var password = document.getElementById('loginPasswordInput').value.trim();  
-    if (!password) { showToast('(´･ω･`)', '请输入密码'); return; }  
-    var savedPassword = localStorage.getItem('erzhong_password');  
-    if (password === savedPassword) {  
-        closeModal();  
-        showToast('(｡•̀ᴗ-)✧', '登录成功！');  
-        showWelcomeToast();  
-    } else {  
-        showToast('(｡•́︿•̀｡)', '密码错误');  
-    }  
-}  
-  
-function saveNickname() {  
-    var nickname = document.getElementById('nicknameInput').value.trim();  
-    var password = document.getElementById('passwordInput').value.trim();  
-    var kouling = document.getElementById('koulingInput').value.trim();  
-    if (!nickname) { showToast('(´･ω･`)', '请输入昵称'); return; }  
-    if (!password) { showToast('(´･ω･`)', '请设置密码'); return; }  
-    userNickname = nickname;  
-    userPassword = password;  
-    userUid = '1000000';  
-    if (kouling === '1900') {  
-        isAdmin = true;  
-        showToast('⭐', '口令正确！你已成为管理员');  
-    }  
-    localStorage.setItem('erzhong_nickname', nickname);  
-    localStorage.setItem('erzhong_password', password);  
-    localStorage.setItem('erzhong_uid', userUid);  
-    localStorage.setItem('erzhong_admin', isAdmin ? '1' : '0');  
-    closeModal();  
-    updateRegisterBtn();  
-    var label = document.getElementById('currentIdentityLabel');  
-    if (identityMode === 'nickname') {  
-        label.textContent = '✏️ ' + userNickname + (isAdmin ? ' ⭐' : '');  
-    }  
-    showWelcomeToast();  
-}  
-  
-function updateRegisterBtn() {  
-    var btn = document.getElementById('registerBtn');  
-    if (userNickname) {  
-        btn.textContent = userNickname + (isAdmin ? ' ⭐' : '');  
-        btn.classList.add('logged-in');  
-        if (isAdmin) btn.classList.add('admin');  
-    } else {  
-        btn.textContent = '点击注册';  
-        btn.classList.remove('logged-in');  
-        btn.classList.remove('admin');  
-    }  
-}  
-  
-function showAbout() {  
-    var overlay = document.createElement('div');  
-    overlay.className = 'modal-overlay';  
-    overlay.innerHTML = '<div class="modal">' +  
-        '<h3>📮 关于二中心事箱</h3>' +  
-        '<p>这里是一个匿名的小天地</p>' +  
-        '<p>你可以：<br>' +  
-        '♥ 表白 — 说出你的心意<br>' +  
-        '! 吐槽 — 发泄你的情绪<br>' +  
-        '✦ 祝福 — 送上你的祝愿<br>' +  
-        '◌ 树洞 — 倾诉你的秘密<br>' +  
-        '? 寻人 — 寻找那个TA<br>' +  
-        '· 其他 — 分享任何事</p>' +  
-        '<p>🍜 必吃榜 — 推荐学校周围的美食</p>' +  
-        '<p>💬 小茶馆 — 找个桌位，坐下聊聊</p>' +  
-        '<p>所有内容均为匿名发布<br>请文明发言，传递温暖</p>' +  
-        '<button class="close-btn" onclick="closeModal()">知道了</button></div>';  
-    document.body.appendChild(overlay);  
-}  
-  
-function showUpdate() {  
-    var overlay = document.createElement('div');  
-    overlay.className = 'modal-overlay';  
-    overlay.innerHTML = '<div class="modal"><div class="update-log">' +  
-        '<h3>📢 更新日志</h3>' +  
-        '<div class="update-version">v2.4（当前版本）</div>' +  
-        '<div class="update-item">· 动画修复（setTimeout版）</div>' +  
-        '<div class="update-item">· 书法暗红大标题</div>' +  
-        '<div class="update-item">· 网易云歌单播放器</div>' +  
-        '<div class="update-item">· UID登录入口</div>' +  
-        '<div class="update-item">· 自动登录+欢迎弹窗</div>' +  
-        '<div class="update-item">· 注册昵称系统</div>' +  
-        '<div class="update-item">· 敏感词过滤</div>' +  
-        '<div class="update-item">· 非管理员禁发链接</div>' +  
-        '<div class="update-item">· 两侧竖版文案装饰</div>' +  
-        '<div class="update-item">· 顶部磨砂固定栏</div>' +  
-        '<div class="update-item">· 管理员口令认证</div>' +  
-        '<div class="update-version">v1.0</div>' +  
-        '<div class="update-item">· 心事箱分类发帖</div>' +  
-        '<div class="update-item">· 必吃榜美食推荐</div>' +  
-        '<div class="update-item">· 小茶馆多桌聊天</div>' +  
-        '</div>' +  
-        '<button class="close-btn" onclick="closeModal()">知道了</button></div>';  
-    document.body.appendChild(overlay);  
-}  
-  
-function closeModal() {  
-    var overlay = document.querySelector('.modal-overlay');  
-    if (overlay) overlay.remove();  
-}  
-  
-var savedNickname = localStorage.getItem('erzhong_nickname');  
-var savedPassword = localStorage.getItem('erzhong_password');  
-var savedUid = localStorage.getItem('erzhong_uid');  
-var savedAdmin = localStorage.getItem('erzhong_admin');  
-if (savedNickname) {  
-    userNickname = savedNickname;  
-    userPassword = savedPassword || '';  
-    userUid = savedUid || '1000000';  
-    isAdmin = savedAdmin === '1';  
-    updateRegisterBtn();  
-    setTimeout(function() {  
-        showWelcomeToast();  
-    }, 3200);  
-}  
-  
-renderPosts();  
-renderFoods();  
-</script>  
-</body>  
-</html>  
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>二中·集</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.ttf') format('truetype'); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { height: 100%; overflow: hidden; }
+body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; display: flex; justify-content: center; padding: 40px 20px; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.container { width: 100%; max-width: 480px; position: relative; }
+.top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
+.music-player { max-width: 220px; overflow: hidden; }
+.top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; display: block; margin-left: auto; }
+.register-btn.logged-in { color: #6a8cc9; }
+.register-btn.logged-in.admin { color: #b8860b; }
+.top-btns-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.top-btn { border: 1px solid #ddd; background: none; color: #999; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 10px; border-radius: 2px; }
+.side-text { position: fixed; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none; }
+.side-text.left { left: 0; padding-left: 8px; }
+.side-text.right { right: 0; padding-right: 8px; }
+.side-text p { font-size: 12px; color: #ddd; letter-spacing: 4px; line-height: 2.2; writing-mode: vertical-rl; text-align: center; margin-bottom: 20px; max-height: 300px; }
+.side-text.left p:first-child { margin-top: -60px; }
+.side-text.left p:last-child { margin-top: 40px; }
+.side-text.right p:first-child { margin-top: -20px; }
+.side-text.right p:last-child { margin-top: 60px; }
+.side-text.left p, .side-text.right p { -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent); }
+.loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fafafa; transition: opacity 0.6s ease; }
+.loading-screen.fade-out { opacity: 0; pointer-events: none; }
+.loading-image { width: 180px; height: 180px; border-radius: 50%; margin-bottom: 20px; background: radial-gradient(ellipse, #f0f0f0 40%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse, black 40%, transparent 70%); mask-image: radial-gradient(ellipse, black 40%, transparent 70%); }
+.loading-title { font-size: 32px; letter-spacing: 6px; color: #8b1a1a; font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; }
+.loading-text { position: absolute; bottom: 60px; font-size: 12px; color: #bbb; letter-spacing: 2px; }.header { text-align: center; margin-bottom: 20px; }
+.header-icon { font-size: 36px; margin-bottom: 12px; }
+.header h1 { font-size: 22px; font-weight: 300; letter-spacing: 6px; color: #1a1a1a; margin-bottom: 10px; }
+.header .line { width: 24px; height: 1px; background: #1a1a1a; margin: 0 auto 12px; }
+.header .subtitle { font-size: 12px; color: #999; letter-spacing: 2px; }
+.stats-bar { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; font-size: 11px; color: #bbb; letter-spacing: 1px; }
+.mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+.mode-btn { border: none; background: none; font-size: 12px; letter-spacing: 1px; color: #bbb; cursor: pointer; padding: 8px 10px; font-family: inherit; border-bottom: 2px solid transparent; }
+.mode-btn.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
+.input-area { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 24px; margin-bottom: 20px; }
+.categories { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.category-btn { border: 1px solid #ddd; background: none; color: #999; padding: 5px 14px; font-size: 12px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }
+.category-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+.identity-switch { display: flex; gap: 8px; margin-bottom: 10px; }
+.identity-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 12px; font-size: 11px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }
+.identity-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+textarea, input[type="text"], input[type="password"], .chat-input { font-size: 16px !important; }
+textarea { width: 100%; border: none; outline: none; resize: none; line-height: 1.8; color: #333; font-family: inherit; min-height: 60px; }
+textarea::placeholder { color: #ccc; letter-spacing: 1px; }
+.food-inputs { display: flex; flex-direction: column; gap: 10px; }
+.food-inputs input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; }
+.food-inputs textarea { border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; min-height: 50px; }
+.food-select-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.food-select-label { font-size: 11px; color: #999; letter-spacing: 1px; width: 100%; margin-bottom: 2px; }
+.food-select-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 12px; font-size: 11px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }
+.food-select-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+.input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
+.anonymous { font-size: 12px; color: #bbb; letter-spacing: 1px; }
+.publish-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 28px; font-size: 13px; letter-spacing: 3px; cursor: pointer; font-family: inherit; border-radius: 2px; }
+.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.filter-btn { border: none; background: none; color: #bbb; padding: 4px 10px; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; }
+.filter-btn.active { color: #1a1a1a; font-weight: 600; }
+.posts-list, .food-list { display: flex; flex-direction: column; gap: 14px; }
+.post-card, .food-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 18px 22px; animation: fadeIn 0.4s ease; position: relative; }
+.post-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; }
+.tag-表白 { background: #fff0f0; color: #d4677a; }
+.tag-吐槽 { background: #f0f0f0; color: #888; }
+.tag-祝福 { background: #fff8e8; color: #c9a44a; }
+.tag-树洞 { background: #f0f5ff; color: #6a8cc9; }
+.tag-寻人 { background: #f0fff4; color: #5aa86a; }
+.tag-其他 { background: #f5f0ff; color: #9a7ac9; }
+.food-badge { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; background: #fff5e8; color: #c98a4a; }
+.food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.food-tag { font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: #f5f5f5; color: #888; }
+.food-tag.distance { background: #f0f5ff; color: #6a8cc9; }
+.food-tag.rating { background: #fff8e8; color: #c9a44a; }
+.post-emoji { font-size: 13px; color: #ccc; margin-bottom: 8px; }
+.post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }
+.post-author { font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; }
+.post-author.nickname { color: #6a8cc9; }
+.post-author.anon { color: #ccc; }
+.post-author.admin { color: #b8860b; }
+.admin-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
+.admin-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
+.admin-btn.delete { color: #d4677a; border-color: #f0c0c8; }
+.admin-btn.pin { color: #c9a44a; border-color: #f0e0c0; }
+.food-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+.food-detail { font-size: 13px; color: #666; line-height: 1.8; margin-bottom: 4px; }
+.food-comment { font-size: 13px; color: #888; line-height: 1.8; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
+.post-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
+.post-time { font-size: 11px; color: #ccc; letter-spacing: 1px; }
+.post-number { font-size: 11px; color: #ddd; letter-spacing: 1px; }
+.empty-state { text-align: center; padding: 40px 20px; color: #ccc; }
+.empty-icon { font-size: 15px; margin-bottom: 12px; letter-spacing: 2px; }
+.empty-state p { font-size: 13px; letter-spacing: 2px; }
+.empty-state .empty-sub { font-size: 11px; color: #ddd; margin-top: 6px; letter-spacing: 1px; }
+.footer { text-align: center; margin-top: 30px; font-size: 11px; color: #ccc; letter-spacing: 2px; }
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid #e8e8e8; border-radius: 12px; padding: 24px 32px; text-align: center; z-index: 2000; animation: fadeIn 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.toast .toast-icon { font-size: 20px; margin-bottom: 8px; }
+.toast .toast-text { font-size: 13px; color: #666; letter-spacing: 1px; }
+.welcome-toast { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid #e8e8e8; border-radius: 16px; padding: 32px 40px; text-align: center; z-index: 3000; animation: fadeIn 0.5s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+.welcome-toast .welcome-icon { font-size: 28px; margin-bottom: 12px; }
+.welcome-toast .welcome-title { font-size: 14px; color: #999; letter-spacing: 2px; margin-bottom: 6px; }
+.welcome-toast .welcome-name { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; }
+.welcome-toast .welcome-uid { font-size: 11px; color: #ccc; letter-spacing: 1px; margin-top: 6px; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal { background: #fff; border-radius: 8px; padding: 28px 24px; max-width: 350px; width: 90%; text-align: center; max-height: 80vh; overflow-y: auto; }
+.modal h3 { font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8e8e8; }
+.modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }
+.modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
+.modal input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; }
+.modal .link-btn { border: none; background: none; color: #8ecae6; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; margin-top: 8px; }
+.update-log { text-align: left; }
+.update-version { font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 1px; margin: 12px 0 6px; }
+.update-item { font-size: 12px; color: #888; line-height: 2; letter-spacing: 1px; padding-left: 12px; }
+.tea-room-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.tea-room-card { flex: 1 1 45%; background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 16px; text-align: center; cursor: pointer; }
+.tea-room-icon { font-size: 28px; margin-bottom: 8px; }
+.tea-room-name { font-size: 14px; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 4px; }
+.tea-room-desc { font-size: 11px; color: #bbb; letter-spacing: 1px; }
+.chat-box { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; margin-bottom: 12px; min-height: 150px; }
+.chat-message { animation: fadeIn 0.3s ease; }
+.chat-name { font-size: 11px; color: #999; letter-spacing: 1px; }
+.chat-name.admin { color: #b8860b; }
+.chat-text { font-size: 13px; color: #333; line-height: 1.6; word-break: break-word; }
+.chat-time { font-size: 10px; color: #ddd; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; }
+.chat-send-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 18px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
+.back-link { font-size: 12px; color: #bbb; letter-spacing: 1px; cursor: pointer; margin-bottom: 12px; display: inline-block; }
+.chat-spacer { height: 250px; }
+.food-spacer { height: 150px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body><div class="loading-screen" id="loadingScreen">
+    <div class="loading-image"></div>
+    <div class="loading-title">二中·集</div>
+    <div class="loading-text" id="loadingText">正在进入</div>
+</div>
+
+<div class="side-text left">
+    <p>二十一世紀 人類依然需要擁抱 理解 以及愛</p >
+    <p>我要發呆、靜坐、咀嚼、散步、看天、把所有沒有意義的事鄭重其事做一遍</p >
+</div>
+<div class="side-text right">
+    <p>人們傳頌勇氣 而我可不可以 愛你哭泣的心</p >
+    <p>我們不要在這裡 跟我回去十八歲 躲到台大校園杜鵑花叢下 不要被命運找到</p >
+</div>
+
+<div class="container">
+    <div class="top-bar">
+        <div class="top-left">
+            <div class="site-title">二中·集</div>
+            <div class="music-player">
+                <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="220" height="66" src="https://music.163.com/outchain/player?type=0&amp;id=110231&amp;auto=1&amp;height=66"></iframe>
+            </div>
+        </div>
+        <div class="top-right">
+            <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
+            <div class="top-btns-row">
+                <button class="top-btn" onclick="showUpdate()">📢 更新</button>
+                <button class="top-btn" onclick="showAbout()">关于</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="header">
+        <div class="header-icon" id="headerIcon">📮</div>
+        <h1 id="headerTitle">二中心事箱</h1>
+        <div class="line"></div>
+        <p class="subtitle" id="headerSubtitle">把不敢说的话，悄悄放进这里</p >
+    </div>
+    
+    <div class="stats-bar">
+        <span>📮 小纸条 <span id="postCount">0</span> 张</span>
+        <span>·</span>
+        <span>🍜 美食 <span id="foodCount">0</span> 家</span>
+    </div>
+    
+    <div class="mode-switch">
+        <button class="mode-btn active" data-mode="post" onclick="switchMode('post')">📮 心事箱</button>
+        <button class="mode-btn" data-mode="food" onclick="switchMode('food')">🍜 必吃榜</button>
+        <button class="mode-btn" data-mode="chat" onclick="switchMode('chat')">💬 小茶馆</button>
+    </div>
+    
+    <div id="postSection">
+        <div class="input-area">
+            <div class="categories" id="categories">
+                <button class="category-btn active" data-tag="表白">♥ 表白</button>
+                <button class="category-btn" data-tag="吐槽">! 吐槽</button>
+                <button class="category-btn" data-tag="祝福">✦ 祝福</button>
+                <button class="category-btn" data-tag="树洞">◌ 树洞</button>
+                <button class="category-btn" data-tag="寻人">? 寻人</button>
+                <button class="category-btn" data-tag="其他">· 其他</button>
+            </div>
+            <div class="identity-switch" id="identitySwitch">
+                <button class="identity-btn active" data-identity="anon">🕊️ 匿名</button>
+                <button class="identity-btn" data-identity="nickname">✏️ 昵称</button>
+            </div>
+            <textarea id="postContent" placeholder="说点什么... 勇敢一点！" maxlength="500"></textarea>
+            <div class="input-footer">
+                <span class="anonymous" id="currentIdentityLabel">🕊️ 匿名发布</span>
+                <button class="publish-btn" onclick="submitPost()">悄悄送出</button>
+            </div>
+        </div>
+        <div class="filter-bar" id="filterBar">
+            <button class="filter-btn active" data-filter="全部">全部</button>
+            <button class="filter-btn" data-filter="表白">♥ 表白</button>
+            <button class="filter-btn" data-filter="吐槽">! 吐槽</button>
+            <button class="filter-btn" data-filter="祝福">✦ 祝福</button>
+            <button class="filter-btn" data-filter="树洞">◌ 树洞</button>
+            <button class="filter-btn" data-filter="寻人">? 寻人</button>
+            <button class="filter-btn" data-filter="其他">· 其他</button>
+        </div>
+        <div class="posts-list" id="postsList">
+            <div class="empty-state">
+                <div class="empty-icon">(´･ω･`)</div>
+                <p>加载中...</p >
+                <p class="empty-sub">请稍等</p >
+            </div>
+        </div>
+    </div>
+    
+    <div id="foodSection" style="display:none;">
+        <div class="input-area">
+            <div class="food-inputs">
+                <input type="text" id="foodName" placeholder="🏪 店名（比如：老王麻辣烫）">
+                <input type="text" id="foodRecommend" placeholder="⭐ 推荐菜（比如：招牌麻辣烫）">
+                <input type="text" id="foodPrice" placeholder="💰 人均（比如：15元）">
+                <span class="food-select-label">🚶 距离</span>
+                <div class="food-select-group" id="distanceGroup">
+                    <button class="food-select-btn active" data-distance="校门口">校门口</button>
+                    <button class="food-select-btn" data-distance="步行5分钟">步行5分钟</button>
+                    <button class="food-select-btn" data-distance="骑车10分钟">骑车10分钟</button>
+                    <button class="food-select-btn" data-distance="稍远但值得">稍远但值得</button>
+                </div>
+                <span class="food-select-label">⭐ 推荐度</span>
+                <div class="food-select-group" id="ratingGroup">
+                    <button class="food-select-btn active" data-rating="必吃">必吃</button>
+                    <button class="food-select-btn" data-rating="不错">不错</button>
+                    <button class="food-select-btn" data-rating="还行">还行</button>
+                </div>
+                <textarea id="foodComment" placeholder="📝 评价一下...好吃吗？"></textarea>
+            </div>
+            <div class="input-footer">
+                <span class="anonymous">🍜 美食推荐</span>
+                <button class="publish-btn" onclick="submitFood()">推荐</button>
+            </div>
+        </div>
+        <div class="food-list" id="foodList">
+            <div class="empty-state">
+                <div class="empty-icon">(´･ω･`)</div>
+                <p>还没有美食推荐</p >
+                <p class="empty-sub">快来推荐你爱的店吧！</p >
+            </div>
+        </div>
+        <div class="food-spacer"></div>
+    </div>
+    
+    <div id="chatSection" style="display:none;">
+        <div id="teaRoomList">
+            <div class="tea-room-grid">
+                <div class="tea-room-card" onclick="enterRoom('八卦桌')">
+                    <div class="tea-room-icon">🍵</div>
+                    <div class="tea-room-name">八卦桌</div>
+                    <div class="tea-room-desc">东家长西家短</div>
+                </div>
+                <div class="tea-room-card" onclick="enterRoom('学习桌')">
+                    <div class="tea-room-icon">📚</div>
+                    <div class="tea-room-name">学习桌</div>
+                    <div class="tea-room-desc">讨论作业考试</div>
+                </div>
+                <div class="tea-room-card" onclick="enterRoom('游戏桌')">
+                    <div class="tea-room-icon">🎮</div>
+                    <div class="tea-room-name">游戏桌</div>
+                    <div class="tea-room-desc">开黑组队</div>
+                </div>
+                <div class="tea-room-card" onclick="enterRoom('音乐桌')">
+                    <div class="tea-room-icon">🎵</div>
+                    <div class="tea-room-name">音乐桌</div>
+                    <div class="tea-room-desc">分享歌曲</div>
+                </div>
+                <div class="tea-room-card" onclick="enterRoom('深夜桌')">
+                    <div class="tea-room-icon">🌙</div>
+                    <div class="tea-room-name">深夜桌</div>
+                    <div class="tea-room-desc">睡不着来聊</div>
+                </div>
+            </div>
+            <div class="chat-spacer"></div>
+        </div>
+        <div id="chatRoom" style="display:none;">
+            <span class="back-link" onclick="backToRooms()">← 返回小茶馆</span>
+            <div class="chat-box" id="chatBox"></div>
+            <div class="chat-input-row">
+                <input type="text" class="chat-input" id="chatInput" placeholder="说点什么...">
+                <button class="chat-send-btn" onclick="sendChat()">发送</button>
+            </div>
+            <div class="chat-spacer"></div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p >
+    </div>
+</div><script>
+const supabase = window.supabase.createClient(
+    'https://byokxdqvxtdshsdoagtm.supabase.co',
+    'sb_publishable_nadYCZZneDKNjFTb5edh2A_Q3tS18h4'
+);
+
+var selectedTag = '表白';
+var currentFilter = '全部';
+var allPosts = [];
+var allFoods = [];
+var selectedDistance = '校门口';
+var selectedRating = '必吃';
+var currentRoom = '';
+var myChatName = '';
+var identityMode = 'anon';
+var userNickname = '';
+var userPassword = '';
+var isAdmin = false;
+var userUid = '';
+
+var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','(^-^)','(｡•̀ᴗ•́｡)','(◍•ᴗ•◍)','(´｡✪ω✪｡`)'];
+var chatMessages = {};
+
+var bannedWords = ['傻逼','垃圾','去死','滚蛋','废物','白痴','智障','脑残','操你','妈的','他妈','尼玛','fuck','shit','sb','cnm','nmsl'];
+var linkPatterns = ['http','www','.com','.cn','.net','.org','.xyz','.top','.vip','.cc'];
+
+function stripSymbols(text) {
+    return text.replace(/[\s·._\-*#@!？?。，,、:：;；()（）\[\]【】'"<>~]/g, '');
+}
+
+function containsBanned(content) {
+    var cleaned = stripSymbols(content).toLowerCase();
+    for (var i = 0; i < bannedWords.length; i++) {
+        if (cleaned.indexOf(bannedWords[i]) !== -1) return true;
+    }
+    return false;
+}
+
+function containsLink(content) {
+    var cleaned = content.toLowerCase();
+    for (var i = 0; i < linkPatterns.length; i++) {
+        if (cleaned.indexOf(linkPatterns[i]) !== -1) return true;
+    }
+    return false;
+}
+
+function showToast(icon, text) {
+    var oldToast = document.querySelector('.toast');
+    if (oldToast) oldToast.remove();
+    var toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = '<div class="toast-icon">' + icon + '</div><div class="toast-text">' + text + '</div>';
+    document.body.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.4s';
+        setTimeout(function() { toast.remove(); }, 400);
+    }, 1800);
+}
+
+function showWelcomeToast() {
+    var welcome = document.createElement('div');
+    welcome.className = 'welcome-toast';
+    welcome.innerHTML = '<div class="welcome-icon">(｡•̀ᴗ-)✧</div>' +
+        '<div class="welcome-title">欢迎回来</div>' +
+        '<div class="welcome-name">' + userNickname + (isAdmin ? ' ⭐' : '') + '</div>' +
+        '<div class="welcome-uid">UID: ' + userUid + '</div>';
+    document.body.appendChild(welcome);
+    setTimeout(function() {
+        welcome.style.opacity = '0';
+        welcome.style.transition = 'opacity 0.5s';
+        setTimeout(function() { welcome.remove(); }, 500);
+    }, 2000);
+}
+
+setTimeout(function() {
+    var loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+        loadingScreen.classList.add('fade-out');
+        setTimeout(function() { loadingScreen.remove(); }, 600);
+    }
+}, 3000);
+
+var dotCount = 0;
+function updateDots() {
+    dotCount = (dotCount + 1) % 4;
+    var dots = '';
+    for (var i = 0; i < dotCount; i++) dots += '·';
+    var loadingText = document.getElementById('loadingText');
+    if (loadingText) loadingText.textContent = '正在进入' + dots;
+    setTimeout(updateDots, 400);
+}
+updateDots();
+
+function switchMode(mode) {
+    document.getElementById('postSection').style.display = 'none';
+    document.getElementById('foodSection').style.display = 'none';
+    document.getElementById('chatSection').style.display = 'none';
+    var modeBtns = document.querySelectorAll('.mode-btn');
+    modeBtns.forEach(function(btn) {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-mode') === mode) btn.classList.add('active');
+    });
+    if (mode === 'post') {
+        document.getElementById('postSection').style.display = '';
+        document.getElementById('headerIcon').textContent = '📮';
+        document.getElementById('headerTitle').textContent = '二中心事箱';
+        document.getElementById('headerSubtitle').textContent = '把不敢说的话，悄悄放进这里';
+    } else if (mode === 'food') {
+        document.getElementById('foodSection').style.display = '';
+        document.getElementById('headerIcon').textContent = '🍜';
+        document.getElementById('headerTitle').textContent = '二中必吃榜';
+        document.getElementById('headerSubtitle').textContent = '学校周围的美食指南';
+    } else {
+        document.getElementById('chatSection').style.display = '';
+        document.getElementById('headerIcon').textContent = '💬';
+        document.getElementById('headerTitle').textContent = '二中小茶馆';
+        document.getElementById('headerSubtitle').textContent = '找个桌位，坐下聊聊';
+    }
+}
+
+var categoryBtns = document.querySelectorAll('.category-btn');
+categoryBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        categoryBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        selectedTag = btn.getAttribute('data-tag');
+    });
+});
+
+var identityBtns = document.querySelectorAll('.identity-btn');
+identityBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        identityBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        identityMode = btn.getAttribute('data-identity');
+        var label = document.getElementById('currentIdentityLabel');
+        if (identityMode === 'anon') {
+            label.textContent = '🕊️ 匿名发布';
+        } else {
+            if (userNickname) {
+                label.textContent = '✏️ ' + userNickname + (isAdmin ? ' ⭐' : '');
+            } else {
+                label.textContent = '✏️ 昵称发布（点右上角注册）';
+            }
+        }
+    });
+});
+
+var filterBtns = document.querySelectorAll('.filter-btn');
+filterBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        filterBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        currentFilter = btn.getAttribute('data-filter');
+        renderPosts();
+    });
+});
+
+var distanceBtns = document.querySelectorAll('#distanceGroup .food-select-btn');
+distanceBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        distanceBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        selectedDistance = btn.getAttribute('data-distance');
+    });
+});
+
+var ratingBtns = document.querySelectorAll('#ratingGroup .food-select-btn');
+ratingBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        ratingBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        selectedRating = btn.getAttribute('data-rating');
+    });
+});
+
+async function submitPost() {
+    var content = document.getElementById('postContent').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么再送出去吧'); return; }
+    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    if (!isAdmin && containsLink(content)) { showToast('(｡•́︿•̀｡)', '非管理员不能发链接'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    var author = randomEmoji;
+    var authorClass = 'anon';
+    if (identityMode === 'nickname' && userNickname) {
+        author = userNickname + (isAdmin ? ' ⭐' : '');
+        authorClass = isAdmin ? 'admin' : 'nickname';
+    }
+    var { data, error } = await supabase.from('posts').insert([
+        { content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr }
+    ]);
+    if (error) { showToast('(｡•́︿•̀｡)', '发布失败，请重试'); return; }
+    document.getElementById('postContent').value = '';
+    await loadPosts();
+    showToast('(｡•̀ᴗ-)✧', '已经悄悄送出啦');
+}
+
+async function loadPosts() {
+    var { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('id', { ascending: false })
+        .limit(100);
+    if (data) {
+        allPosts = data.map(function(p) {
+            return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time };
+        });
+        updateStats();
+        renderPosts();
+    }
+}async function deletePost(id) {
+    var { error } = await supabase.from('posts').delete().eq('id', id);
+    if (!error) {
+        await loadPosts();
+        showToast('(｡•̀ᴗ-)✧', '已删除');
+    }
+}
+
+function submitFood() {
+    var name = document.getElementById('foodName').value.trim();
+    var recommend = document.getElementById('foodRecommend').value.trim();
+    var price = document.getElementById('foodPrice').value.trim();
+    var comment = document.getElementById('foodComment').value.trim();
+    if (!name || !recommend) { showToast('(´･ω･`)', '至少填店名和推荐菜'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    allFoods.unshift({ name: name, recommend: recommend, price: price || '未知', comment: comment || '暂无评价', distance: selectedDistance, rating: selectedRating, time: timeStr, number: allFoods.length + 1 });
+    document.getElementById('foodName').value = '';
+    document.getElementById('foodRecommend').value = '';
+    document.getElementById('foodPrice').value = '';
+    document.getElementById('foodComment').value = '';
+    updateStats();
+    renderFoods();
+    showToast('(｡•̀ᴗ-)✧', '推荐成功！');
+}
+
+function updateStats() {
+    document.getElementById('postCount').textContent = allPosts.length;
+    document.getElementById('foodCount').textContent = allFoods.length;
+}
+
+function renderPosts() {
+    var postsList = document.getElementById('postsList');
+    postsList.innerHTML = '';
+    var filteredPosts = allPosts.filter(function(post) {
+        if (currentFilter === '全部') return true;
+        return post.tag === currentFilter;
+    });
+    if (filteredPosts.length === 0) {
+        postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p ><p class="empty-sub">来做第一个勇敢的人吧！</p ></div>';
+        return;
+    }
+    filteredPosts.forEach(function(post) {
+        var card = document.createElement('div');
+        card.className = 'post-card';
+        card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + post.tag + '</span>' +
+            '<div class="post-author ' + post.authorClass + '">' + post.author + '</div>' +
+            '<div class="post-content">' + post.content + '</div>' +
+            '<div class="post-meta"><span class="post-time">' + post.time + '</span><span class="post-number">#' + String(post.id).padStart(3, '0') + '</span></div>';
+        if (isAdmin) {
+            card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button></div>';
+        }
+        postsList.appendChild(card);
+    });
+}
+
+function renderFoods() {
+    var foodList = document.getElementById('foodList');
+    foodList.innerHTML = '';
+    if (allFoods.length === 0) {
+        foodList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有美食推荐</p ><p class="empty-sub">快来推荐你爱的店吧！</p ></div>';
+        return;
+    }
+    allFoods.forEach(function(food) {
+        var card = document.createElement('div');
+        card.className = 'food-card';
+        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span>' +
+            '<div class="food-name">' + food.name + '</div>' +
+            '<div class="food-detail">⭐ ' + food.recommend + '</div>' +
+            '<div class="food-detail">💰 ' + food.price + '</div>' +
+            '<div class="food-tags"><span class="food-tag distance">🚶 ' + food.distance + '</span><span class="food-tag rating">⭐ ' + food.rating + '</span></div>' +
+            '<div class="food-comment">📝 ' + food.comment + '</div>' +
+            '<div class="post-meta"><span class="post-time">' + food.time + '</span><span class="post-number">#' + String(food.number).padStart(3, '0') + '</span></div>';
+        foodList.appendChild(card);
+    });
+}
+
+function enterRoom(name) {
+    currentRoom = name;
+    if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];
+    document.getElementById('teaRoomList').style.display = 'none';
+    document.getElementById('chatRoom').style.display = '';
+    var chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = '';
+    var msgs = chatMessages[currentRoom] || [];
+    msgs.forEach(function(msg) {
+        var div = document.createElement('div');
+        div.className = 'chat-message';
+        div.innerHTML = '<span class="chat-name">' + msg.name + '</span> <span class="chat-text">' + msg.text + '</span> <span class="chat-time">' + msg.time + '</span>';
+        chatBox.appendChild(div);
+    });
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function backToRooms() {
+    document.getElementById('teaRoomList').style.display = '';
+    document.getElementById('chatRoom').style.display = 'none';
+}
+
+function sendChat() {
+    var input = document.getElementById('chatInput');
+    var text = input.value.trim();
+    if (!text) return;
+    if (!currentRoom) return;
+    var now = new Date();
+    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    if (!chatMessages[currentRoom]) chatMessages[currentRoom] = [];
+    var displayName = userNickname ? userNickname + (isAdmin ? ' ⭐' : '') : myChatName;
+    chatMessages[currentRoom].push({ name: displayName, text: text, time: timeStr });
+    input.value = '';
+    enterRoom(currentRoom);
+}
+
+function handleRegisterClick() {
+    if (userNickname) {
+        showLogin();
+    } else {
+        showRegister();
+    }
+}
+
+function showRegister() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal">' +
+        '<h3>✏️ 注册</h3>' +
+        '<input type="text" id="nicknameInput" placeholder="输入昵称...">' +
+        '<input type="password" id="passwordInput" placeholder="设置密码...">' +
+        '<input type="password" id="koulingInput" placeholder="口令（选填）">' +
+        '<button class="close-btn" onclick="saveNickname()">完成注册</button>' +
+        '<button class="link-btn" onclick="showUidLogin()">已有账号？用UID登录 →</button></div>';
+    document.body.appendChild(overlay);
+}
+
+function showUidLogin() {
+    closeModal();
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal">' +
+        '<h3>🔑 UID登录</h3>' +
+        '<input type="text" id="uidInput" placeholder="输入UID...">' +
+        '<input type="password" id="uidPasswordInput" placeholder="输入密码...">' +
+        '<button class="close-btn" onclick="verifyUidLogin()">登录</button>' +
+        '<button class="link-btn" onclick="showRegister()">没有账号？去注册 →</button></div>';
+    document.body.appendChild(overlay);
+}
+
+function verifyUidLogin() {
+    var uid = document.getElementById('uidInput').value.trim();
+    var password = document.getElementById('uidPasswordInput').value.trim();
+    if (!uid || !password) { showToast('(´･ω･`)', '请输入UID和密码'); return; }
+    var savedUid = localStorage.getItem('erzhong_uid');
+    var savedPassword = localStorage.getItem('erzhong_password');
+    if (uid === savedUid && password === savedPassword) {
+        closeModal();
+        showToast('(｡•̀ᴗ-)✧', '登录成功！');
+        showWelcomeToast();
+    } else {
+        showToast('(｡•́︿•̀｡)', 'UID或密码错误');
+    }
+}
+
+function showLogin() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal">' +
+        '<h3>🔑 登录</h3>' +
+        '<p>欢迎回来，' + userNickname + '</p >' +
+        '<input type="password" id="loginPasswordInput" placeholder="输入密码...">' +
+        '<button class="close-btn" onclick="verifyLogin()">登录</button></div>';
+    document.body.appendChild(overlay);
+}
+
+function verifyLogin() {
+    var password = document.getElementById('loginPasswordInput').value.trim();
+    if (!password) { showToast('(´･ω･`)', '请输入密码'); return; }
+    var savedPassword = localStorage.getItem('erzhong_password');
+    if (password === savedPassword) {
+        closeModal();
+        showToast('(｡•̀ᴗ-)✧', '登录成功！');
+        showWelcomeToast();
+    } else {
+        showToast('(｡•́︿•̀｡)', '密码错误');
+    }
+}
+
+function saveNickname() {
+    var nickname = document.getElementById('nicknameInput').value.trim();
+    var password = document.getElementById('passwordInput').value.trim();
+    var kouling = document.getElementById('koulingInput').value.trim();
+    if (!nickname) { showToast('(´･ω･`)', '请输入昵称'); return; }
+    if (!password) { showToast('(´･ω･`)', '请设置密码'); return; }
+    userNickname = nickname;
+    userPassword = password;
+    userUid = '1000000';
+    if (kouling === '1900') {
+        isAdmin = true;
+        showToast('⭐', '口令正确！你已成为管理员');
+    }
+    localStorage.setItem('erzhong_nickname', nickname);
+    localStorage.setItem('erzhong_password', password);
+    localStorage.setItem('erzhong_uid', userUid);
+    localStorage.setItem('erzhong_admin', isAdmin ? '1' : '0');
+    closeModal();
+    updateRegisterBtn();
+    var label = document.getElementById('currentIdentityLabel');
+    if (identityMode === 'nickname') {
+        label.textContent = '✏️ ' + userNickname + (isAdmin ? ' ⭐' : '');
+    }
+    showWelcomeToast();
+}
+
+function updateRegisterBtn() {
+    var btn = document.getElementById('registerBtn');
+    if (userNickname) {
+        btn.textContent = userNickname + (isAdmin ? ' ⭐' : '');
+        btn.classList.add('logged-in');
+        if (isAdmin) btn.classList.add('admin');
+    } else {
+        btn.textContent = '点击注册';
+        btn.classList.remove('logged-in');
+        btn.classList.remove('admin');
+    }
+}
+
+function showAbout() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal">' +
+        '<h3>📮 关于二中心事箱</h3>' +
+        '<p>这里是一个匿名的小天地</p >' +
+        '<p>你可以：<br>' +
+        '♥ 表白 — 说出你的心意<br>' +
+        '! 吐槽 — 发泄你的情绪<br>' +
+        '✦ 祝福 — 送上你的祝愿<br>' +
+        '◌ 树洞 — 倾诉你的秘密<br>' +
+        '? 寻人 — 寻找那个TA<br>' +
+        '· 其他 — 分享任何事</p >' +
+        '<p>🍜 必吃榜 — 推荐学校周围的美食</p >' +
+        '<p>💬 小茶馆 — 找个桌位，坐下聊聊</p >' +
+        '<p>所有内容均为匿名发布<br>请文明发言，传递温暖</p >' +
+        '<button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    document.body.appendChild(overlay);
+}
+
+function showUpdate() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><div class="update-log">' +
+        '<h3>📢 更新日志</h3>' +
+        '<div class="update-version">v3.0（当前版本）</div>' +
+        '<div class="update-item">· 数据库接入（帖子互通）</div>' +
+        '<div class="update-item">· 管理员删帖功能</div>' +
+        '<div class="update-item">· 自动登录+欢迎弹窗</div>' +
+        '<div class="update-item">· 注册昵称系统</div>' +
+        '<div class="update-item">· 敏感词过滤</div>' +
+        '<div class="update-item">· 非管理员禁发链接</div>' +
+        '<div class="update-item">· 两侧竖版文案装饰</div>' +
+        '<div class="update-item">· 顶部磨砂固定栏</div>' +
+        '<div class="update-item">· 管理员口令认证</div>' +
+        '<div class="update-version">v1.0</div>' +
+        '<div class="update-item">· 心事箱分类发帖</div>' +
+        '<div class="update-item">· 必吃榜美食推荐</div>' +
+        '<div class="update-item">· 小茶馆多桌聊天</div>' +
+        '</div>' +
+        '<button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    document.body.appendChild(overlay);
+}
+
+function closeModal() {
+    var overlay = document.querySelector('.modal-overlay');
+    if (overlay) overlay.remove();
+}
+
+var savedNickname = localStorage.getItem('erzhong_nickname');
+var savedPassword = localStorage.getItem('erzhong_password');
+var savedUid = localStorage.getItem('erzhong_uid');
+var savedAdmin = localStorage.getItem('erzhong_admin');
+if (savedNickname) {
+    userNickname = savedNickname;
+    userPassword = savedPassword || '';
+    userUid = savedUid || '1000000';
+    isAdmin = savedAdmin === '1';
+    updateRegisterBtn();
+    setTimeout(function() {
+        showWelcomeToast();
+    }, 3200);
+}
+
+loadPosts();
+renderFoods();
+</script>
+</body>
+</html>
