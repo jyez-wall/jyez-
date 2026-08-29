@@ -364,17 +364,21 @@ setTimeout(function() {
 }, 100);
 var bgm = document.getElementById('bgm');
 bgm.volume = 0.5;
-bgm.src = playlist[0];
-document.getElementById('musicLabel').textContent = songNames[0];
+function playRandomSong() {
+    currentSong = Math.floor(Math.random() * playlist.length);
+    bgm.src = playlist[currentSong];
+    document.getElementById('musicLabel').textContent = songNames[currentSong];
+    bgm.play().catch(function() {
+        document.body.addEventListener('click', function() { bgm.play().catch(function(){}); }, { once: true });
+    });
+}
 bgm.addEventListener('ended', function() {
     currentSong = (currentSong + 1) % playlist.length;
     bgm.src = playlist[currentSong];
     document.getElementById('musicLabel').textContent = songNames[currentSong];
     bgm.play();
 });
-bgm.play().catch(function() {
-    document.body.addEventListener('click', function() { bgm.play().catch(function(){}); }, { once: true });
-});
+playRandomSong();
 function toggleMusic() {
     if (bgm.paused) { bgm.play(); showToast('🎵', '开始播放'); } else { bgm.pause(); showToast('🎵', '已暂停'); }
 }
@@ -778,7 +782,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v6.1（当前版本）</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-item">· 小茶馆消息保存</div><div class="update-item">· 三首歌循环</div><div class="update-item">· 回复功能</div><div class="update-item">· 搜索帖子</div><div class="update-item">· 置顶功能</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v6.2（当前版本）</div><div class="update-item">· 随机播放+顺序轮换</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-item">· 小茶馆消息保存</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
