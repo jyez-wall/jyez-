@@ -20,7 +20,7 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
-.music-bar { font-size: 11px; color: #999; letter-spacing: 1px; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 10px; display: inline-block; }
+.music-bar { font-size: 11px; color: #999; letter-spacing: 1px; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 10px; display: inline-block; cursor: pointer; }
 .top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
 .register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; display: block; margin-left: auto; }
 .register-btn.logged-in { color: #6a8cc9; }
@@ -55,7 +55,7 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .identity-switch { display: flex; gap: 8px; margin-bottom: 10px; }
 .identity-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 12px; font-size: 11px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }
 .identity-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
-textarea, input[type="text"], input[type="password"], .chat-input { font-size: 16px !important; }
+textarea, input[type="text"], input[type="password"], .chat-input, .reply-input { font-size: 16px !important; }
 textarea { width: 100%; border: none; outline: none; resize: none; line-height: 1.8; color: #333; font-family: inherit; min-height: 60px; }
 textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .food-inputs { display: flex; flex-direction: column; gap: 10px; }
@@ -94,7 +94,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .reply-content { font-size: 12px; color: #666; line-height: 1.6; word-break: break-word; }
 .reply-time { font-size: 9px; color: #ddd; }
 .reply-input-row { display: flex; gap: 6px; margin-top: 8px; }
-.reply-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 6px 10px; font-size: 12px !important; outline: none; font-family: inherit; color: #333; }
+.reply-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 6px 10px; outline: none; font-family: inherit; color: #333; }
 .reply-send-btn { border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 4px 12px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
 .admin-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
 .admin-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
@@ -180,7 +180,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
     <div class="top-bar">
         <div class="top-left">
             <div class="site-title">二中·集</div>
-            <div class="music-bar">🎵 One Last Kiss - 宇多田光</div>
+            <div class="music-bar" onclick="toggleMusic()">🎵 One Last Kiss - 宇多田光</div>
         </div>
         <div class="top-right">
             <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
@@ -190,7 +190,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
             </div>
         </div>
     </div>
-    <audio id="bgm" controls loop style="width:100%;margin-bottom:10px;">
+    <audio id="bgm" autoplay loop style="display:none;">
         <source src="https://music.163.com/song/media/outer/url?id=1824020871.mp3" type="audio/mpeg">
     </audio>
     <div class="header">
@@ -353,6 +353,15 @@ setTimeout(function() {
     var loadingScreen = document.getElementById('loadingScreen');
     if (loadingScreen) { loadingScreen.classList.add('fade-out'); setTimeout(function() { loadingScreen.remove(); }, 600); }
 }, 100);
+function toggleMusic() {
+    var bgm = document.getElementById('bgm');
+    if (bgm.paused) { bgm.play(); showToast('🎵', '开始播放'); } else { bgm.pause(); showToast('🎵', '已暂停'); }
+}
+var bgm = document.getElementById('bgm');
+bgm.volume = 0.5;
+bgm.play().catch(function() {
+    document.body.addEventListener('click', function() { bgm.play().catch(function(){}); }, { once: true });
+});
 function switchMode(mode) {
     document.getElementById('postSection').style.display = 'none';
     document.getElementById('foodSection').style.display = 'none';
@@ -404,7 +413,7 @@ async function togglePin(id, pinStatus) {
 }
 function searchPosts() {
     var query = document.getElementById('searchInput').value.trim().toLowerCase();
-    if (!query) { loadPosts(); return; }
+    if (!query) { renderPosts(); return; }
     var filtered = allPosts.filter(function(p) { return p.content.toLowerCase().indexOf(query) !== -1 || (p.author && p.author.toLowerCase().indexOf(query) !== -1); });
     var postsList = document.getElementById('postsList');
     postsList.innerHTML = '';
@@ -454,8 +463,8 @@ async function submitReply(postId) {
     var result = await supabaseClient.from('replies').insert([{ post_id: String(postId), content: content, author: randomEmoji, time: timeStr }]);
     if (result.error) { showToast('(｡•́︿•̀｡)', '回复失败'); return; }
     input.value = '';
-    toggleReplies(postId);
-    toggleReplies(postId);
+    await loadPosts();
+    showToast('(｡•̀ᴗ-)✧', '回复成功');
 }
 function submitFood() {
     var name = document.getElementById('foodName').value.trim();
