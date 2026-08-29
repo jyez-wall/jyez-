@@ -287,7 +287,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
     </div>
 </div>
 <script>
-var supabase = window.supabase.createClient('https://byokxdqvxtdshsdoagtm.supabase.co', 'sb_publishable_nadYCZZneDKNjFTb5edh2A_Q3tS18h4');
+const supabase = window.supabase.createClient('https://byokxdqvxtdshsdoagtm.supabase.co', 'sb_publishable_nadYCZZneDKNjFTb5edh2A_Q3tS18h4');
 var selectedTag = '表白';
 var currentFilter = '全部';
 var allPosts = [];
@@ -360,18 +360,18 @@ async function submitPost() {
     var author = randomEmoji;
     var authorClass = 'anon';
     if (identityMode === 'nickname' && userNickname) { author = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); authorClass = 'admin'; }
-    var result = await supaCLIENT.FROM('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr }]);
+    var result = await supabase.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr }]);
     if (result.error) { showToast('(｡•́︿•̀｡)', '发布失败'); return; }
     document.getElementById('postContent').value = '';
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '已经悄悄送出啦');
 }
 async function loadPosts() {
-    var result = await supaCLIENT.FROM('posts').select('*').order('id', { ascending: false }).limit(100);
+    var result = await supabase.from('posts').select('*').order('id', { ascending: false }).limit(100);
     if (result.data) { allPosts = result.data.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time }; }); updateStats(); renderPosts(); }
 }
 async function deletePost(id) {
-    var result = await supaCLIENT.FROM('posts').delete().eq('id', id);
+    var result = await supabase.from('posts').delete().eq('id', id);
     if (!result.error) { await loadPosts(); showToast('(｡•̀ᴗ-)✧', '已删除'); }
 }
 function submitFood() {
@@ -458,7 +458,7 @@ function showUserMenu() {
 }
 async function showUserList() {
     closeModal();
-    var result = await supaCLIENT.FROM('users').select('*').order('uid', { ascending: true });
+    var result = await supabase.from('users').select('*').order('uid', { ascending: true });
     var users = result.data || [];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -488,7 +488,7 @@ async function toggleAdmin(uid, makeAdmin) {
         var count = window._allUsers.filter(function(u) { return u.isadmin; }).length;
         if (count >= 3) { showToast('(｡•́︿•̀｡)', '管理员已达上限'); return; }
     }
-    var result = await supaCLIENT.FROM('users').update({ isadmin: makeAdmin }).eq('uid', uid);
+    var result = await supabase.from('users').update({ isadmin: makeAdmin }).eq('uid', uid);
     if (!result.error) { showToast('(｡•̀ᴗ-)✧', makeAdmin ? '已设为管理员' : '已取消管理员'); showUserList(); }
 }
 function showUidLogin() {
@@ -502,7 +502,7 @@ async function verifyUidLogin() {
     var uid = document.getElementById('uidInput').value.trim();
     var password = document.getElementById('uidPasswordInput').value.trim();
     if (!uid || !password) { showToast('(´･ω･`)', '请输入UID和密码'); return; }
-    var result = await supaCLIENT.FROM('users').select('*').eq('uid', uid).single();
+    var result = await supabase.from('users').select('*').eq('uid', uid).single();
     if (result.data && result.data.password === password) {
         userNickname = result.data.nickname;
         userUid = result.data.uid;
@@ -532,7 +532,7 @@ async function saveNickname() {
     var kouling = document.getElementById('koulingInput').value.trim();
     if (!nickname) { showToast('(´･ω･`)', '请输入昵称'); return; }
     if (!password) { showToast('(´･ω･`)', '请设置密码'); return; }
-    var ownerCheck = await supaCLIENT.FROM('users').select('*').eq('isowner', true).single();
+    var ownerCheck = await supabase.from('users').select('*').eq('isowner', true).single();
     var isFirstOwner = !ownerCheck.data;
     if (kouling === '1900' && isFirstOwner) {
         isOwner = true;
@@ -541,11 +541,11 @@ async function saveNickname() {
         showToast('(｡•́︿•̀｡)', '站长已存在');
         return;
     } else {
-        var maxResult = await supaCLIENT.FROM('users').select('uid').order('uid', { ascending: false }).limit(1);
+        var maxResult = await supabase.from('users').select('uid').order('uid', { ascending: false }).limit(1);
         var maxUid = maxResult.data && maxResult.data.length > 0 ? parseInt(maxResult.data[0].uid) : 999999;
         userUid = String(maxUid + 1);
     }
-    var insertResult = await supaCLIENT.FROM('users').insert([{ nickname: nickname, password: password, uid: userUid, isadmin: false, isowner: isOwner }]);
+    var insertResult = await supabase.from('users').insert([{ nickname: nickname, password: password, uid: userUid, isadmin: false, isowner: isOwner }]);
     if (insertResult.error) { showToast('(｡•́︿•̀｡)', '注册失败'); return; }
     userNickname = nickname;
     userPassword = password;
@@ -575,7 +575,7 @@ function closeModal() { var overlay = document.querySelector('.modal-overlay'); 
 var savedUid = localStorage.getItem('erzhong_uid');
 var savedPassword = localStorage.getItem('erzhong_password');
 if (savedUid && savedPassword) {
-    supaCLIENT.FROM('users').select('*').eq('uid', savedUid).single().then(function(result) {
+    supabase.from('users').select('*').eq('uid', savedUid).single().then(function(result) {
         if (result.data && result.data.password === savedPassword) {
             userNickname = result.data.nickname;
             userUid = result.data.uid;
