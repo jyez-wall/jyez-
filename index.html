@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>二中·集</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📮</text></svg>">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
+@font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.ttf') format('truetype'); font-display: swap; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { height: 100%; overflow: hidden; }
 body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; display: flex; justify-content: center; padding: 40px 20px; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -13,11 +15,12 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .loading-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fafafa; transition: opacity 0.6s ease; }
 .loading-screen.fade-out { opacity: 0; pointer-events: none; }
 .loading-image { width: 180px; height: 180px; border-radius: 50%; margin-bottom: 20px; background: radial-gradient(ellipse, #f0f0f0 40%, transparent 70%); }
-.loading-title { font-size: 32px; letter-spacing: 6px; color: #8b1a1a; font-family: 'STXingkai', 'KaiTi', serif; }
+.loading-title { font-size: 32px; letter-spacing: 6px; color: #8b1a1a; font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; }
 .loading-text { position: absolute; bottom: 60px; font-size: 12px; color: #bbb; letter-spacing: 2px; }
 .top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.site-title { font-family: 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
+.site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
+.music-bar { font-size: 11px; color: #999; letter-spacing: 1px; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 10px; display: inline-block; }
 .top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
 .register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; display: block; margin-left: auto; }
 .register-btn.logged-in { color: #6a8cc9; }
@@ -42,6 +45,9 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
 .mode-btn { border: none; background: none; font-size: 12px; letter-spacing: 1px; color: #bbb; cursor: pointer; padding: 8px 10px; font-family: inherit; border-bottom: 2px solid transparent; }
 .mode-btn.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
+.search-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+.search-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 8px 12px; outline: none; font-family: inherit; color: #333; font-size: 14px !important; }
+.search-btn { border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 14px; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
 .input-area { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 24px; margin-bottom: 20px; }
 .categories { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .category-btn { border: 1px solid #ddd; background: none; color: #999; padding: 5px 14px; font-size: 12px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }
@@ -75,21 +81,30 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .tag-寻人 { background: #f0fff4; color: #5aa86a; }
 .tag-其他 { background: #f5f0ff; color: #9a7ac9; }
 .pin-tag { background: #fff8e8; color: #c9a44a; }
-.food-badge { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; background: #fff5e8; color: #c98a4a; }
-.food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.food-tag { font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: #f5f5f5; color: #888; }
-.food-tag.distance { background: #f0f5ff; color: #6a8cc9; }
-.food-tag.rating { background: #fff8e8; color: #c9a44a; }
 .post-emoji { font-size: 13px; color: #ccc; margin-bottom: 8px; }
 .post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }
 .post-author { font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; }
 .post-author.nickname { color: #6a8cc9; }
 .post-author.anon { color: #ccc; }
 .post-author.admin { color: #b8860b; }
+.reply-btn { border: none; background: none; color: #bbb; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 0; margin-top: 8px; }
+.replies-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
+.reply-item { padding: 6px 0; border-bottom: 1px solid #fafafa; }
+.reply-author { font-size: 10px; color: #ccc; letter-spacing: 1px; }
+.reply-content { font-size: 12px; color: #666; line-height: 1.6; word-break: break-word; }
+.reply-time { font-size: 9px; color: #ddd; }
+.reply-input-row { display: flex; gap: 6px; margin-top: 8px; }
+.reply-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 6px 10px; font-size: 12px !important; outline: none; font-family: inherit; color: #333; }
+.reply-send-btn { border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 4px 12px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
 .admin-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
 .admin-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
 .admin-btn.delete { color: #d4677a; border-color: #f0c0c8; }
 .admin-btn.pin { color: #c9a44a; border-color: #f0e0c0; }
+.food-badge { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; background: #fff5e8; color: #c98a4a; }
+.food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.food-tag { font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: #f5f5f5; color: #888; }
+.food-tag.distance { background: #f0f5ff; color: #6a8cc9; }
+.food-tag.rating { background: #fff8e8; color: #c9a44a; }
 .food-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
 .food-detail { font-size: 13px; color: #666; line-height: 1.8; margin-bottom: 4px; }
 .food-comment { font-size: 13px; color: #888; line-height: 1.8; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
@@ -124,7 +139,6 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .user-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
 .user-action-btn.set { color: #6a8cc9; border-color: #c0d0e8; }
 .user-action-btn.remove { color: #c9a44a; border-color: #f0e0c0; }
-.search-input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 8px 12px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; font-size: 14px !important; }
 .update-log { text-align: left; }
 .update-version { font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 1px; margin: 12px 0 6px; }
 .update-item { font-size: 12px; color: #888; line-height: 2; letter-spacing: 1px; padding-left: 12px; }
@@ -166,6 +180,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
     <div class="top-bar">
         <div class="top-left">
             <div class="site-title">二中·集</div>
+            <div class="music-bar">🎵 One Last Kiss - 宇多田光</div>
         </div>
         <div class="top-right">
             <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
@@ -175,6 +190,9 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
             </div>
         </div>
     </div>
+    <audio id="bgm" controls loop style="width:100%;margin-bottom:10px;">
+        <source src="https://music.163.com/song/media/outer/url?id=1824020871.mp3" type="audio/mpeg">
+    </audio>
     <div class="header">
         <div class="header-icon" id="headerIcon">📮</div>
         <h1 id="headerTitle">二中心事箱</h1>
@@ -192,6 +210,10 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
         <button class="mode-btn" data-mode="chat" onclick="switchMode('chat')">💬 小茶馆</button>
     </div>
     <div id="postSection">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索帖子关键词...">
+            <button class="search-btn" onclick="searchPosts()">搜索</button>
+        </div>
         <div class="input-area">
             <div class="categories" id="categories">
                 <button class="category-btn active" data-tag="表白">♥ 表白</button>
@@ -380,6 +402,61 @@ async function togglePin(id, pinStatus) {
     var result = await supabaseClient.from('posts').update({ pinned: pinStatus }).eq('id', id);
     if (!result.error) { await loadPosts(); showToast('(｡•̀ᴗ-)✧', pinStatus ? '已置顶' : '已取消置顶'); }
 }
+function searchPosts() {
+    var query = document.getElementById('searchInput').value.trim().toLowerCase();
+    if (!query) { loadPosts(); return; }
+    var filtered = allPosts.filter(function(p) { return p.content.toLowerCase().indexOf(query) !== -1 || (p.author && p.author.toLowerCase().indexOf(query) !== -1); });
+    var postsList = document.getElementById('postsList');
+    postsList.innerHTML = '';
+    if (filtered.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>没有找到相关帖子</p></div>'; return; }
+    filtered.forEach(function(post) { renderPostCard(post, postsList); });
+}
+function renderPostCard(post, container) {
+    var card = document.createElement('div');
+    card.className = 'post-card';
+    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + post.tag + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + post.author + '</div><div class="post-content">' + post.content + '</div><div class="post-meta"><span class="post-time">' + post.time + '</span><span class="post-number">#' + String(post.id).padStart(3, '0') + '</span></div><button class="reply-btn" onclick="toggleReplies(' + post.id + ')">💬 回复</button><div class="replies-section" id="replies-' + post.id + '" style="display:none;"></div>';
+    if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button><button class="admin-btn pin" onclick="togglePin(' + post.id + ', ' + (post.pinned ? 'false' : 'true') + ')">' + (post.pinned ? '取消置顶' : '置顶') + '</button></div>'; }
+    container.appendChild(card);
+}
+function renderPosts() {
+    var postsList = document.getElementById('postsList');
+    postsList.innerHTML = '';
+    var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
+    filteredPosts.sort(function(a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
+    if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
+    filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
+}
+async function toggleReplies(postId) {
+    var section = document.getElementById('replies-' + postId);
+    if (section.style.display === 'none') {
+        var result = await supabaseClient.from('replies').select('*').eq('post_id', String(postId)).order('id', { ascending: true });
+        var replies = result.data || [];
+        section.innerHTML = '';
+        replies.forEach(function(r) {
+            var div = document.createElement('div');
+            div.className = 'reply-item';
+            div.innerHTML = '<span class="reply-author">' + r.author + '</span> <span class="reply-time">' + r.time + '</span><div class="reply-content">' + r.content + '</div>';
+            section.appendChild(div);
+        });
+        section.innerHTML += '<div class="reply-input-row"><input type="text" class="reply-input" id="replyInput-' + postId + '" placeholder="匿名回复..."><button class="reply-send-btn" onclick="submitReply(' + postId + ')">发送</button></div>';
+        section.style.display = '';
+    } else {
+        section.style.display = 'none';
+    }
+}
+async function submitReply(postId) {
+    var input = document.getElementById('replyInput-' + postId);
+    var content = input.value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    var result = await supabaseClient.from('replies').insert([{ post_id: String(postId), content: content, author: randomEmoji, time: timeStr }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '回复失败'); return; }
+    input.value = '';
+    toggleReplies(postId);
+    toggleReplies(postId);
+}
 function submitFood() {
     var name = document.getElementById('foodName').value.trim();
     var recommend = document.getElementById('foodRecommend').value.trim();
@@ -398,20 +475,6 @@ function submitFood() {
     showToast('(｡•̀ᴗ-)✧', '推荐成功！');
 }
 function updateStats() { document.getElementById('postCount').textContent = allPosts.length; document.getElementById('foodCount').textContent = allFoods.length; }
-function renderPosts() {
-    var postsList = document.getElementById('postsList');
-    postsList.innerHTML = '';
-    var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
-    filteredPosts.sort(function(a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
-    if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
-    filteredPosts.forEach(function(post) {
-        var card = document.createElement('div');
-        card.className = 'post-card';
-        card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + post.tag + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + post.author + '</div><div class="post-content">' + post.content + '</div><div class="post-meta"><span class="post-time">' + post.time + '</span><span class="post-number">#' + String(post.id).padStart(3, '0') + '</span></div>';
-        if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button><button class="admin-btn pin" onclick="togglePin(' + post.id + ', ' + (post.pinned ? 'false' : 'true') + ')">' + (post.pinned ? '取消置顶' : '置顶') + '</button></div>'; }
-        postsList.appendChild(card);
-    });
-}
 function renderFoods() {
     var foodList = document.getElementById('foodList');
     foodList.innerHTML = '';
@@ -577,7 +640,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v4.1（当前版本）</div><div class="update-item">· 昵称查重</div><div class="update-item">· 置顶功能</div><div class="update-item">· 管理员管理</div><div class="update-item">· 用户列表</div><div class="update-item">· 数据库互通</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v5.0（当前版本）</div><div class="update-item">· 回复功能</div><div class="update-item">· 搜索帖子</div><div class="update-item">· 音乐播放</div><div class="update-item">· 标签页图标</div><div class="update-item">· 昵称查重</div><div class="update-item">· 置顶功能</div><div class="update-item">· 站长系统</div><div class="update-item">· 管理员管理</div><div class="update-item">· 用户列表</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
