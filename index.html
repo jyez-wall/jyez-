@@ -568,7 +568,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v4.0（当前版本）</div><div class="update-item">· 站长系统（口令1900）</div><div class="update-item">· 管理员管理（上限3人）</div><div class="update-item">· 用户列表+搜索</div><div class="update-item">· UID真实递增</div><div class="update-item">· 数据库互通</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v4.0（当前版本）</div><div class="update-item">· 站长系统</div><div class="update-item">· 管理员管理（上限3人）</div><div class="update-item">· 用户列表+搜索</div><div class="update-item">· UID真实递增</div><div class="update-item">· 数据库互通</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
