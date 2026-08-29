@@ -19,12 +19,12 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .loading-text { position: absolute; bottom: 60px; font-size: 12px; color: #bbb; letter-spacing: 2px; }
 .top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.title-row { display: flex; align-items: center; gap: 6px; }
-#countdown { font-size: 10px; color: #999; letter-spacing: 1px; white-space: nowrap; }
 .site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
 .music-bar { font-size: 11px; color: #999; letter-spacing: 1px; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 10px; display: inline-block; cursor: pointer; }
 .top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
-.register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; display: block; margin-left: auto; }
+.register-row { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+#countdown { font-size: 10px; color: #999; letter-spacing: 1px; white-space: nowrap; }
+.register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; }
 .register-btn.logged-in { color: #6a8cc9; }
 .register-btn.logged-in.admin { color: #b8860b; }
 .top-btns-row { display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px; }
@@ -183,14 +183,14 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 <div class="container">
     <div class="top-bar">
         <div class="top-left">
-            <div class="title-row">
-                <span id="countdown"></span>
-                <span class="site-title">二中·集</span>
-            </div>
+            <div class="site-title">二中·集</div>
             <div class="music-bar" onclick="toggleMusic()">🎵 <span id="musicLabel">One Last Kiss</span></div>
         </div>
         <div class="top-right">
-            <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
+            <div class="register-row">
+                <span id="countdown"></span>
+                <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
+            </div>
             <div class="top-btns-row">
                 <button class="top-btn" onclick="showUpdate()">📢 更新</button>
                 <button class="top-btn" onclick="showTeacherList()">👨‍🏫 评价</button>
@@ -352,7 +352,7 @@ function updateCountdown() {
     var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     var seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    document.getElementById('countdown').textContent = '⏳ ' + days + '天 ' + hours + '小时 ' + minutes + '分 ' + seconds + '秒 ║ ';
+    document.getElementById('countdown').textContent = '⏳' + days + '天' + hours + ':' + minutes + ':' + seconds;
 }
 updateCountdown();
 setInterval(updateCountdown, 1000);
