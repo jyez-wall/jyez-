@@ -79,8 +79,8 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .tag-祝福 { background: #fff8e8; color: #c9a44a; }
 .tag-树洞 { background: #f0f5ff; color: #6a8cc9; }
 .tag-寻人 { background: #f0fff4; color: #5aa86a; }
-.tag-其他 { background: #f5f0ff; color: #9a7ac9; }
 .tag-出物 { background: #f0f0f0; color: #1a1a1a; }
+.tag-其他 { background: #f5f0ff; color: #9a7ac9; }
 .pin-tag { background: #fff8e8; color: #c9a44a; }
 .post-emoji { font-size: 13px; color: #ccc; margin-bottom: 8px; }
 .post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }
@@ -323,6 +323,7 @@ var allFoods = [];
 var selectedDistance = '校门口';
 var selectedRating = '必吃';
 var currentRoom = '';
+var currentClassRoom = '';
 var myChatName = '';
 var identityMode = 'anon';
 var userNickname = '';
@@ -330,7 +331,6 @@ var userPassword = '';
 var isAdmin = false;
 var isOwner = false;
 var userUid = '';
-var currentClassRoom = '';
 var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','(^-^)','(｡•̀ᴗ•́｡)','(◍•ᴗ•◍)','(´｡✪ω✪｡`)'];
 var chatMessages = {};
 var bannedWords = ['傻逼','垃圾','去死','滚蛋','废物','白痴','智障','脑残','操你','妈的','他妈','尼玛','fuck','shit','sb','cnm','nmsl'];
@@ -409,7 +409,7 @@ async function submitPost() {
     var author = randomEmoji;
     var authorClass = 'anon';
     if (identityMode === 'nickname' && userNickname) { author = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); authorClass = 'admin'; }
-    var result = await supabaseClient.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr, pinned: false }]);
+    var result = await supabaseClient.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr, pinned: false, author_uid: userUid || '' }]);
     if (result.error) { showToast('(｡•́︿•̀｡)', '发布失败'); return; }
     document.getElementById('postContent').value = '';
     await loadPosts();
@@ -417,7 +417,15 @@ async function submitPost() {
 }
 async function loadPosts() {
     var result = await supabaseClient.from('posts').select('*').order('id', { ascending: false }).limit(100);
-    if (result.data) { allPosts = result.data.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned }; }); updateStats(); renderPosts(); }
+    if (result.data) { allPosts = result.data.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '' }; }); updateStats(); renderPosts(); checkUnreadReplies(); }
+}
+async function checkUnreadReplies() {
+    if (!userUid) return;
+    var result = await supabaseClient.from('replies').select('*').eq('is_read', false);
+    var unreadReplies = result.data || [];
+    var myPostIds = allPosts.filter(function(p) { return p.author_uid === userUid; }).map(function(p) { return String(p.id); });
+    var unreadCount = unreadReplies.filter(function(r) { return myPostIds.indexOf(r.post_id) !== -1; }).length;
+    if (unreadCount > 0) { showToast('💬', '你有 ' + unreadCount + ' 条新回复'); }
 }
 async function deletePost(id) {
     var result = await supabaseClient.from('posts').delete().eq('id', id);
@@ -467,6 +475,7 @@ async function toggleReplies(postId) {
         section.innerHTML += '<div class="reply-input-row"><input type="text" class="reply-input" id="replyInput-' + postId + '" placeholder="匿名回复..."><button class="reply-send-btn" onclick="submitReply(' + postId + ')">发送</button></div>';
         section.setAttribute('data-loaded', 'true');
         section.style.display = '';
+        supabaseClient.from('replies').update({ is_read: true }).eq('post_id', String(postId)).eq('is_read', false).then(function() {});
     } else {
         section.style.display = 'none';
     }
@@ -479,7 +488,7 @@ async function submitReply(postId) {
     var now = new Date();
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
     var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    var result = await supabaseClient.from('replies').insert([{ post_id: String(postId), content: content, author: randomEmoji, time: timeStr }]);
+    var result = await supabaseClient.from('replies').insert([{ post_id: String(postId), content: content, author: randomEmoji, time: timeStr, is_read: false }]);
     if (result.error) { showToast('(｡•́︿•̀｡)', '回复失败'); return; }
     input.value = '';
     var section = document.getElementById('replies-' + postId);
@@ -518,6 +527,7 @@ function renderFoods() {
 }
 async function enterRoom(name) {
     currentRoom = name;
+    currentClassRoom = '';
     if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];
     document.getElementById('teaRoomList').style.display = 'none';
     document.getElementById('chatRoom').style.display = '';
@@ -528,7 +538,7 @@ async function enterRoom(name) {
     msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-function backToRooms() { document.getElementById('teaRoomList').style.display = ''; document.getElementById('chatRoom').style.display = 'none'; }
+function backToRooms() { document.getElementById('teaRoomList').style.display = ''; document.getElementById('chatRoom').style.display = 'none'; currentClassRoom = ''; }
 async function sendChat() {
     var input = document.getElementById('chatInput');
     var text = input.value.trim();
@@ -538,8 +548,13 @@ async function sendChat() {
     var now = new Date();
     var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
     var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;
-    var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
-    if (!result.error) { input.value = ''; enterRoom(currentRoom); }
+    if (currentClassRoom) {
+        var classResult = await supabaseClient.from('class_messages').insert([{ class_id: String(currentClassRoom), content: text, author: displayName, time: timeStr }]);
+        if (!classResult.error) { input.value = ''; enterClassRoom(currentClassRoom, ''); }
+    } else {
+        var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
+        if (!result.error) { input.value = ''; enterRoom(currentRoom); }
+    }
 }
 async function showClassList() {
     var result = await supabaseClient.from('classes').select('*').order('id', { ascending: true });
@@ -563,31 +578,14 @@ async function createClass() {
 async function enterClassRoom(classId, className) {
     closeModal();
     currentClassRoom = classId;
+    currentRoom = 'class_' + classId;
     document.getElementById('teaRoomList').style.display = 'none';
     document.getElementById('chatRoom').style.display = '';
-    currentRoom = 'class_' + classId;
     var chatBox = document.getElementById('chatBox');
     chatBox.innerHTML = '<div style="text-align:center;color:#ccc;font-size:12px;margin-bottom:10px;">🏠 ' + escapeHtml(className) + '</div>';
     var result = await supabaseClient.from('class_messages').select('*').eq('class_id', String(classId)).order('id', { ascending: true }).limit(50);
     var msgs = result.data || [];
     msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
-}
-async function sendChat() {
-    var input = document.getElementById('chatInput');
-    var text = input.value.trim();
-    if (!text) return;
-    if (!currentRoom) return;
-    if (containsBanned(text)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
-    var now = new Date();
-    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;
-    if (currentClassRoom) {
-        var classResult = await supabaseClient.from('class_messages').insert([{ class_id: String(currentClassRoom), content: text, author: displayName, time: timeStr }]);
-        if (!classResult.error) { input.value = ''; enterClassRoom(currentClassRoom, ''); }
-    } else {
-        var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
-        if (!result.error) { input.value = ''; enterRoom(currentRoom); }
-    }
 }
 async function showTeacherList() {
     var result = await supabaseClient.from('teachers').select('*').order('id', { ascending: true });
@@ -620,9 +618,11 @@ async function showTeacherReviews(teacherId, teacherName) {
     overlay.className = 'modal-overlay';
     var html = '<div class="modal"><h3>' + escapeHtml(teacherName) + '</h3><p>⭐ 平均评分：' + avgRating + '（' + reviews.length + '人评价）</p><div class="user-list">';
     reviews.forEach(function(r) {
-        html += '<div class="reply-item"><span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + '⭐'.repeat(r.rating) + ' ' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div></div>';
+        var stars = '';
+        for (var i = 0; i < r.rating; i++) stars += '⭐';
+        html += '<div class="reply-item"><span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + stars + ' ' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div></div>';
     });
-    html += '</div><p>我要评价：</p><div class="rating-stars" id="ratingStars">⭐⭐⭐⭐⭐</div><textarea id="reviewContent" placeholder="写下你的评价..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="submitTeacherReview(' + teacherId + ')">提交评价</button><br><button class="link-btn" onclick="showTeacherList()">← 返回列表</button></div>';
+    html += '</div><p>我要评价：</p><div class="rating-stars" id="ratingStars"></div><textarea id="reviewContent" placeholder="写下你的评价..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="submitTeacherReview(' + teacherId + ')">提交评价</button><br><button class="link-btn" onclick="showTeacherList()">← 返回列表</button></div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
     window._selectedRating = 5;
@@ -633,7 +633,7 @@ async function showTeacherReviews(teacherId, teacherName) {
             var span = document.createElement('span');
             span.textContent = '⭐';
             span.style.cursor = 'pointer';
-            span.style.opacity = idx <= 5 ? '1' : '0.3';
+            span.style.opacity = '1';
             span.onclick = function() { window._selectedRating = idx; var spans = stars.children; for (var j = 0; j < spans.length; j++) { spans[j].style.opacity = j < idx ? '1' : '0.3'; } };
             stars.appendChild(span);
         })(i);
@@ -778,7 +778,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v6.0（当前版本）</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-item">· 小茶馆消息保存</div><div class="update-item">· 三首歌循环</div><div class="update-item">· 回复功能</div><div class="update-item">· 搜索帖子</div><div class="update-item">· 置顶功能</div><div class="update-item">· 站长系统</div><div class="update-item">· 管理员管理</div><div class="update-item">· 用户列表</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v6.1（当前版本）</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-item">· 小茶馆消息保存</div><div class="update-item">· 三首歌循环</div><div class="update-item">· 回复功能</div><div class="update-item">· 搜索帖子</div><div class="update-item">· 置顶功能</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
