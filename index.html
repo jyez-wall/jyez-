@@ -67,13 +67,14 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .filter-btn.active { color: #1a1a1a; font-weight: 600; }
 .posts-list, .food-list { display: flex; flex-direction: column; gap: 14px; }
 .post-card, .food-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 18px 22px; animation: fadeIn 0.4s ease; position: relative; }
-.post-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; }
+.post-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; margin-right: 4px; }
 .tag-表白 { background: #fff0f0; color: #d4677a; }
 .tag-吐槽 { background: #f0f0f0; color: #888; }
 .tag-祝福 { background: #fff8e8; color: #c9a44a; }
 .tag-树洞 { background: #f0f5ff; color: #6a8cc9; }
 .tag-寻人 { background: #f0fff4; color: #5aa86a; }
 .tag-其他 { background: #f5f0ff; color: #9a7ac9; }
+.pin-tag { background: #fff8e8; color: #c9a44a; }
 .food-badge { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; background: #fff5e8; color: #c98a4a; }
 .food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .food-tag { font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: #f5f5f5; color: #888; }
@@ -88,6 +89,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .admin-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
 .admin-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
 .admin-btn.delete { color: #d4677a; border-color: #f0c0c8; }
+.admin-btn.pin { color: #c9a44a; border-color: #f0e0c0; }
 .food-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
 .food-detail { font-size: 13px; color: #666; line-height: 1.8; margin-bottom: 4px; }
 .food-comment { font-size: 13px; color: #888; line-height: 1.8; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
@@ -360,7 +362,7 @@ async function submitPost() {
     var author = randomEmoji;
     var authorClass = 'anon';
     if (identityMode === 'nickname' && userNickname) { author = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); authorClass = 'admin'; }
-    var result = await supabaseClient.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr }]);
+    var result = await supabaseClient.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr, pinned: false }]);
     if (result.error) { showToast('(｡•́︿•̀｡)', '发布失败'); return; }
     document.getElementById('postContent').value = '';
     await loadPosts();
@@ -368,11 +370,15 @@ async function submitPost() {
 }
 async function loadPosts() {
     var result = await supabaseClient.from('posts').select('*').order('id', { ascending: false }).limit(100);
-    if (result.data) { allPosts = result.data.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time }; }); updateStats(); renderPosts(); }
+    if (result.data) { allPosts = result.data.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned }; }); updateStats(); renderPosts(); }
 }
 async function deletePost(id) {
     var result = await supabaseClient.from('posts').delete().eq('id', id);
     if (!result.error) { await loadPosts(); showToast('(｡•̀ᴗ-)✧', '已删除'); }
+}
+async function togglePin(id, pinStatus) {
+    var result = await supabaseClient.from('posts').update({ pinned: pinStatus }).eq('id', id);
+    if (!result.error) { await loadPosts(); showToast('(｡•̀ᴗ-)✧', pinStatus ? '已置顶' : '已取消置顶'); }
 }
 function submitFood() {
     var name = document.getElementById('foodName').value.trim();
@@ -396,12 +402,13 @@ function renderPosts() {
     var postsList = document.getElementById('postsList');
     postsList.innerHTML = '';
     var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
+    filteredPosts.sort(function(a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
     if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
     filteredPosts.forEach(function(post) {
         var card = document.createElement('div');
         card.className = 'post-card';
-        card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + post.tag + '</span><div class="post-author ' + post.authorClass + '">' + post.author + '</div><div class="post-content">' + post.content + '</div><div class="post-meta"><span class="post-time">' + post.time + '</span><span class="post-number">#' + String(post.id).padStart(3, '0') + '</span></div>';
-        if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button></div>'; }
+        card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + post.tag + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + post.author + '</div><div class="post-content">' + post.content + '</div><div class="post-meta"><span class="post-time">' + post.time + '</span><span class="post-number">#' + String(post.id).padStart(3, '0') + '</span></div>';
+        if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button><button class="admin-btn pin" onclick="togglePin(' + post.id + ', ' + (post.pinned ? 'false' : 'true') + ')">' + (post.pinned ? '取消置顶' : '置顶') + '</button></div>'; }
         postsList.appendChild(card);
     });
 }
@@ -532,6 +539,8 @@ async function saveNickname() {
     var kouling = document.getElementById('koulingInput').value.trim();
     if (!nickname) { showToast('(´･ω･`)', '请输入昵称'); return; }
     if (!password) { showToast('(´･ω･`)', '请设置密码'); return; }
+    var nicknameCheck = await supabaseClient.from('users').select('*').eq('nickname', nickname).single();
+    if (nicknameCheck.data) { showToast('(｡•́︿•̀｡)', '该昵称已注册，请登录'); return; }
     var ownerCheck = await supabaseClient.from('users').select('*').eq('isowner', true).single();
     var isFirstOwner = !ownerCheck.data;
     if (kouling === '1900' && isFirstOwner) {
@@ -568,7 +577,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v4.0（当前版本）</div><div class="update-item">· 站长系统</div><div class="update-item">· 管理员管理（上限3人）</div><div class="update-item">· 用户列表+搜索</div><div class="update-item">· UID真实递增</div><div class="update-item">· 数据库互通</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v4.1（当前版本）</div><div class="update-item">· 昵称查重</div><div class="update-item">· 置顶功能</div><div class="update-item">· 管理员管理</div><div class="update-item">· 用户列表</div><div class="update-item">· 数据库互通</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
