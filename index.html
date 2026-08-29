@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📮</text></svg>">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-@font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.woff2') format('woff2'); font-display: swap; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { height: 100%; overflow: hidden; }
 body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; display: flex; justify-content: center; padding: 40px 20px; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -25,8 +25,8 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; display: block; margin-left: auto; }
 .register-btn.logged-in { color: #6a8cc9; }
 .register-btn.logged-in.admin { color: #b8860b; }
-.top-btns-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
-.top-btn { border: 1px solid #ddd; background: none; color: #999; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 10px; border-radius: 2px; }
+.top-btns-row { display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px; }
+.top-btn { border: 1px solid #ddd; background: none; color: #999; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 8px; border-radius: 2px; }
 .side-text { position: fixed; top: 50%; transform: translateY(-50%); z-index: 0; pointer-events: none; user-select: none; }
 .side-text.left { left: 0; padding-left: 8px; }
 .side-text.right { right: 0; padding-right: 8px; }
@@ -80,6 +80,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .tag-树洞 { background: #f0f5ff; color: #6a8cc9; }
 .tag-寻人 { background: #f0fff4; color: #5aa86a; }
 .tag-其他 { background: #f5f0ff; color: #9a7ac9; }
+.tag-出物 { background: #f0f0f0; color: #1a1a1a; }
 .pin-tag { background: #fff8e8; color: #c9a44a; }
 .post-emoji { font-size: 13px; color: #ccc; margin-bottom: 8px; }
 .post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }
@@ -129,16 +130,17 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .modal h3 { font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8e8e8; }
 .modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }
 .modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
-.modal input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; }
+.modal input, .modal select { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; font-size: 14px !important; }
 .modal .link-btn { border: none; background: none; color: #8ecae6; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; margin-top: 8px; }
-.user-list { max-height: 300px; overflow-y: auto; text-align: left; }
-.user-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; }
-.user-info { display: flex; flex-direction: column; gap: 2px; }
-.user-name { font-size: 13px; color: #333; letter-spacing: 1px; }
-.user-uid { font-size: 11px; color: #ccc; }
-.user-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
+.user-list, .teacher-list, .class-list { max-height: 300px; overflow-y: auto; text-align: left; }
+.user-item, .teacher-item, .class-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; }
+.user-info, .teacher-info, .class-info { display: flex; flex-direction: column; gap: 2px; }
+.user-name, .teacher-name, .class-name { font-size: 13px; color: #333; letter-spacing: 1px; }
+.user-uid, .teacher-subject, .class-desc { font-size: 11px; color: #ccc; }
+.user-action-btn, .teacher-action-btn, .class-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
 .user-action-btn.set { color: #6a8cc9; border-color: #c0d0e8; }
 .user-action-btn.remove { color: #c9a44a; border-color: #f0e0c0; }
+.rating-stars { font-size: 16px; cursor: pointer; letter-spacing: 2px; }
 .update-log { text-align: left; }
 .update-version { font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 1px; margin: 12px 0 6px; }
 .update-item { font-size: 12px; color: #888; line-height: 2; letter-spacing: 1px; padding-left: 12px; }
@@ -180,19 +182,18 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
     <div class="top-bar">
         <div class="top-left">
             <div class="site-title">二中·集</div>
-            <div class="music-bar" onclick="toggleMusic()">🎵 One Last Kiss - 宇多田光</div>
+            <div class="music-bar" onclick="toggleMusic()">🎵 <span id="musicLabel">One Last Kiss</span></div>
         </div>
         <div class="top-right">
             <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
             <div class="top-btns-row">
                 <button class="top-btn" onclick="showUpdate()">📢 更新</button>
+                <button class="top-btn" onclick="showTeacherList()">👨‍🏫 评价</button>
                 <button class="top-btn" onclick="showAbout()">关于</button>
             </div>
         </div>
     </div>
-    <audio id="bgm" autoplay loop style="display:none;">
-        <source src="https://music.163.com/song/media/outer/url?id=1824020871.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bgm" autoplay loop style="display:none;"></audio>
     <div class="header">
         <div class="header-icon" id="headerIcon">📮</div>
         <h1 id="headerTitle">二中心事箱</h1>
@@ -221,6 +222,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
                 <button class="category-btn" data-tag="祝福">✦ 祝福</button>
                 <button class="category-btn" data-tag="树洞">◌ 树洞</button>
                 <button class="category-btn" data-tag="寻人">? 寻人</button>
+                <button class="category-btn" data-tag="出物">◆ 出物</button>
                 <button class="category-btn" data-tag="其他">· 其他</button>
             </div>
             <div class="identity-switch" id="identitySwitch">
@@ -240,6 +242,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
             <button class="filter-btn" data-filter="祝福">✦ 祝福</button>
             <button class="filter-btn" data-filter="树洞">◌ 树洞</button>
             <button class="filter-btn" data-filter="寻人">? 寻人</button>
+            <button class="filter-btn" data-filter="出物">◆ 出物</button>
             <button class="filter-btn" data-filter="其他">· 其他</button>
         </div>
         <div class="posts-list" id="postsList">
@@ -293,6 +296,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
                 <div class="tea-room-card" onclick="enterRoom('游戏桌')"><div class="tea-room-icon">🎮</div><div class="tea-room-name">游戏桌</div><div class="tea-room-desc">开黑组队</div></div>
                 <div class="tea-room-card" onclick="enterRoom('音乐桌')"><div class="tea-room-icon">🎵</div><div class="tea-room-name">音乐桌</div><div class="tea-room-desc">分享歌曲</div></div>
                 <div class="tea-room-card" onclick="enterRoom('深夜桌')"><div class="tea-room-icon">🌙</div><div class="tea-room-name">深夜桌</div><div class="tea-room-desc">睡不着来聊</div></div>
+                <div class="tea-room-card" onclick="showClassList()"><div class="tea-room-icon">🏠</div><div class="tea-room-name">班级小窝</div><div class="tea-room-desc">找到你的班级</div></div>
             </div>
             <div class="chat-spacer"></div>
         </div>
@@ -326,26 +330,31 @@ var userPassword = '';
 var isAdmin = false;
 var isOwner = false;
 var userUid = '';
+var currentClassRoom = '';
 var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','(^-^)','(｡•̀ᴗ•́｡)','(◍•ᴗ•◍)','(´｡✪ω✪｡`)'];
 var chatMessages = {};
 var bannedWords = ['傻逼','垃圾','去死','滚蛋','废物','白痴','智障','脑残','操你','妈的','他妈','尼玛','fuck','shit','sb','cnm','nmsl'];
 var linkPatterns = ['http','www','.com','.cn','.net','.org','.xyz','.top','.vip','.cc'];
+var playlist = ['song1.mp3','song2.mp3','song3.mp3'];
+var currentSong = 0;
+var songNames = ['One Last Kiss','我好想你','遇见'];
 function stripSymbols(text) { return text.replace(/[\s·._\-*#@!？?。，,、:：;；()（）\[\]【】'"<>~]/g, ''); }
 function containsBanned(content) { var cleaned = stripSymbols(content).toLowerCase(); for (var i = 0; i < bannedWords.length; i++) { if (cleaned.indexOf(bannedWords[i]) !== -1) return true; } return false; }
 function containsLink(content) { var cleaned = content.toLowerCase(); for (var i = 0; i < linkPatterns.length; i++) { if (cleaned.indexOf(linkPatterns[i]) !== -1) return true; } return false; }
+function escapeHtml(text) { var div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 function showToast(icon, text) {
     var oldToast = document.querySelector('.toast');
     if (oldToast) oldToast.remove();
     var toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = '<div class="toast-icon">' + icon + '</div><div class="toast-text">' + text + '</div>';
+    toast.innerHTML = '<div class="toast-icon">' + icon + '</div><div class="toast-text">' + escapeHtml(text) + '</div>';
     document.body.appendChild(toast);
     setTimeout(function() { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.4s'; setTimeout(function() { toast.remove(); }, 400); }, 1800);
 }
 function showWelcomeToast() {
     var welcome = document.createElement('div');
     welcome.className = 'welcome-toast';
-    welcome.innerHTML = '<div class="welcome-icon">(｡•̀ᴗ-)✧</div><div class="welcome-title">欢迎回来</div><div class="welcome-name">' + userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</div><div class="welcome-uid">UID: ' + userUid + '</div>';
+    welcome.innerHTML = '<div class="welcome-icon">(｡•̀ᴗ-)✧</div><div class="welcome-title">欢迎回来</div><div class="welcome-name">' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</div><div class="welcome-uid">UID: ' + escapeHtml(userUid) + '</div>';
     document.body.appendChild(welcome);
     setTimeout(function() { welcome.style.opacity = '0'; welcome.style.transition = 'opacity 0.5s'; setTimeout(function() { welcome.remove(); }, 500); }, 2000);
 }
@@ -353,15 +362,22 @@ setTimeout(function() {
     var loadingScreen = document.getElementById('loadingScreen');
     if (loadingScreen) { loadingScreen.classList.add('fade-out'); setTimeout(function() { loadingScreen.remove(); }, 600); }
 }, 100);
-function toggleMusic() {
-    var bgm = document.getElementById('bgm');
-    if (bgm.paused) { bgm.play(); showToast('🎵', '开始播放'); } else { bgm.pause(); showToast('🎵', '已暂停'); }
-}
 var bgm = document.getElementById('bgm');
 bgm.volume = 0.5;
+bgm.src = playlist[0];
+document.getElementById('musicLabel').textContent = songNames[0];
+bgm.addEventListener('ended', function() {
+    currentSong = (currentSong + 1) % playlist.length;
+    bgm.src = playlist[currentSong];
+    document.getElementById('musicLabel').textContent = songNames[currentSong];
+    bgm.play();
+});
 bgm.play().catch(function() {
     document.body.addEventListener('click', function() { bgm.play().catch(function(){}); }, { once: true });
 });
+function toggleMusic() {
+    if (bgm.paused) { bgm.play(); showToast('🎵', '开始播放'); } else { bgm.pause(); showToast('🎵', '已暂停'); }
+}
 function switchMode(mode) {
     document.getElementById('postSection').style.display = 'none';
     document.getElementById('foodSection').style.display = 'none';
@@ -423,7 +439,7 @@ function searchPosts() {
 function renderPostCard(post, container) {
     var card = document.createElement('div');
     card.className = 'post-card';
-    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + post.tag + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + post.author + '</div><div class="post-content">' + post.content + '</div><div class="post-meta"><span class="post-time">' + post.time + '</span><span class="post-number">#' + String(post.id).padStart(3, '0') + '</span></div><button class="reply-btn" onclick="toggleReplies(' + post.id + ')">💬 回复</button><div class="replies-section" id="replies-' + post.id + '" style="display:none;"></div>';
+    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + escapeHtml(post.tag) + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + escapeHtml(post.author) + '</div><div class="post-content">' + escapeHtml(post.content) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(post.time) + '</span><span class="post-number">#' + post.id + '</span></div><button class="reply-btn" onclick="toggleReplies(' + post.id + ')">💬 回复</button><div class="replies-section" id="replies-' + post.id + '" style="display:none;"></div>';
     if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button><button class="admin-btn pin" onclick="togglePin(' + post.id + ', ' + (post.pinned ? 'false' : 'true') + ')">' + (post.pinned ? '取消置顶' : '置顶') + '</button></div>'; }
     container.appendChild(card);
 }
@@ -438,16 +454,18 @@ function renderPosts() {
 async function toggleReplies(postId) {
     var section = document.getElementById('replies-' + postId);
     if (section.style.display === 'none') {
+        if (section.getAttribute('data-loaded') === 'true') { section.style.display = ''; return; }
         var result = await supabaseClient.from('replies').select('*').eq('post_id', String(postId)).order('id', { ascending: true });
         var replies = result.data || [];
         section.innerHTML = '';
         replies.forEach(function(r) {
             var div = document.createElement('div');
             div.className = 'reply-item';
-            div.innerHTML = '<span class="reply-author">' + r.author + '</span> <span class="reply-time">' + r.time + '</span><div class="reply-content">' + r.content + '</div>';
+            div.innerHTML = '<span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div>';
             section.appendChild(div);
         });
         section.innerHTML += '<div class="reply-input-row"><input type="text" class="reply-input" id="replyInput-' + postId + '" placeholder="匿名回复..."><button class="reply-send-btn" onclick="submitReply(' + postId + ')">发送</button></div>';
+        section.setAttribute('data-loaded', 'true');
         section.style.display = '';
     } else {
         section.style.display = 'none';
@@ -457,12 +475,15 @@ async function submitReply(postId) {
     var input = document.getElementById('replyInput-' + postId);
     var content = input.value.trim();
     if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
     var now = new Date();
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
     var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
     var result = await supabaseClient.from('replies').insert([{ post_id: String(postId), content: content, author: randomEmoji, time: timeStr }]);
     if (result.error) { showToast('(｡•́︿•̀｡)', '回复失败'); return; }
     input.value = '';
+    var section = document.getElementById('replies-' + postId);
+    section.setAttribute('data-loaded', 'false');
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '回复成功');
 }
@@ -491,34 +512,141 @@ function renderFoods() {
     allFoods.forEach(function(food) {
         var card = document.createElement('div');
         card.className = 'food-card';
-        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span><div class="food-name">' + food.name + '</div><div class="food-detail">⭐ ' + food.recommend + '</div><div class="food-detail">💰 ' + food.price + '</div><div class="food-tags"><span class="food-tag distance">🚶 ' + food.distance + '</span><span class="food-tag rating">⭐ ' + food.rating + '</span></div><div class="food-comment">📝 ' + food.comment + '</div><div class="post-meta"><span class="post-time">' + food.time + '</span><span class="post-number">#' + String(food.number).padStart(3, '0') + '</span></div>';
+        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span><div class="food-name">' + escapeHtml(food.name) + '</div><div class="food-detail">⭐ ' + escapeHtml(food.recommend) + '</div><div class="food-detail">💰 ' + escapeHtml(food.price) + '</div><div class="food-tags"><span class="food-tag distance">🚶 ' + escapeHtml(food.distance) + '</span><span class="food-tag rating">⭐ ' + escapeHtml(food.rating) + '</span></div><div class="food-comment">📝 ' + escapeHtml(food.comment) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(food.time) + '</span><span class="post-number">#' + food.number + '</span></div>';
         foodList.appendChild(card);
     });
 }
-function enterRoom(name) {
+async function enterRoom(name) {
     currentRoom = name;
     if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];
     document.getElementById('teaRoomList').style.display = 'none';
     document.getElementById('chatRoom').style.display = '';
     var chatBox = document.getElementById('chatBox');
     chatBox.innerHTML = '';
-    var msgs = chatMessages[currentRoom] || [];
-    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + msg.name + '</span> <span class="chat-text">' + msg.text + '</span> <span class="chat-time">' + msg.time + '</span>'; chatBox.appendChild(div); });
+    var result = await supabaseClient.from('chat_messages').select('*').eq('room', name).order('id', { ascending: true }).limit(50);
+    var msgs = result.data || [];
+    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 function backToRooms() { document.getElementById('teaRoomList').style.display = ''; document.getElementById('chatRoom').style.display = 'none'; }
-function sendChat() {
+async function sendChat() {
     var input = document.getElementById('chatInput');
     var text = input.value.trim();
     if (!text) return;
     if (!currentRoom) return;
+    if (containsBanned(text)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
     var now = new Date();
     var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    if (!chatMessages[currentRoom]) chatMessages[currentRoom] = [];
     var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;
-    chatMessages[currentRoom].push({ name: displayName, text: text, time: timeStr });
-    input.value = '';
-    enterRoom(currentRoom);
+    var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
+    if (!result.error) { input.value = ''; enterRoom(currentRoom); }
+}
+async function showClassList() {
+    var result = await supabaseClient.from('classes').select('*').order('id', { ascending: true });
+    var classes = result.data || [];
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><h3>🏠 班级小窝</h3><div class="class-list">';
+    classes.forEach(function(c) {
+        html += '<div class="class-item"><div class="class-info"><span class="class-name">' + escapeHtml(c.name) + '</span></div><button class="class-action-btn" onclick="enterClassRoom(\'' + c.id + '\',\'' + escapeHtml(c.name) + '\')">进入</button></div>';
+    });
+    html += '</div><input type="text" id="newClassName" placeholder="创建新班级（如：高一1班）"><button class="close-btn" onclick="createClass()">创建班级</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+async function createClass() {
+    var name = document.getElementById('newClassName').value.trim();
+    if (!name) { showToast('(´･ω･`)', '请输入班级名'); return; }
+    var result = await supabaseClient.from('classes').insert([{ name: name }]);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '班级创建成功'); showClassList(); }
+}
+async function enterClassRoom(classId, className) {
+    closeModal();
+    currentClassRoom = classId;
+    document.getElementById('teaRoomList').style.display = 'none';
+    document.getElementById('chatRoom').style.display = '';
+    currentRoom = 'class_' + classId;
+    var chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = '<div style="text-align:center;color:#ccc;font-size:12px;margin-bottom:10px;">🏠 ' + escapeHtml(className) + '</div>';
+    var result = await supabaseClient.from('class_messages').select('*').eq('class_id', String(classId)).order('id', { ascending: true }).limit(50);
+    var msgs = result.data || [];
+    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
+}
+async function sendChat() {
+    var input = document.getElementById('chatInput');
+    var text = input.value.trim();
+    if (!text) return;
+    if (!currentRoom) return;
+    if (containsBanned(text)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    var now = new Date();
+    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;
+    if (currentClassRoom) {
+        var classResult = await supabaseClient.from('class_messages').insert([{ class_id: String(currentClassRoom), content: text, author: displayName, time: timeStr }]);
+        if (!classResult.error) { input.value = ''; enterClassRoom(currentClassRoom, ''); }
+    } else {
+        var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
+        if (!result.error) { input.value = ''; enterRoom(currentRoom); }
+    }
+}
+async function showTeacherList() {
+    var result = await supabaseClient.from('teachers').select('*').order('id', { ascending: true });
+    var teachers = result.data || [];
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><h3>👨‍🏫 老师评价</h3><div class="teacher-list">';
+    teachers.forEach(function(t) {
+        html += '<div class="teacher-item"><div class="teacher-info"><span class="teacher-name">' + escapeHtml(t.name) + '</span><span class="teacher-subject">' + escapeHtml(t.subject || '') + '</span></div><button class="teacher-action-btn" onclick="showTeacherReviews(' + t.id + ',\'' + escapeHtml(t.name) + '\')">查看</button></div>';
+    });
+    html += '</div><input type="text" id="newTeacherName" placeholder="添加老师姓名"><input type="text" id="newTeacherSubject" placeholder="科目（选填）"><button class="close-btn" onclick="addTeacher()">添加老师</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+async function addTeacher() {
+    var name = document.getElementById('newTeacherName').value.trim();
+    var subject = document.getElementById('newTeacherSubject').value.trim();
+    if (!name) { showToast('(´･ω･`)', '请输入老师姓名'); return; }
+    var result = await supabaseClient.from('teachers').insert([{ name: name, subject: subject }]);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '老师添加成功'); showTeacherList(); }
+}
+async function showTeacherReviews(teacherId, teacherName) {
+    closeModal();
+    var result = await supabaseClient.from('teacher_reviews').select('*').eq('teacher_id', String(teacherId)).order('id', { ascending: false });
+    var reviews = result.data || [];
+    var totalRating = 0;
+    reviews.forEach(function(r) { totalRating += r.rating; });
+    var avgRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : '暂无';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><h3>' + escapeHtml(teacherName) + '</h3><p>⭐ 平均评分：' + avgRating + '（' + reviews.length + '人评价）</p><div class="user-list">';
+    reviews.forEach(function(r) {
+        html += '<div class="reply-item"><span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + '⭐'.repeat(r.rating) + ' ' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div></div>';
+    });
+    html += '</div><p>我要评价：</p><div class="rating-stars" id="ratingStars">⭐⭐⭐⭐⭐</div><textarea id="reviewContent" placeholder="写下你的评价..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="submitTeacherReview(' + teacherId + ')">提交评价</button><br><button class="link-btn" onclick="showTeacherList()">← 返回列表</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+    window._selectedRating = 5;
+    var stars = document.getElementById('ratingStars');
+    stars.innerHTML = '';
+    for (var i = 1; i <= 5; i++) {
+        (function(idx) {
+            var span = document.createElement('span');
+            span.textContent = '⭐';
+            span.style.cursor = 'pointer';
+            span.style.opacity = idx <= 5 ? '1' : '0.3';
+            span.onclick = function() { window._selectedRating = idx; var spans = stars.children; for (var j = 0; j < spans.length; j++) { spans[j].style.opacity = j < idx ? '1' : '0.3'; } };
+            stars.appendChild(span);
+        })(i);
+    }
+}
+async function submitTeacherReview(teacherId) {
+    var content = document.getElementById('reviewContent').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    var result = await supabaseClient.from('teacher_reviews').insert([{ teacher_id: String(teacherId), rating: window._selectedRating || 5, content: content, author: randomEmoji, time: timeStr }]);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '评价成功'); showTeacherReviews(teacherId, ''); }
 }
 function handleRegisterClick() { if (userNickname) { showUserMenu(); } else { showRegister(); } }
 function showRegister() {
@@ -530,7 +658,7 @@ function showRegister() {
 function showUserMenu() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><h3>' + userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</h3><p>UID: ' + userUid + '</p>';
+    overlay.innerHTML = '<div class="modal"><h3>' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</h3><p>UID: ' + escapeHtml(userUid) + '</p>';
     if (isOwner) { overlay.innerHTML += '<button class="close-btn" onclick="showUserList()">📋 用户列表</button><br>'; }
     overlay.innerHTML += '<button class="close-btn" onclick="logout()">退出登录</button></div>';
     document.body.appendChild(overlay);
@@ -543,7 +671,7 @@ async function showUserList() {
     overlay.className = 'modal-overlay';
     var html = '<div class="modal"><h3>📋 用户列表</h3><input type="text" class="search-input" id="userSearch" placeholder="搜索UID或昵称..." oninput="filterUsers()"><div class="user-list" id="userList">';
     users.forEach(function(u) {
-        html += '<div class="user-item" data-uid="' + u.uid + '" data-name="' + u.nickname + '"><div class="user-info"><span class="user-name">' + u.nickname + (u.isadmin ? ' ⭐' : '') + '</span><span class="user-uid">UID: ' + u.uid + '</span></div>';
+        html += '<div class="user-item" data-uid="' + escapeHtml(u.uid) + '" data-name="' + escapeHtml(u.nickname) + '"><div class="user-info"><span class="user-name">' + escapeHtml(u.nickname) + (u.isadmin ? ' ⭐' : '') + '</span><span class="user-uid">UID: ' + escapeHtml(u.uid) + '</span></div>';
         if (u.isadmin) { html += '<button class="user-action-btn remove" onclick="toggleAdmin(\'' + u.uid + '\', false)">取消管理员</button>'; }
         else { html += '<button class="user-action-btn set" onclick="toggleAdmin(\'' + u.uid + '\', true)">设为管理员</button>'; }
         html += '</div>';
@@ -611,6 +739,7 @@ async function saveNickname() {
     var kouling = document.getElementById('koulingInput').value.trim();
     if (!nickname) { showToast('(´･ω･`)', '请输入昵称'); return; }
     if (!password) { showToast('(´･ω･`)', '请设置密码'); return; }
+    if (containsBanned(nickname)) { showToast('(｡•́︿•̀｡)', '昵称包含不当词汇'); return; }
     var nicknameCheck = await supabaseClient.from('users').select('*').eq('nickname', nickname).single();
     if (nicknameCheck.data) { showToast('(｡•́︿•̀｡)', '该昵称已注册，请登录'); return; }
     var ownerCheck = await supabaseClient.from('users').select('*').eq('isowner', true).single();
@@ -643,13 +772,13 @@ function updateRegisterBtn() {
 function showAbout() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v5.0（当前版本）</div><div class="update-item">· 回复功能</div><div class="update-item">· 搜索帖子</div><div class="update-item">· 音乐播放</div><div class="update-item">· 标签页图标</div><div class="update-item">· 昵称查重</div><div class="update-item">· 置顶功能</div><div class="update-item">· 站长系统</div><div class="update-item">· 管理员管理</div><div class="update-item">· 用户列表</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v6.0（当前版本）</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-item">· 小茶馆消息保存</div><div class="update-item">· 三首歌循环</div><div class="update-item">· 回复功能</div><div class="update-item">· 搜索帖子</div><div class="update-item">· 置顶功能</div><div class="update-item">· 站长系统</div><div class="update-item">· 管理员管理</div><div class="update-item">· 用户列表</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
