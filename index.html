@@ -19,6 +19,8 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .loading-text { position: absolute; bottom: 60px; font-size: 12px; color: #bbb; letter-spacing: 2px; }
 .top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.title-row { display: flex; align-items: center; gap: 6px; }
+#countdown { font-size: 10px; color: #999; letter-spacing: 1px; white-space: nowrap; }
 .site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
 .music-bar { font-size: 11px; color: #999; letter-spacing: 1px; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 10px; display: inline-block; cursor: pointer; }
 .top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
@@ -181,7 +183,10 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 <div class="container">
     <div class="top-bar">
         <div class="top-left">
-            <div class="site-title">二中·集</div>
+            <div class="title-row">
+                <span id="countdown"></span>
+                <span class="site-title">二中·集</span>
+            </div>
             <div class="music-bar" onclick="toggleMusic()">🎵 <span id="musicLabel">One Last Kiss</span></div>
         </div>
         <div class="top-right">
@@ -338,6 +343,19 @@ var linkPatterns = ['http','www','.com','.cn','.net','.org','.xyz','.top','.vip'
 var playlist = ['song1.mp3','song2.mp3','song3.mp3'];
 var currentSong = 0;
 var songNames = ['One Last Kiss','我好想你','遇见'];
+var schoolDate = new Date('2026-08-31T09:00:00');
+function updateCountdown() {
+    var now = new Date();
+    var diff = schoolDate - now;
+    if (diff <= 0) { document.getElementById('countdown').style.display = 'none'; return; }
+    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    document.getElementById('countdown').textContent = '⏳ ' + days + '天 ' + hours + '小时 ' + minutes + '分 ' + seconds + '秒 ║ ';
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
 function stripSymbols(text) { return text.replace(/[\s·._\-*#@!？?。，,、:：;；()（）\[\]【】'"<>~]/g, ''); }
 function containsBanned(content) { var cleaned = stripSymbols(content).toLowerCase(); for (var i = 0; i < bannedWords.length; i++) { if (cleaned.indexOf(bannedWords[i]) !== -1) return true; } return false; }
 function containsLink(content) { var cleaned = content.toLowerCase(); for (var i = 0; i < linkPatterns.length; i++) { if (cleaned.indexOf(linkPatterns[i]) !== -1) return true; } return false; }
@@ -782,7 +800,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v6.2（当前版本）</div><div class="update-item">· 随机播放+顺序轮换</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-item">· 小茶馆消息保存</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v6.3（当前版本）</div><div class="update-item">· 开学倒计时（精确到秒）</div><div class="update-item">· 随机播放+顺序轮换</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-item">· 小茶馆消息保存</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
