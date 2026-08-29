@@ -6,14 +6,13 @@
 <title>二中·集</title>  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  
 <style>  
-@font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.ttf') format('truetype'); font-display: swap; }  
 * { margin: 0; padding: 0; box-sizing: border-box; }  
 html { height: 100%; overflow: hidden; }  
 body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; display: flex; justify-content: center; padding: 40px 20px; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }  
 .container { width: 100%; max-width: 480px; position: relative; }  
 .top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }  
 .top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }  
-.site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }  
+.site-title { font-family: 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }  
 .top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }  
 .register-btn { border: none; background: none; color: #8ecae6; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 4px 0; display: block; margin-left: auto; }  
 .register-btn.logged-in { color: #6a8cc9; }  
@@ -110,6 +109,15 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }  
 .modal input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; }  
 .modal .link-btn { border: none; background: none; color: #8ecae6; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; margin-top: 8px; }  
+.user-list { max-height: 300px; overflow-y: auto; text-align: left; }  
+.user-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; }  
+.user-info { display: flex; flex-direction: column; gap: 2px; }  
+.user-name { font-size: 13px; color: #333; letter-spacing: 1px; }  
+.user-uid { font-size: 11px; color: #ccc; }  
+.user-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }  
+.user-action-btn.set { color: #6a8cc9; border-color: #c0d0e8; }  
+.user-action-btn.remove { color: #c9a44a; border-color: #f0e0c0; }  
+.search-input { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 8px 12px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; font-size: 14px !important; }  
 .update-log { text-align: left; }  
 .update-version { font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 1px; margin: 12px 0 6px; }  
 .update-item { font-size: 12px; color: #888; line-height: 2; letter-spacing: 1px; padding-left: 12px; }  
@@ -246,31 +254,11 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
     <div id="chatSection" style="display:none;">  
         <div id="teaRoomList">  
             <div class="tea-room-grid">  
-                <div class="tea-room-card" onclick="enterRoom('八卦桌')">  
-                    <div class="tea-room-icon">🍵</div>  
-                    <div class="tea-room-name">八卦桌</div>  
-                    <div class="tea-room-desc">东家长西家短</div>  
-                </div>  
-                <div class="tea-room-card" onclick="enterRoom('学习桌')">  
-                    <div class="tea-room-icon">📚</div>  
-                    <div class="tea-room-name">学习桌</div>  
-                    <div class="tea-room-desc">讨论作业考试</div>  
-                </div>  
-                <div class="tea-room-card" onclick="enterRoom('游戏桌')">  
-                    <div class="tea-room-icon">🎮</div>  
-                    <div class="tea-room-name">游戏桌</div>  
-                    <div class="tea-room-desc">开黑组队</div>  
-                </div>  
-                <div class="tea-room-card" onclick="enterRoom('音乐桌')">  
-                    <div class="tea-room-icon">🎵</div>  
-                    <div class="tea-room-name">音乐桌</div>  
-                    <div class="tea-room-desc">分享歌曲</div>  
-                </div>  
-                <div class="tea-room-card" onclick="enterRoom('深夜桌')">  
-                    <div class="tea-room-icon">🌙</div>  
-                    <div class="tea-room-name">深夜桌</div>  
-                    <div class="tea-room-desc">睡不着来聊</div>  
-                </div>  
+                <div class="tea-room-card" onclick="enterRoom('八卦桌')"><div class="tea-room-icon">🍵</div><div class="tea-room-name">八卦桌</div><div class="tea-room-desc">东家长西家短</div></div>  
+                <div class="tea-room-card" onclick="enterRoom('学习桌')"><div class="tea-room-icon">📚</div><div class="tea-room-name">学习桌</div><div class="tea-room-desc">讨论作业考试</div></div>  
+                <div class="tea-room-card" onclick="enterRoom('游戏桌')"><div class="tea-room-icon">🎮</div><div class="tea-room-name">游戏桌</div><div class="tea-room-desc">开黑组队</div></div>  
+                <div class="tea-room-card" onclick="enterRoom('音乐桌')"><div class="tea-room-icon">🎵</div><div class="tea-room-name">音乐桌</div><div class="tea-room-desc">分享歌曲</div></div>  
+                <div class="tea-room-card" onclick="enterRoom('深夜桌')"><div class="tea-room-icon">🌙</div><div class="tea-room-name">深夜桌</div><div class="tea-room-desc">睡不着来聊</div></div>  
             </div>  
             <div class="chat-spacer"></div>  
         </div>  
@@ -302,6 +290,7 @@ var identityMode = 'anon';
 var userNickname = '';  
 var userPassword = '';  
 var isAdmin = false;  
+var isOwner = false;  
 var userUid = '';  
 var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','(^-^)','(｡•̀ᴗ•́｡)','(◍•ᴗ•◍)','(´｡✪ω✪｡`)'];  
 var chatMessages = {};  
@@ -322,7 +311,7 @@ function showToast(icon, text) {
 function showWelcomeToast() {  
     var welcome = document.createElement('div');  
     welcome.className = 'welcome-toast';  
-    welcome.innerHTML = '<div class="welcome-icon">(｡•̀ᴗ-)✧</div><div class="welcome-title">欢迎回来</div><div class="welcome-name">' + userNickname + (isAdmin ? ' ⭐' : '') + '</div><div class="welcome-uid">UID: ' + userUid + '</div>';  
+    welcome.innerHTML = '<div class="welcome-icon">(｡•̀ᴗ-)✧</div><div class="welcome-title">欢迎回来</div><div class="welcome-name">' + userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</div><div class="welcome-uid">UID: ' + userUid + '</div>';  
     document.body.appendChild(welcome);  
     setTimeout(function() { welcome.style.opacity = '0'; welcome.style.transition = 'opacity 0.5s'; setTimeout(function() { welcome.remove(); }, 500); }, 2000);  
 }  
@@ -339,7 +328,7 @@ function switchMode(mode) {
 var categoryBtns = document.querySelectorAll('.category-btn');  
 categoryBtns.forEach(function(btn) { btn.addEventListener('click', function() { categoryBtns.forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); selectedTag = btn.getAttribute('data-tag'); }); });  
 var identityBtns = document.querySelectorAll('.identity-btn');  
-identityBtns.forEach(function(btn) { btn.addEventListener('click', function() { identityBtns.forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); identityMode = btn.getAttribute('data-identity'); var label = document.getElementById('currentIdentityLabel'); if (identityMode === 'anon') { label.textContent = '🕊️ 匿名发布'; } else { if (userNickname) { label.textContent = '✏️ ' + userNickname + (isAdmin ? ' ⭐' : ''); } else { label.textContent = '✏️ 昵称发布（点右上角注册）'; } } }); });  
+identityBtns.forEach(function(btn) { btn.addEventListener('click', function() { identityBtns.forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); identityMode = btn.getAttribute('data-identity'); var label = document.getElementById('currentIdentityLabel'); if (identityMode === 'anon') { label.textContent = '🕊️ 匿名发布'; } else { if (userNickname) { label.textContent = '✏️ ' + userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); } else { label.textContent = '✏️ 昵称发布（点右上角注册）'; } } }); });  
 var filterBtns = document.querySelectorAll('.filter-btn');  
 filterBtns.forEach(function(btn) { btn.addEventListener('click', function() { filterBtns.forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); currentFilter = btn.getAttribute('data-filter'); renderPosts(); }); });  
 var distanceBtns = document.querySelectorAll('#distanceGroup .food-select-btn');  
@@ -350,13 +339,13 @@ async function submitPost() {
     var content = document.getElementById('postContent').value.trim();  
     if (!content) { showToast('(´･ω･`)', '写点什么再送出去吧'); return; }  
     if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }  
-    if (!isAdmin && containsLink(content)) { showToast('(｡•́︿•̀｡)', '非管理员不能发链接'); return; }  
+    if (!isAdmin && !isOwner && containsLink(content)) { showToast('(｡•́︿•̀｡)', '非管理员不能发链接'); return; }  
     var now = new Date();  
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');  
     var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];  
     var author = randomEmoji;  
     var authorClass = 'anon';  
-    if (identityMode === 'nickname' && userNickname) { author = userNickname + (isAdmin ? ' ⭐' : ''); authorClass = isAdmin ? 'admin' : 'nickname'; }  
+    if (identityMode === 'nickname' && userNickname) { author = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); authorClass = isOwner ? 'admin' : (isAdmin ? 'admin' : 'nickname'); }  
     var result = await supabase.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr }]);  
     if (result.error) { showToast('(｡•́︿•̀｡)', '发布失败'); return; }  
     document.getElementById('postContent').value = '';  
@@ -398,7 +387,7 @@ function renderPosts() {
         var card = document.createElement('div');  
         card.className = 'post-card';  
         card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + post.tag + '</span><div class="post-author ' + post.authorClass + '">' + post.author + '</div><div class="post-content">' + post.content + '</div><div class="post-meta"><span class="post-time">' + post.time + '</span><span class="post-number">#' + String(post.id).padStart(3, '0') + '</span></div>';  
-        if (isAdmin) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button></div>'; }  
+        if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button></div>'; }  
         postsList.appendChild(card);  
     });  
 }  
@@ -433,17 +422,60 @@ function sendChat() {
     var now = new Date();  
     var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');  
     if (!chatMessages[currentRoom]) chatMessages[currentRoom] = [];  
-    var displayName = userNickname ? userNickname + (isAdmin ? ' ⭐' : '') : myChatName;  
+    var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;  
     chatMessages[currentRoom].push({ name: displayName, text: text, time: timeStr });  
     input.value = '';  
     enterRoom(currentRoom);  
 }  
-function handleRegisterClick() { if (userNickname) { showLogin(); } else { showRegister(); } }  
+function handleRegisterClick() { if (userNickname) { showUserMenu(); } else { showRegister(); } }  
 function showRegister() {  
     var overlay = document.createElement('div');  
     overlay.className = 'modal-overlay';  
     overlay.innerHTML = '<div class="modal"><h3>✏️ 注册</h3><input type="text" id="nicknameInput" placeholder="输入昵称..."><input type="password" id="passwordInput" placeholder="设置密码..."><input type="password" id="koulingInput" placeholder="口令（选填）"><button class="close-btn" onclick="saveNickname()">完成注册</button><button class="link-btn" onclick="showUidLogin()">已有账号？用UID登录 →</button></div>';  
     document.body.appendChild(overlay);  
+}  
+function showUserMenu() {  
+    var overlay = document.createElement('div');  
+    overlay.className = 'modal-overlay';  
+    overlay.innerHTML = '<div class="modal"><h3>' + userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</h3><p>UID: ' + userUid + '</p>';  
+    if (isOwner) { overlay.innerHTML += '<button class="close-btn" onclick="showUserList()">📋 用户列表</button><br>'; }  
+    overlay.innerHTML += '<button class="close-btn" onclick="logout()">退出登录</button></div>';  
+    document.body.appendChild(overlay);  
+}  
+async function showUserList() {  
+    closeModal();  
+    var result = await supabase.from('users').select('*').order('uid', { ascending: true });  
+    var users = result.data || [];  
+    var overlay = document.createElement('div');  
+    overlay.className = 'modal-overlay';  
+    var html = '<div class="modal"><h3>📋 用户列表</h3><input type="text" class="search-input" id="userSearch" placeholder="搜索UID或昵称..." oninput="filterUsers()"><div class="user-list" id="userList">';  
+    users.forEach(function(u) {  
+        html += '<div class="user-item" data-uid="' + u.uid + '" data-name="' + u.nickname + '"><div class="user-info"><span class="user-name">' + u.nickname + (u.isadmin ? ' ⭐' : '') + '</span><span class="user-uid">UID: ' + u.uid + '</span></div>';  
+        if (u.isadmin) { html += '<button class="user-action-btn remove" onclick="toggleAdmin(' + u.uid + ', false)">取消管理员</button>'; }  
+        else { html += '<button class="user-action-btn set" onclick="toggleAdmin(' + u.uid + ', true)">设为管理员</button>'; }  
+        html += '</div>';  
+    });  
+    html += '</div><button class="close-btn" onclick="closeModal()">关闭</button></div>';  
+    overlay.innerHTML = html;  
+    document.body.appendChild(overlay);  
+    window._allUsers = users;  
+}  
+function filterUsers() {  
+    var query = document.getElementById('userSearch').value.toLowerCase();  
+    var items = document.querySelectorAll('.user-item');  
+    items.forEach(function(item) {  
+        var name = item.getAttribute('data-name').toLowerCase();  
+        var uid = item.getAttribute('data-uid').toLowerCase();  
+        if (name.indexOf(query) !== -1 || uid.indexOf(query) !== -1) { item.style.display = ''; } else { item.style.display = 'none'; }  
+    });  
+}  
+async function toggleAdmin(uid, makeAdmin) {  
+    if (makeAdmin) {  
+        var count = window._allUsers.filter(function(u) { return u.isadmin; }).length;  
+        if (count >= 3) { showToast('(｡•́︿•̀｡)', '管理员已达上限'); return; }  
+    }  
+    var result = await supabase.from('users').update({ isadmin: makeAdmin }).eq('uid', uid);  
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', makeAdmin ? '已设为管理员' : '已取消管理员'); showUserList(); }  
 }  
 function showUidLogin() {  
     closeModal();  
@@ -452,13 +484,21 @@ function showUidLogin() {
     overlay.innerHTML = '<div class="modal"><h3>🔑 UID登录</h3><input type="text" id="uidInput" placeholder="输入UID..."><input type="password" id="uidPasswordInput" placeholder="输入密码..."><button class="close-btn" onclick="verifyUidLogin()">登录</button><button class="link-btn" onclick="showRegister()">没有账号？去注册 →</button></div>';  
     document.body.appendChild(overlay);  
 }  
-function verifyUidLogin() {  
+async function verifyUidLogin() {  
     var uid = document.getElementById('uidInput').value.trim();  
     var password = document.getElementById('uidPasswordInput').value.trim();  
     if (!uid || !password) { showToast('(´･ω･`)', '请输入UID和密码'); return; }  
-    var savedUid = localStorage.getItem('erzhong_uid');  
-    var savedPassword = localStorage.getItem('erzhong_password');  
-    if (uid === savedUid && password === savedPassword) { closeModal(); showToast('(｡•̀ᴗ-)✧', '登录成功！'); showWelcomeToast(); } else { showToast('(｡•́︿•̀｡)', 'UID或密码错误'); }  
+    var result = await supabase.from('users').select('*').eq('uid', uid).single();  
+    if (result.data && result.data.password === password) {  
+        userNickname = result.data.nickname;  
+        userUid = result.data.uid;  
+        isAdmin = result.data.isadmin;  
+        isOwner = result.data.isowner;  
+        localStorage.setItem('erzhong_uid', uid);  
+        closeModal();  
+        updateRegisterBtn();  
+        showWelcomeToast();  
+    } else { showToast('(｡•́︿•̀｡)', 'UID或密码错误'); }  
 }  
 function showLogin() {  
     var overlay = document.createElement('div');  
@@ -472,29 +512,49 @@ function verifyLogin() {
     var savedPassword = localStorage.getItem('erzhong_password');  
     if (password === savedPassword) { closeModal(); showToast('(｡•̀ᴗ-)✧', '登录成功！'); showWelcomeToast(); } else { showToast('(｡•́︿•̀｡)', '密码错误'); }  
 }  
-function saveNickname() {  
+async function saveNickname() {  
     var nickname = document.getElementById('nicknameInput').value.trim();  
     var password = document.getElementById('passwordInput').value.trim();  
     var kouling = document.getElementById('koulingInput').value.trim();  
     if (!nickname) { showToast('(´･ω･`)', '请输入昵称'); return; }  
     if (!password) { showToast('(´･ω･`)', '请设置密码'); return; }  
+    var ownerCheck = await supabase.from('users').select('*').eq('isowner', true).single();  
+    var isFirstOwner = !ownerCheck.data;  
+    if (kouling === '1900' && isFirstOwner) {  
+        isOwner = true;  
+        userUid = '1000000';  
+    } else if (kouling === '1900' && !isFirstOwner) {  
+        showToast('(｡•́︿•̀｡)', '站长已存在');  
+        return;  
+    } else {  
+        var maxResult = await supabase.from('users').select('uid').order('uid', { ascending: false }).limit(1);  
+        var maxUid = maxResult.data && maxResult.data.length > 0 ? parseInt(maxResult.data[0].uid) : 999999;  
+        userUid = String(maxUid + 1);  
+    }  
+    var insertResult = await supabase.from('users').insert([{ nickname: nickname, password: password, uid: userUid, isadmin: false, isowner: isOwner }]);  
+    if (insertResult.error) { showToast('(｡•́︿•̀｡)', '注册失败'); return; }  
     userNickname = nickname;  
     userPassword = password;  
-    userUid = '1000000';  
-    if (kouling === '1900') { isAdmin = true; showToast('⭐', '口令正确！你已成为管理员'); }  
-    localStorage.setItem('erzhong_nickname', nickname);  
-    localStorage.setItem('erzhong_password', password);  
     localStorage.setItem('erzhong_uid', userUid);  
-    localStorage.setItem('erzhong_admin', isAdmin ? '1' : '0');  
+    localStorage.setItem('erzhong_password', password);  
     closeModal();  
     updateRegisterBtn();  
-    var label = document.getElementById('currentIdentityLabel');  
-    if (identityMode === 'nickname') { label.textContent = '✏️ ' + userNickname + (isAdmin ? ' ⭐' : ''); }  
     showWelcomeToast();  
 }  
 function updateRegisterBtn() {  
     var btn = document.getElementById('registerBtn');  
-    if (userNickname) { btn.textContent = userNickname + (isAdmin ? ' ⭐' : ''); btn.classList.add('logged-in'); if (isAdmin) btn.classList.add('admin'); } else { btn.textContent = '点击注册'; btn.classList.remove('logged-in'); btn.classList.remove('admin'); }  
+    if (userNickname) { btn.textContent = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); btn.classList.add('logged-in'); if (isAdmin || isOwner) btn.classList.add('admin'); } else { btn.textContent = '点击注册'; btn.classList.remove('logged-in'); btn.classList.remove('admin'); }  
+}  
+function logout() {  
+    userNickname = '';  
+    userUid = '';  
+    isAdmin = false;  
+    isOwner = false;  
+    localStorage.removeItem('erzhong_uid');  
+    localStorage.removeItem('erzhong_password');  
+    closeModal();  
+    updateRegisterBtn();  
+    showToast('(´･ω･`)', '已退出');  
 }  
 function showAbout() {  
     var overlay = document.createElement('div');  
@@ -505,15 +565,24 @@ function showAbout() {
 function showUpdate() {  
     var overlay = document.createElement('div');  
     overlay.className = 'modal-overlay';  
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v3.1（当前版本）</div><div class="update-item">· 数据库接入（帖子互通）</div><div class="update-item">· 管理员删帖功能</div><div class="update-item">· 自动登录+欢迎弹窗</div><div class="update-item">· 注册昵称系统</div><div class="update-item">· 敏感词过滤</div><div class="update-item">· 非管理员禁发链接</div><div class="update-item">· 两侧竖版文案装饰</div><div class="update-item">· 顶部磨砂固定栏</div><div class="update-item">· 管理员口令认证</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';  
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v4.0（当前版本）</div><div class="update-item">· 站长系统（口令1900）</div><div class="update-item">· 管理员管理（上限3人）</div><div class="update-item">· 用户列表+搜索</div><div class="update-item">· UID真实递增</div><div class="update-item">· 数据库互通</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';  
     document.body.appendChild(overlay);  
 }  
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }  
-var savedNickname = localStorage.getItem('erzhong_nickname');  
-var savedPassword = localStorage.getItem('erzhong_password');  
 var savedUid = localStorage.getItem('erzhong_uid');  
-var savedAdmin = localStorage.getItem('erzhong_admin');  
-if (savedNickname) { userNickname = savedNickname; userPassword = savedPassword || ''; userUid = savedUid || '1000000'; isAdmin = savedAdmin === '1'; updateRegisterBtn(); setTimeout(function() { showWelcomeToast(); }, 1500); }  
+var savedPassword = localStorage.getItem('erzhong_password');  
+if (savedUid && savedPassword) {  
+    supabase.from('users').select('*').eq('uid', savedUid).single().then(function(result) {  
+        if (result.data && result.data.password === savedPassword) {  
+            userNickname = result.data.nickname;  
+            userUid = result.data.uid;  
+            isAdmin = result.data.isadmin;  
+            isOwner = result.data.isowner;  
+            updateRegisterBtn();  
+            setTimeout(function() { showWelcomeToast(); }, 1500);  
+        }  
+    });  
+}  
 loadPosts();  
 renderFoods();  
 </script>  
