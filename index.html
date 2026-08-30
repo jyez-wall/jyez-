@@ -190,7 +190,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
     <div class="top-bar">
         <div class="top-left">
             <div class="site-title">二中·集</div>
-            <div class="music-bar" onclick="toggleMusic()">🎵 <span id="musicLabel">One Last Kiss</span></div>
+            <div class="music-bar" onclick="showPlaylist()">🎵 <span id="musicLabel">One Last Kiss</span></div>
         </div>
         <div class="top-right">
             <div class="register-row">
@@ -339,8 +339,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
     <div class="footer">
         <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p>
     </div>
-</div>
-<script>
+</div><script>
 var supabaseClient = window.supabase.createClient('https://byokxdqvxtdshsdoagtm.supabase.co', 'sb_publishable_nadYCZZneDKNjFTb5edh2A_Q3tS18h4');
 var selectedTag = '表白';
 var currentFilter = '全部';
@@ -418,6 +417,24 @@ bgm.addEventListener('ended', function() {
     bgm.play();
 });
 playRandomSong();
+function showPlaylist() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><h3>🎵 播放列表</h3><div class="user-list">';
+    songNames.forEach(function(name, index) {
+        html += '<div class="reply-item" style="cursor:pointer;" onclick="playSong(' + index + ')">' + (index === currentSong ? '▶ ' : '') + escapeHtml(name) + '</div>';
+    });
+    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+function playSong(index) {
+    currentSong = index;
+    bgm.src = playlist[index];
+    document.getElementById('musicLabel').textContent = songNames[index];
+    bgm.play();
+    closeModal();
+}
 function toggleMusic() {
     if (bgm.paused) { bgm.play(); showToast('🎵', '开始播放'); } else { bgm.pause(); showToast('🎵', '已暂停'); }
 }
@@ -852,7 +869,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v7.2（当前版本）</div><div class="update-item">· PWA图标支持</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-item">· 回复提醒</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v7.3（当前版本）</div><div class="update-item">· 歌单选择播放</div><div class="update-item">· PWA图标支持</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-item">· 回复提醒</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
