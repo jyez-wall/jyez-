@@ -294,8 +294,8 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
         <div class="food-list" id="foodList">
             <div class="empty-state">
                 <div class="empty-icon">(´･ω･`)</div>
-                <p>还没有美食推荐</p>
-                <p class="empty-sub">快来推荐你爱的店吧！</p>
+                <p>加载中...</p>
+                <p class="empty-sub">请稍等</p>
             </div>
         </div>
         <div class="food-spacer"></div>
@@ -339,7 +339,8 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
     <div class="footer">
         <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p>
     </div>
-</div><script>
+</div>
+<script>
 var supabaseClient = window.supabase.createClient('https://byokxdqvxtdshsdoagtm.supabase.co', 'sb_publishable_nadYCZZneDKNjFTb5edh2A_Q3tS18h4');
 var selectedTag = '表白';
 var currentFilter = '全部';
@@ -360,9 +361,9 @@ var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','
 var chatMessages = {};
 var bannedWords = ['傻逼','垃圾','去死','滚蛋','废物','白痴','智障','脑残','操你','妈的','他妈','尼玛','fuck','shit','sb','cnm','nmsl'];
 var linkPatterns = ['http','www','.com','.cn','.net','.org','.xyz','.top','.vip','.cc'];
-var playlist = ['song1.mp3','song2.mp3','song3.mp3','song4.mp3','song5.mp3','song6.mp3'];
+var playlist = ['song1.mp3','song2.mp3','song3.mp3','song4.mp3','song5.mp3','song6.mp3','song7.mp3','song8.mp3','song9.mp3'];
 var currentSong = 0;
-var songNames = ['One Last Kiss','我好想你','遇见','碎碎念','死ぬのがいいわ','玻璃'];
+var songNames = ['One Last Kiss','我好想你','遇见','碎碎念','死ぬのがいいわ','玻璃','春娇与志明','浴室','小半'];
 var schoolDate = new Date('2026-08-31T09:00:00');
 var allRepliesCache = {};
 var replyTarget = null;
@@ -487,6 +488,10 @@ async function loadPosts() {
     var result = await supabaseClient.from('posts').select('*').order('id', { ascending: false }).limit(100);
     if (result.data) { allPosts = result.data.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '' }; }); updateStats(); renderPosts(); checkUnreadReplies(); }
 }
+async function loadFoods() {
+    var result = await supabaseClient.from('foods').select('*').order('id', { ascending: false }).limit(100);
+    if (result.data) { allFoods = result.data.map(function(f) { return { id: f.id, name: f.name, recommend: f.recommend, price: f.price, distance: f.distance, rating: f.rating, comment: f.comment, time: f.time }; }); updateStats(); renderFoods(); }
+}
 async function checkUnreadReplies() {
     if (!userUid) return;
     var result = await supabaseClient.from('replies').select('*').eq('is_read', false);
@@ -593,21 +598,22 @@ function renderPosts() {
     if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
     filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
 }
-function submitFood() {
+async function submitFood() {
     var name = document.getElementById('foodName').value.trim();
     var recommend = document.getElementById('foodRecommend').value.trim();
     var price = document.getElementById('foodPrice').value.trim();
     var comment = document.getElementById('foodComment').value.trim();
     if (!name || !recommend) { showToast('(´･ω･`)', '至少填店名和推荐菜'); return; }
+    if (containsBanned(name) || containsBanned(recommend) || containsBanned(comment)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
     var now = new Date();
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    allFoods.unshift({ name: name, recommend: recommend, price: price || '未知', comment: comment || '暂无评价', distance: selectedDistance, rating: selectedRating, time: timeStr, number: allFoods.length + 1 });
+    var result = await supabaseClient.from('foods').insert([{ name: name, recommend: recommend, price: price || '未知', distance: selectedDistance, rating: selectedRating, comment: comment || '暂无评价', time: timeStr }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '推荐失败'); return; }
     document.getElementById('foodName').value = '';
     document.getElementById('foodRecommend').value = '';
     document.getElementById('foodPrice').value = '';
     document.getElementById('foodComment').value = '';
-    updateStats();
-    renderFoods();
+    await loadFoods();
     showToast('(｡•̀ᴗ-)✧', '推荐成功！');
 }
 function updateStats() { document.getElementById('postCount').textContent = allPosts.length; document.getElementById('foodCount').textContent = allFoods.length; }
@@ -618,7 +624,7 @@ function renderFoods() {
     allFoods.forEach(function(food) {
         var card = document.createElement('div');
         card.className = 'food-card';
-        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span><div class="food-name">' + escapeHtml(food.name) + '</div><div class="food-detail">⭐ ' + escapeHtml(food.recommend) + '</div><div class="food-detail">💰 ' + escapeHtml(food.price) + '</div><div class="food-tags"><span class="food-tag distance">🚶 ' + escapeHtml(food.distance) + '</span><span class="food-tag rating">⭐ ' + escapeHtml(food.rating) + '</span></div><div class="food-comment">📝 ' + escapeHtml(food.comment) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(food.time) + '</span><span class="post-number">#' + food.number + '</span></div>';
+        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span><div class="food-name">' + escapeHtml(food.name) + '</div><div class="food-detail">⭐ ' + escapeHtml(food.recommend) + '</div><div class="food-detail">💰 ' + escapeHtml(food.price) + '</div><div class="food-tags"><span class="food-tag distance">🚶 ' + escapeHtml(food.distance) + '</span><span class="food-tag rating">⭐ ' + escapeHtml(food.rating) + '</span></div><div class="food-comment">📝 ' + escapeHtml(food.comment) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(food.time) + '</span><span class="post-number">#' + food.id + '</span></div>';
         foodList.appendChild(card);
     });
 }
@@ -875,7 +881,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v8.2（当前版本）</div><div class="update-item">· 回复始终展开</div><div class="update-item">· 回复引用标注</div><div class="update-item">· 歌单浅色文字</div><div class="update-item">· 歌单选择播放</div><div class="update-item">· PWA图标支持</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v8.3（当前版本）</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增三首歌曲</div><div class="update-item">· 回复始终展开</div><div class="update-item">· 回复引用标注</div><div class="update-item">· 歌单浅色文字</div><div class="update-item">· 歌单选择播放</div><div class="update-item">· PWA图标支持</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
@@ -894,7 +900,7 @@ if (savedUid && savedPassword) {
     });
 }
 loadPosts();
-renderFoods();
+loadFoods();
 </script>
 </body>
 </html>
