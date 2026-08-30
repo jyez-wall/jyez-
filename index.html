@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>二中·集</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📮</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📮</text></svg>">
+<link rel="manifest" href="data:application/manifest+json,{'name':'二中·集','short_name':'二中·集','start_url':'.','display':'standalone','background_color':'%23fafafa','theme_color':'%238b1a1a','icons':[{'src':'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>','sizes':'192x192','type':'image/svg+xml'}]}">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
 @font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.woff2') format('woff2'); font-display: swap; }
@@ -551,7 +553,7 @@ async function throwBottle() {
     showToast('🍾', '瓶子已扔进海里');
 }
 async function pickBottle() {
-    var result = await supabaseClient.from('bottles').select('*').eq('is_replied', false).limit(1);
+    var result = await supabaseClient.from('bottles').select('*').eq('is_replied', false).limit(10);
     if (!result.data || result.data.length === 0) { showToast('🌊', '海里没有瓶子了'); return; }
     var bottle = result.data[Math.floor(Math.random() * result.data.length)];
     var overlay = document.createElement('div');
@@ -849,7 +851,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v7.0（当前版本）</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v7.1（当前版本）</div><div class="update-item">· PWA支持（添加到主屏幕）</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
