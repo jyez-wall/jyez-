@@ -44,8 +44,8 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .header .line { width: 24px; height: 1px; background: #1a1a1a; margin: 0 auto 12px; }
 .header .subtitle { font-size: 12px; color: #999; letter-spacing: 2px; }
 .stats-bar { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; font-size: 11px; color: #bbb; letter-spacing: 1px; }
-.mode-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-.mode-btn { border: none; background: none; font-size: 12px; letter-spacing: 1px; color: #bbb; cursor: pointer; padding: 8px 10px; font-family: inherit; border-bottom: 2px solid transparent; }
+.mode-switch { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.mode-btn { border: none; background: none; font-size: 12px; letter-spacing: 1px; color: #bbb; cursor: pointer; padding: 8px 8px; font-family: inherit; border-bottom: 2px solid transparent; }
 .mode-btn.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
 .search-bar { display: flex; gap: 8px; margin-bottom: 12px; }
 .search-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 8px 12px; outline: none; font-family: inherit; color: #333; font-size: 14px !important; }
@@ -118,6 +118,9 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .empty-icon { font-size: 15px; margin-bottom: 12px; letter-spacing: 2px; }
 .empty-state p { font-size: 13px; letter-spacing: 2px; }
 .empty-state .empty-sub { font-size: 11px; color: #ddd; margin-top: 6px; letter-spacing: 1px; }
+.bottle-area { text-align: center; padding: 30px 0; }
+.bottle-icon { font-size: 60px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 .footer { text-align: center; margin-top: 30px; font-size: 11px; color: #ccc; letter-spacing: 2px; }
 .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid #e8e8e8; border-radius: 12px; padding: 24px 32px; text-align: center; z-index: 2000; animation: fadeIn 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
 .toast .toast-icon { font-size: 20px; margin-bottom: 8px; }
@@ -214,6 +217,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
         <button class="mode-btn active" data-mode="post" onclick="switchMode('post')">📮 心事箱</button>
         <button class="mode-btn" data-mode="food" onclick="switchMode('food')">🍜 必吃榜</button>
         <button class="mode-btn" data-mode="chat" onclick="switchMode('chat')">💬 小茶馆</button>
+        <button class="mode-btn" data-mode="bottle" onclick="switchMode('bottle')">🍾 漂流瓶</button>
     </div>
     <div id="postSection">
         <div class="search-bar">
@@ -315,6 +319,20 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
             <div class="chat-spacer"></div>
         </div>
     </div>
+    <div id="bottleSection" style="display:none;">
+        <div class="bottle-area">
+            <div class="bottle-icon">🍾</div>
+            <p style="font-size:13px;color:#999;letter-spacing:2px;margin-bottom:20px;">把心事装进瓶子，扔进海里</p>
+            <div class="input-area" style="text-align:left;">
+                <textarea id="bottleContent" placeholder="写下想说的话..." maxlength="300"></textarea>
+                <div class="input-footer">
+                    <span class="anonymous">🕊️ 匿名</span>
+                    <button class="publish-btn" onclick="throwBottle()">扔瓶子</button>
+                </div>
+            </div>
+            <button class="publish-btn" onclick="pickBottle()" style="margin-top:10px;">🌊 捞一个瓶子</button>
+        </div>
+    </div>
     <div class="footer">
         <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p>
     </div>
@@ -340,9 +358,9 @@ var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','
 var chatMessages = {};
 var bannedWords = ['傻逼','垃圾','去死','滚蛋','废物','白痴','智障','脑残','操你','妈的','他妈','尼玛','fuck','shit','sb','cnm','nmsl'];
 var linkPatterns = ['http','www','.com','.cn','.net','.org','.xyz','.top','.vip','.cc'];
-var playlist = ['song1.mp3','song2.mp3','song3.mp3'];
+var playlist = ['song1.mp3','song2.mp3','song3.mp3','song4.mp3','song5.mp3','song6.mp3'];
 var currentSong = 0;
-var songNames = ['One Last Kiss','我好想你','遇见'];
+var songNames = ['One Last Kiss','我好想你','遇见','碎碎念','死ぬのがいいわ','玻璃'];
 var schoolDate = new Date('2026-08-31T09:00:00');
 function updateCountdown() {
     var now = new Date();
@@ -404,11 +422,13 @@ function switchMode(mode) {
     document.getElementById('postSection').style.display = 'none';
     document.getElementById('foodSection').style.display = 'none';
     document.getElementById('chatSection').style.display = 'none';
+    document.getElementById('bottleSection').style.display = 'none';
     var modeBtns = document.querySelectorAll('.mode-btn');
     modeBtns.forEach(function(btn) { btn.classList.remove('active'); if (btn.getAttribute('data-mode') === mode) btn.classList.add('active'); });
     if (mode === 'post') { document.getElementById('postSection').style.display = ''; document.getElementById('headerIcon').textContent = '📮'; document.getElementById('headerTitle').textContent = '二中心事箱'; document.getElementById('headerSubtitle').textContent = '把不敢说的话，悄悄放进这里'; }
     else if (mode === 'food') { document.getElementById('foodSection').style.display = ''; document.getElementById('headerIcon').textContent = '🍜'; document.getElementById('headerTitle').textContent = '二中必吃榜'; document.getElementById('headerSubtitle').textContent = '学校周围的美食指南'; }
-    else { document.getElementById('chatSection').style.display = ''; document.getElementById('headerIcon').textContent = '💬'; document.getElementById('headerTitle').textContent = '二中小茶馆'; document.getElementById('headerSubtitle').textContent = '找个桌位，坐下聊聊'; }
+    else if (mode === 'chat') { document.getElementById('chatSection').style.display = ''; document.getElementById('headerIcon').textContent = '💬'; document.getElementById('headerTitle').textContent = '二中小茶馆'; document.getElementById('headerSubtitle').textContent = '找个桌位，坐下聊聊'; }
+    else { document.getElementById('bottleSection').style.display = ''; document.getElementById('headerIcon').textContent = '🍾'; document.getElementById('headerTitle').textContent = '漂流瓶'; document.getElementById('headerSubtitle').textContent = '把心事扔进海里，或捞起别人的瓶子'; }
 }
 var categoryBtns = document.querySelectorAll('.category-btn');
 categoryBtns.forEach(function(btn) { btn.addEventListener('click', function() { categoryBtns.forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); selectedTag = btn.getAttribute('data-tag'); }); });
@@ -517,6 +537,35 @@ async function submitReply(postId) {
     section.setAttribute('data-loaded', 'false');
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '回复成功');
+}
+async function throwBottle() {
+    var content = document.getElementById('bottleContent').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    var result = await supabaseClient.from('bottles').insert([{ content: content, author: randomEmoji, time: timeStr, is_replied: false, reply: '', reply_time: '' }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '扔瓶子失败'); return; }
+    document.getElementById('bottleContent').value = '';
+    showToast('🍾', '瓶子已扔进海里');
+}
+async function pickBottle() {
+    var result = await supabaseClient.from('bottles').select('*').eq('is_replied', false).limit(1);
+    if (!result.data || result.data.length === 0) { showToast('🌊', '海里没有瓶子了'); return; }
+    var bottle = result.data[Math.floor(Math.random() * result.data.length)];
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><h3>🍾 你捞到一个瓶子</h3><p>' + escapeHtml(bottle.content) + '</p><p style="font-size:10px;color:#ccc;">' + escapeHtml(bottle.author) + ' · ' + escapeHtml(bottle.time) + '</p><textarea id="bottleReply" placeholder="回复这个瓶子..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="replyBottle(' + bottle.id + ')">回复</button><br><button class="link-btn" onclick="closeModal()">扔回海里</button></div>';
+    document.body.appendChild(overlay);
+}
+async function replyBottle(bottleId) {
+    var content = document.getElementById('bottleReply').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var result = await supabaseClient.from('bottles').update({ is_replied: true, reply: content, reply_time: timeStr }).eq('id', bottleId);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已回复'); closeModal(); }
 }
 function submitFood() {
     var name = document.getElementById('foodName').value.trim();
@@ -794,13 +843,13 @@ function updateRegisterBtn() {
 function showAbout() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v6.3（当前版本）</div><div class="update-item">· 开学倒计时（精确到秒）</div><div class="update-item">· 随机播放+顺序轮换</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-item">· 小茶馆消息保存</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v7.0（当前版本）</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-item">· 回复提醒</div><div class="update-item">· 出物分类</div><div class="update-item">· 班级小窝</div><div class="update-item">· 老师评价</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
