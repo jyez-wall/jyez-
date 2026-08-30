@@ -93,12 +93,13 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .post-author.nickname { color: #6a8cc9; }
 .post-author.anon { color: #ccc; }
 .post-author.admin { color: #b8860b; }
-.reply-btn { border: none; background: none; color: #bbb; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 0; margin-top: 8px; }
+.reply-toggle-btn { border: none; background: none; color: #bbb; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 0; margin-top: 8px; }
 .replies-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
 .reply-item { padding: 6px 0; border-bottom: 1px solid #fafafa; }
 .reply-author { font-size: 10px; color: #ccc; letter-spacing: 1px; }
 .reply-content { font-size: 12px; color: #666; line-height: 1.6; word-break: break-word; }
 .reply-time { font-size: 9px; color: #ddd; }
+.reply-quote { font-size: 10px; color: #bbb; margin-bottom: 2px; }
 .reply-input-row { display: flex; gap: 6px; margin-top: 8px; }
 .reply-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 6px 10px; outline: none; font-family: inherit; color: #333; }
 .reply-send-btn { border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 4px 12px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
@@ -422,7 +423,7 @@ function showPlaylist() {
     overlay.className = 'modal-overlay';
     var html = '<div class="modal"><h3>🎵 播放列表</h3><div class="user-list">';
     songNames.forEach(function(name, index) {
-        html += '<div class="reply-item" style="cursor:pointer;" onclick="playSong(' + index + ')">' + (index === currentSong ? '▶ ' : '') + escapeHtml(name) + '</div>';
+        html += '<div class="reply-item" style="cursor:pointer;font-size:10px;color:#999;" onclick="playSong(' + index + ')">' + (index === currentSong ? '▶ ' : '') + escapeHtml(name) + '</div>';
     });
     html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
@@ -477,6 +478,14 @@ async function submitPost() {
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '已经悄悄送出啦');
 }
+var allRepliesCache = {};
+async function loadRepliesForPost(postId) {
+    if (allRepliesCache[postId]) return allRepliesCache[postId];
+    var result = await supabaseClient.from('replies').select('*').eq('post_id', String(postId)).order('id', { ascending: true });
+    var replies = result.data || [];
+    allRepliesCache[postId] = replies;
+    return replies;
+}
 async function loadPosts() {
     var result = await supabaseClient.from('posts').select('*').order('id', { ascending: false }).limit(100);
     if (result.data) { allPosts = result.data.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '' }; }); updateStats(); renderPosts(); checkUnreadReplies(); }
@@ -506,41 +515,36 @@ function searchPosts() {
     if (filtered.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>没有找到相关帖子</p></div>'; return; }
     filtered.forEach(function(post) { renderPostCard(post, postsList); });
 }
-function renderPostCard(post, container) {
+async function renderPostCard(post, container) {
     var card = document.createElement('div');
     card.className = 'post-card';
-    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + escapeHtml(post.tag) + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + escapeHtml(post.author) + '</div><div class="post-content">' + escapeHtml(post.content) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(post.time) + '</span><span class="post-number">#' + post.id + '</span></div><button class="reply-btn" onclick="toggleReplies(' + post.id + ')">💬 回复</button><div class="replies-section" id="replies-' + post.id + '" style="display:none;"></div>';
+    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + escapeHtml(post.tag) + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + escapeHtml(post.author) + '</div><div class="post-content">' + escapeHtml(post.content) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(post.time) + '</span><span class="post-number">#' + post.id + '</span></div>';
+    var replies = await loadRepliesForPost(post.id);
+    if (replies.length > 0) {
+        card.innerHTML += '<button class="reply-toggle-btn" onclick="toggleReplies(' + post.id + ')">💬 回复 (' + replies.length + ') [收起▲]</button><div class="replies-section" id="replies-' + post.id + '">';
+        replies.forEach(function(r) {
+            card.innerHTML += buildReplyHtml(r);
+        });
+        card.innerHTML += '</div>';
+    } else {
+        card.innerHTML += '<button class="reply-toggle-btn" onclick="toggleReplies(' + post.id + ')">💬 回复 [展开▼]</button><div class="replies-section" id="replies-' + post.id + '" style="display:none;"></div>';
+    }
+    card.innerHTML += '<div class="reply-input-row"><input type="text" class="reply-input" id="replyInput-' + post.id + '" placeholder="匿名回复..."><button class="reply-send-btn" onclick="submitReply(' + post.id + ', null, null)">发送</button></div>';
     if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button><button class="admin-btn pin" onclick="togglePin(' + post.id + ', ' + (post.pinned ? 'false' : 'true') + ')">' + (post.pinned ? '取消置顶' : '置顶') + '</button></div>'; }
     container.appendChild(card);
 }
-function renderPosts() {
-    var postsList = document.getElementById('postsList');
-    postsList.innerHTML = '';
-    var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
-    filteredPosts.sort(function(a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
-    if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
-    filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
-}
-async function toggleReplies(postId) {
-    var section = document.getElementById('replies-' + postId);
-    if (section.style.display === 'none') {
-        if (section.getAttribute('data-loaded') === 'true') { section.style.display = ''; return; }
-        var result = await supabaseClient.from('replies').select('*').eq('post_id', String(postId)).order('id', { ascending: true });
-        var replies = result.data || [];
-        section.innerHTML = '';
-        replies.forEach(function(r) {
-            var div = document.createElement('div');
-            div.className = 'reply-item';
-            div.innerHTML = '<span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div>';
-            section.appendChild(div);
-        });
-        section.innerHTML += '<div class="reply-input-row"><input type="text" class="reply-input" id="replyInput-' + postId + '" placeholder="匿名回复..."><button class="reply-send-btn" onclick="submitReply(' + postId + ')">发送</button></div>';
-        section.setAttribute('data-loaded', 'true');
-        section.style.display = '';
-        supabaseClient.from('replies').update({ is_read: true }).eq('post_id', String(postId)).eq('is_read', false).then(function() {});
-    } else {
-        section.style.display = 'none';
+function buildReplyHtml(r) {
+    var quoteHtml = '';
+    if (r.reply_to_author) {
+        quoteHtml = '<div class="reply-quote">回复 @' + escapeHtml(r.reply_to_author) + '</div>';
     }
+    return '<div class="reply-item">' + quoteHtml + '<span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div><button class="reply-toggle-btn" style="font-size:9px;" onclick="setReplyTarget(' + r.id + ',\'' + escapeHtml(r.author) + '\',' + (r.post_id ? r.post_id : 'null') + ')">回复</button></div>';
+}
+var replyTarget = null;
+function setReplyTarget(replyId, replyAuthor, postId) {
+    replyTarget = { reply_id: replyId, reply_author: replyAuthor };
+    var input = document.getElementById('replyInput-' + postId);
+    if (input) { input.placeholder = '回复 @' + replyAuthor + '...'; input.focus(); }
 }
 async function submitReply(postId) {
     var input = document.getElementById('replyInput-' + postId);
@@ -550,13 +554,27 @@ async function submitReply(postId) {
     var now = new Date();
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
     var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    var result = await supabaseClient.from('replies').insert([{ post_id: String(postId), content: content, author: randomEmoji, time: timeStr, is_read: false }]);
+    var replyData = { post_id: String(postId), content: content, author: randomEmoji, time: timeStr, is_read: false, reply_to: replyTarget ? replyTarget.reply_id : null, reply_to_author: replyTarget ? replyTarget.reply_author : null };
+    var result = await supabaseClient.from('replies').insert([replyData]);
     if (result.error) { showToast('(｡•́︿•̀｡)', '回复失败'); return; }
     input.value = '';
-    var section = document.getElementById('replies-' + postId);
-    section.setAttribute('data-loaded', 'false');
+    input.placeholder = '匿名回复...';
+    replyTarget = null;
+    allRepliesCache[postId] = null;
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '回复成功');
+}
+async function toggleReplies(postId) {
+    var section = document.getElementById('replies-' + postId);
+    if (section.style.display === 'none') {
+        section.style.display = '';
+        var btn = section.parentElement.querySelector('.reply-toggle-btn');
+        if (btn) { btn.textContent = btn.textContent.replace('展开', '收起'); btn.textContent = btn.textContent.replace('▼', '▲'); }
+    } else {
+        section.style.display = 'none';
+        var btn = section.parentElement.querySelector('.reply-toggle-btn');
+        if (btn) { btn.textContent = btn.textContent.replace('收起', '展开'); btn.textContent = btn.textContent.replace('▲', '▼'); }
+    }
 }
 async function throwBottle() {
     var content = document.getElementById('bottleContent').value.trim();
@@ -586,6 +604,14 @@ async function replyBottle(bottleId) {
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
     var result = await supabaseClient.from('bottles').update({ is_replied: true, reply: content, reply_time: timeStr }).eq('id', bottleId);
     if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已回复'); closeModal(); }
+}
+function renderPosts() {
+    var postsList = document.getElementById('postsList');
+    postsList.innerHTML = '';
+    var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
+    filteredPosts.sort(function(a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
+    if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
+    filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
 }
 function submitFood() {
     var name = document.getElementById('foodName').value.trim();
@@ -869,7 +895,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v7.3（当前版本）</div><div class="update-item">· 歌单选择播放</div><div class="update-item">· PWA图标支持</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-item">· 回复提醒</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v8.0（当前版本）</div><div class="update-item">· 回复引用标注</div><div class="update-item">· 默认展开回复</div><div class="update-item">· 歌单浅色文字</div><div class="update-item">· 歌单选择播放</div><div class="update-item">· PWA图标支持</div><div class="update-item">· 漂流瓶功能</div><div class="update-item">· 六首歌循环</div><div class="update-item">· 开学倒计时</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
