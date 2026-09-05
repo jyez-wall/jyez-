@@ -136,16 +136,17 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .toast .toast-text { font-size: 13px; color: #666; letter-spacing: 1px; }
 .toast.fade-out { animation: toastFadeOut 0.4s ease forwards; }
 .toast .toast-action { margin-top: 10px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 4px 16px; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; }
-@keyframes toastFadeIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes toastFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes toastFadeOut { from { opacity: 1; } to { opacity: 0; } }
-.welcome-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid #e8e8e8; border-radius: 16px; padding: 32px 40px; text-align: center; z-index: 3000; animation: fadeIn 0.5s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+.welcome-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid #e8e8e8; border-radius: 16px; padding: 32px 40px; text-align: center; z-index: 3000; animation: simpleFadeIn 0.5s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
 .welcome-toast .welcome-icon { font-size: 28px; margin-bottom: 12px; }
 .welcome-toast .welcome-title { font-size: 14px; color: #999; letter-spacing: 2px; margin-bottom: 6px; }
 .welcome-toast .welcome-name { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; }
 .welcome-toast .welcome-uid { font-size: 11px; color: #ccc; letter-spacing: 1px; margin-top: 6px; }
+@keyframes simpleFadeIn { from { opacity: 0; } to { opacity: 1; } }
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
 .modal { background: #fff; border-radius: 8px; padding: 28px 24px; max-width: 350px; width: 90%; text-align: center; max-height: 80vh; overflow-y: auto; position: relative; }
-.modal-close-x { position: absolute; top: 8px; right: 12px; font-size: 18px; color: #ccc; cursor: pointer; }
+.modal-close-x { position: absolute; top: 10px; right: 12px; font-size: 18px; color: #ccc; cursor: pointer; }
 .modal h3 { font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8e8e8; }
 .modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }
 .modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
@@ -390,7 +391,7 @@ var pendingPostImages = [];
 var pendingReplyImages = {};
 var mapayAppid = '1940';
 var mapayAppkey = '762799bfa7162585793944c651af8057';
-var mapayRedirect = 'https://jyez-wall.github.io/jyez-wall';
+var mapayRedirect = 'https://jyez-wall.github.io/jyez-wall/index.html';
 var mapayProxyUrl = 'https://byokxdqvxtdshsdoagtm.supabase.co/functions/v1/hyper-responder';
 var isSubmitting = false;
 
@@ -958,7 +959,7 @@ function showUserCenter() {
     document.body.appendChild(overlay);
 }
 function socialLogin(type) {
-    fetch(mapayProxyUrl + '?act=login&type=' + type)
+    fetch(mapayProxyUrl + '?act=login&type=' + type + '&redirect=' + encodeURIComponent(mapayRedirect))
     .then(function(res) { return res.json(); })
     .then(function(data) {
         if (data.code === 0 && data.url) {
@@ -971,7 +972,7 @@ function socialLogin(type) {
 }
 function bindSocial(type) {
     if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
-    fetch(mapayProxyUrl + '?act=login&type=' + type)
+    fetch(mapayProxyUrl + '?act=login&type=' + type + '&redirect=' + encodeURIComponent(mapayRedirect + '?bind=1&type=' + type))
     .then(function(res) { return res.json(); })
     .then(function(data) {
         if (data.code === 0 && data.url) {
