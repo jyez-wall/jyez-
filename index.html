@@ -741,7 +741,11 @@ function renderPosts() {
     var postsList = document.getElementById('postsList');
     postsList.innerHTML = '';
     var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
-    filteredPosts.sort(function(a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0); });
+    filteredPosts.sort(function(a, b) {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return b.id - a.id;
+    });
     if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
     filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
 }
@@ -941,18 +945,37 @@ function showUserCenter() {
         html += '<button class="social-btn qq" onclick="bindSocial(\'qq\')">绑定 QQ</button><button class="social-btn wx" onclick="bindSocial(\'wx\')">绑定微信</button><br>';
     }
     if (isOwner) { html += '<button class="close-btn" onclick="showUserList()">📋 用户列表</button><br>'; }
-    html += '<button class="close-btn" onclick="logout()">退出登录</button></div>';
+    html += '<button class="close-btn" onclick="logout()">退出登录</button>';
+    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
 }
 function socialLogin(type) {
     var loginUrl = 'https://login.mapay.cn/connect.php?act=login&appid=' + mapayAppid + '&appkey=' + mapayAppkey + '&type=' + type + '&redirect_uri=' + encodeURIComponent(mapayRedirect);
-    window.location.href = loginUrl;
+    fetch(loginUrl)
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.code === 0 && data.url) {
+            window.location.href = data.url;
+        } else {
+            showToast('(｡•́︿•̀｡)', data.msg || '获取登录地址失败');
+        }
+    })
+    .catch(function() { showToast('(｡•́︿•̀｡)', '网络错误'); });
 }
 function bindSocial(type) {
     if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
     var loginUrl = 'https://login.mapay.cn/connect.php?act=login&appid=' + mapayAppid + '&appkey=' + mapayAppkey + '&type=' + type + '&redirect_uri=' + encodeURIComponent(mapayRedirect + '?bind=1&type=' + type);
-    window.location.href = loginUrl;
+    fetch(loginUrl)
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.code === 0 && data.url) {
+            window.location.href = data.url;
+        } else {
+            showToast('(｡•́︿•̀｡)', data.msg || '获取登录地址失败');
+        }
+    })
+    .catch(function() { showToast('(｡•́︿•̀｡)', '网络错误'); });
 }
 function handleSocialCallback() {
     var params = new URLSearchParams(window.location.search);
