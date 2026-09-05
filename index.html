@@ -7,7 +7,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="data:application/manifest+json,{'name':'二中·集','short_name':'二中·集','start_url':'.','display':'standalone','background_color':'%23fafafa','theme_color':'%238b1a1a','icons':[{'src':'icon-192.png','sizes':'192x192','type':'image/png'},{'src':'icon-512.png','sizes':'512x512','type':'image/png'}]}">
+<link rel="manifest" href='data:application/manifest+json,{"name":"二中·集","short_name":"二中·集","start_url":".","display":"standalone","background_color":"%23fafafa","theme_color":"%238b1a1a","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]}'>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
 @font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.woff2') format('woff2'); font-display: swap; }
@@ -117,10 +117,10 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .post-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
 .post-time { font-size: 11px; color: #ccc; letter-spacing: 1px; }
 .post-number { font-size: 11px; color: #ddd; letter-spacing: 1px; }
-.post-image { margin-top: 12px; max-width: 100%; border-radius: 4px; cursor: pointer; }
-.reply-image { margin-top: 6px; max-width: 100%; border-radius: 4px; cursor: pointer; display: block; }
+.post-image { margin-top: 12px; max-width: 60px; border-radius: 4px; cursor: pointer; }
+.reply-image { margin-top: 6px; max-width: 40px; border-radius: 4px; cursor: pointer; display: block; }
 .image-upload-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; margin-top: 6px; }
-.image-preview { max-width: 100%; border-radius: 4px; margin-top: 8px; display: block; }
+.image-preview { max-width: 40px; border-radius: 4px; margin-top: 8px; display: inline-block; margin-right: 6px; }
 .post-highlight { animation: highlightFlash 2s ease; }
 @keyframes highlightFlash { 0% { background: #fff8e8; } 100% { background: #fff; } }
 .empty-state { text-align: center; padding: 40px 20px; color: #ccc; }
@@ -138,7 +138,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .toast .toast-action { margin-top: 10px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 4px 16px; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; }
 @keyframes toastFadeIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 @keyframes toastFadeOut { from { opacity: 1; } to { opacity: 0; } }
-.welcome-toast { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid #e8e8e8; border-radius: 16px; padding: 32px 40px; text-align: center; z-index: 3000; animation: fadeIn 0.5s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+.welcome-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid #e8e8e8; border-radius: 16px; padding: 32px 40px; text-align: center; z-index: 3000; animation: fadeIn 0.5s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
 .welcome-toast .welcome-icon { font-size: 28px; margin-bottom: 12px; }
 .welcome-toast .welcome-title { font-size: 14px; color: #999; letter-spacing: 2px; margin-bottom: 6px; }
 .welcome-toast .welcome-name { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; }
@@ -261,8 +261,8 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
                 <span class="anonymous" id="currentIdentityLabel">🕊️ 匿名发布</span>
                 <button class="publish-btn" id="publishBtn" onclick="submitPost()">悄悄送出</button>
             </div>
-            <button class="image-upload-btn" onclick="document.getElementById('postImageInput').click()">📷 添加图片</button>
-            <input type="file" id="postImageInput" accept="image/*" style="display:none;" onchange="handlePostImageSelect(event)">
+            <button class="image-upload-btn" onclick="document.getElementById('postImageInput').click()">📷 添加图片（可多选）</button>
+            <input type="file" id="postImageInput" accept="image/*" multiple style="display:none;" onchange="handlePostImageSelect(event)">
         </div>
         <div class="filter-bar" id="filterBar">
             <button class="filter-btn active" data-filter="全部">全部</button>
@@ -385,7 +385,7 @@ var songNames = ['One Last Kiss','我好想你','遇见','碎碎念','死ぬの�
 var schoolDate = new Date('2026-08-31T09:00:00');
 var allRepliesCache = {};
 var replyTarget = null;
-var pendingPostImage = null;
+var pendingPostImages = [];
 var pendingReplyImages = {};
 var mapayAppid = '1940';
 var mapayAppkey = '762799bfa7162585793944c651af8057';
@@ -502,17 +502,22 @@ var ratingBtns = document.querySelectorAll('#ratingGroup .food-select-btn');
 ratingBtns.forEach(function(btn) { btn.addEventListener('click', function() { ratingBtns.forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); selectedRating = btn.getAttribute('data-rating'); }); });
 
 function handlePostImageSelect(event) {
-    var file = event.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { showToast('(｡•́︿•̀｡)', '图片不能超过5MB'); event.target.value = ''; return; }
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        pendingPostImage = file;
-        var preview = document.getElementById('postImagePreview');
-        preview.innerHTML = '<img src="' + e.target.result + '" class="image-preview">';
-        showToast('📷', '图片已选择');
-    };
-    reader.readAsDataURL(file);
+    var files = event.target.files;
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].size > 5 * 1024 * 1024) { showToast('(｡•́︿•̀｡)', '图片不能超过5MB'); continue; }
+        if (pendingPostImages.length >= 9) { showToast('(｡•́︿•̀｡)', '最多9张图片'); break; }
+        pendingPostImages.push(files[i]);
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var preview = document.getElementById('postImagePreview');
+            var img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'image-preview';
+            img.onclick = function() { this.remove(); };
+            preview.appendChild(img);
+        };
+        reader.readAsDataURL(files[i]);
+    }
     event.target.value = '';
 }
 
@@ -534,10 +539,13 @@ async function submitPost() {
     isSubmitting = true;
     var btn = document.getElementById('publishBtn');
     btn.textContent = '送出中...';
-    var imageUrl = null;
-    if (pendingPostImage) {
-        imageUrl = await uploadImage(pendingPostImage, 'posts');
-        if (!imageUrl) { isSubmitting = false; btn.textContent = '悄悄送出'; showToast('(｡•́︿•̀｡)', '图片上传失败'); return; }
+    var imageUrls = [];
+    if (pendingPostImages.length > 0) {
+        for (var i = 0; i < pendingPostImages.length; i++) {
+            var uploadedUrl = await uploadImage(pendingPostImages[i], 'posts');
+            if (uploadedUrl) imageUrls.push(uploadedUrl);
+        }
+        if (imageUrls.length === 0 && pendingPostImages.length > 0) { isSubmitting = false; btn.textContent = '悄悄送出'; showToast('(｡•́︿•̀｡)', '图片上传失败'); return; }
     }
     var now = new Date();
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
@@ -545,10 +553,10 @@ async function submitPost() {
     var author = randomEmoji;
     var authorClass = 'anon';
     if (identityMode === 'nickname' && userNickname) { author = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); authorClass = 'admin'; }
-    var result = await supabaseClient.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr, pinned: false, author_uid: userUid || '', image: imageUrl }]);
+    var result = await supabaseClient.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr, pinned: false, author_uid: userUid || '', image: imageUrls.join(',') }]);
     if (result.error) { isSubmitting = false; btn.textContent = '悄悄送出'; showToast('(｡•́︿•̀｡)', '发布失败'); return; }
     document.getElementById('postContent').value = '';
-    pendingPostImage = null;
+    pendingPostImages = [];
     document.getElementById('postImagePreview').innerHTML = '';
     isSubmitting = false;
     btn.textContent = '悄悄送出';
@@ -605,14 +613,19 @@ async function renderPostCard(post, container) {
     card.className = 'post-card';
     card.setAttribute('data-post-id', post.id);
     card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + escapeHtml(post.tag) + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + escapeHtml(post.author) + '</div><div class="post-content">' + escapeHtml(post.content) + '</div>';
-    if (post.image) { card.innerHTML += '<img src="' + escapeHtml(post.image) + '" class="post-image" onclick="window.open(\'' + escapeHtml(post.image) + '\',\'_blank\')">'; }
+    if (post.image) {
+        var images = post.image.split(',');
+        images.forEach(function(imgUrl) {
+            if (imgUrl.trim()) { card.innerHTML += '<img src="' + escapeHtml(imgUrl.trim()) + '" class="post-image" onclick="window.open(\'' + escapeHtml(imgUrl.trim()) + '\',\'_blank\')">'; }
+        });
+    }
     card.innerHTML += '<div class="post-meta"><span class="post-time">' + escapeHtml(post.time) + '</span><span class="post-number">#' + post.id + '</span></div>';
     var replies = await loadRepliesForPost(post.id);
     card.innerHTML += '<div class="replies-section">';
     replies.forEach(function(r) {
         card.innerHTML += buildReplyHtml(r);
     });
-    card.innerHTML += '<div class="reply-input-row"><input type="text" class="reply-input" id="replyInput-' + post.id + '" placeholder="匿名回复..."><button class="image-upload-btn" onclick="document.getElementById(\'replyImageInput-' + post.id + '\').click()">📷</button><input type="file" id="replyImageInput-' + post.id + '" accept="image/*" style="display:none;" onchange="handleReplyImageSelect(event,' + post.id + ')"><button class="reply-send-btn" onclick="submitReply(' + post.id + ')">发送</button></div><div id="replyImagePreview-' + post.id + '"></div>';
+    card.innerHTML += '<div class="reply-input-row"><input type="text" class="reply-input" id="replyInput-' + post.id + '" placeholder="匿名回复..."><button class="image-upload-btn" onclick="document.getElementById(\'replyImageInput-' + post.id + '\').click()">📷</button><input type="file" id="replyImageInput-' + post.id + '" accept="image/*" multiple style="display:none;" onchange="handleReplyImageSelect(event,' + post.id + ')"><button class="reply-send-btn" onclick="submitReply(' + post.id + ')">发送</button></div><div id="replyImagePreview-' + post.id + '"></div>';
     card.innerHTML += '</div>';
     if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button><button class="admin-btn pin" onclick="togglePin(' + post.id + ', ' + (post.pinned ? 'false' : 'true') + ')">' + (post.pinned ? '取消置顶' : '置顶') + '</button></div>'; }
     container.appendChild(card);
@@ -622,20 +635,33 @@ function buildReplyHtml(r) {
     if (r.reply_to_author) {
         quoteHtml = '<div class="reply-quote">回复 @' + escapeHtml(r.reply_to_author) + '</div>';
     }
-    var imageHtml = r.image ? '<img src="' + escapeHtml(r.image) + '" class="reply-image" onclick="window.open(\'' + escapeHtml(r.image) + '\',\'_blank\')">' : '';
+    var imageHtml = '';
+    if (r.image) {
+        var replyImages = r.image.split(',');
+        replyImages.forEach(function(imgUrl) {
+            if (imgUrl.trim()) { imageHtml += '<img src="' + escapeHtml(imgUrl.trim()) + '" class="reply-image" onclick="window.open(\'' + escapeHtml(imgUrl.trim()) + '\',\'_blank\')">'; }
+        });
+    }
     return '<div class="reply-item">' + quoteHtml + '<span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div>' + imageHtml + '<button class="reply-send-btn" style="font-size:9px;padding:2px 8px;" onclick="setReplyTarget(' + r.id + ',\'' + escapeHtml(r.author) + '\',' + r.post_id + ')">回复</button></div>';
 }
 function handleReplyImageSelect(event, postId) {
-    var file = event.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { showToast('(｡•́︿•̀｡)', '图片不能超过5MB'); event.target.value = ''; return; }
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        pendingReplyImages[postId] = file;
-        var preview = document.getElementById('replyImagePreview-' + postId);
-        preview.innerHTML = '<img src="' + e.target.result + '" class="image-preview">';
-    };
-    reader.readAsDataURL(file);
+    var files = event.target.files;
+    if (!pendingReplyImages[postId]) pendingReplyImages[postId] = [];
+    for (var i = 0; i < files.length; i++) {
+        if (files[i].size > 5 * 1024 * 1024) { showToast('(｡•́︿•̀｡)', '图片不能超过5MB'); continue; }
+        if (pendingReplyImages[postId].length >= 9) { showToast('(｡•́︿•̀｡)', '最多9张图片'); break; }
+        pendingReplyImages[postId].push(files[i]);
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var preview = document.getElementById('replyImagePreview-' + postId);
+            var img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'image-preview';
+            img.onclick = function() { this.remove(); };
+            preview.appendChild(img);
+        };
+        reader.readAsDataURL(files[i]);
+    }
     event.target.value = '';
 }
 function setReplyTarget(replyId, replyAuthor, postId) {
@@ -647,24 +673,27 @@ async function submitReply(postId) {
     if (isSubmitting) return;
     var input = document.getElementById('replyInput-' + postId);
     var content = input.value.trim();
-    if (!content && !pendingReplyImages[postId]) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    if (!content && (!pendingReplyImages[postId] || pendingReplyImages[postId].length === 0)) { showToast('(´･ω･`)', '写点什么吧'); return; }
     if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
     isSubmitting = true;
-    var imageUrl = null;
-    if (pendingReplyImages[postId]) {
-        imageUrl = await uploadImage(pendingReplyImages[postId], 'replies');
-        if (!imageUrl) { isSubmitting = false; showToast('(｡•́︿•̀｡)', '图片上传失败'); return; }
+    var imageUrls = [];
+    if (pendingReplyImages[postId] && pendingReplyImages[postId].length > 0) {
+        for (var i = 0; i < pendingReplyImages[postId].length; i++) {
+            var uploadedUrl = await uploadImage(pendingReplyImages[postId][i], 'replies');
+            if (uploadedUrl) imageUrls.push(uploadedUrl);
+        }
+        if (imageUrls.length === 0 && pendingReplyImages[postId].length > 0) { isSubmitting = false; showToast('(｡•́︿•̀｡)', '图片上传失败'); return; }
     }
     var now = new Date();
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
     var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    var replyData = { post_id: String(postId), content: content, author: randomEmoji, time: timeStr, is_read: false, reply_to: replyTarget ? replyTarget.reply_id : null, reply_to_author: replyTarget ? replyTarget.reply_author : null, image: imageUrl };
+    var replyData = { post_id: String(postId), content: content, author: randomEmoji, time: timeStr, is_read: false, reply_to: replyTarget ? replyTarget.reply_id : null, reply_to_author: replyTarget ? replyTarget.reply_author : null, image: imageUrls.join(',') };
     var result = await supabaseClient.from('replies').insert([replyData]);
     if (result.error) { isSubmitting = false; showToast('(｡•́︿•̀｡)', '回复失败'); return; }
     input.value = '';
     input.placeholder = '匿名回复...';
     replyTarget = null;
-    pendingReplyImages[postId] = null;
+    pendingReplyImages[postId] = [];
     var preview = document.getElementById('replyImagePreview-' + postId);
     if (preview) preview.innerHTML = '';
     allRepliesCache[postId] = null;
@@ -893,7 +922,7 @@ function handleRegisterClick() { if (userNickname) { showUserCenter(); } else { 
 function showRegister() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><h3>✏️ 注册</h3><input type="text" id="nicknameInput" placeholder="输入昵称..."><input type="password" id="passwordInput" placeholder="设置密码..."><input type="password" id="koulingInput" placeholder="口令（选填）"><button class="close-btn" onclick="saveNickname()">完成注册</button><button class="link-btn" onclick="showUidLogin()">已有账号？用UID登录 →</button><br><button class="social-btn qq" onclick="socialLogin(\'qq\')">QQ登录</button><button class="social-btn wx" onclick="socialLogin(\'wx\')">微信登录</button></div>';
+    overlay.innerHTML = '<div class="modal"><h3>✏️ 注册</h3><input type="text" id="nicknameInput" placeholder="输入昵称..."><input type="password" id="passwordInput" placeholder="设置密码..."><input type="password" id="koulingInput" placeholder="口令（选填）"><button class="close-btn" onclick="saveNickname()">完成注册</button><button class="link-btn uid-tab-btn" onclick="showUidLogin()">已有账号？用UID登录 →</button><br><button class="social-btn qq" onclick="socialLogin(\'qq\')">QQ登录</button><button class="social-btn wx" onclick="socialLogin(\'wx\')">微信登录</button></div>';
     document.body.appendChild(overlay);
 }
 function showUidLogin() {
@@ -958,7 +987,7 @@ function handleSocialCallback() {
                         showWelcomeToast();
                     } else {
                         var nickname = data.nickname || 'QQ用户';
-                        var maxResult = supabaseClient.from('users').select('uid').order('uid', { ascending: false }).limit(1).then(function(mr) {
+                        supabaseClient.from('users').select('uid').order('uid', { ascending: false }).limit(1).then(function(mr) {
                             var maxUid = mr.data && mr.data.length > 0 ? parseInt(mr.data[0].uid) : 999999;
                             var newUid = String(maxUid + 1);
                             supabaseClient.from('users').insert([{ nickname: nickname, password: '', uid: newUid, isadmin: false, isowner: false, social_uid: socialUid, social_type: socialType }]).then(function(ir) {
@@ -1093,7 +1122,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v9.0（当前版本）</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖图片上传</div><div class="update-item">· 回复图片上传</div><div class="update-item">· 美食删除</div><div class="update-item">· 防重复提交</div><div class="update-item">· 置顶排序修复</div><div class="update-item">· 回复提醒升级</div><div class="update-item">· QQ/微信登录</div><div class="update-item">· 用户中心</div><div class="update-item">· Toast动画修复</div><div class="update-item">· 开屏动画停留</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v9.0（当前版本）</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· 美食删除</div><div class="update-item">· 防重复提交</div><div class="update-item">· 置顶排序修复</div><div class="update-item">· 回复提醒升级</div><div class="update-item">· QQ/微信登录</div><div class="update-item">· 用户中心</div><div class="update-item">· Toast动画修复</div><div class="update-item">· 开屏动画停留</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
