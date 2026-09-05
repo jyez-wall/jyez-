@@ -144,7 +144,8 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .welcome-toast .welcome-name { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; }
 .welcome-toast .welcome-uid { font-size: 11px; color: #ccc; letter-spacing: 1px; margin-top: 6px; }
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal { background: #fff; border-radius: 8px; padding: 28px 24px; max-width: 350px; width: 90%; text-align: center; max-height: 80vh; overflow-y: auto; }
+.modal { background: #fff; border-radius: 8px; padding: 28px 24px; max-width: 350px; width: 90%; text-align: center; max-height: 80vh; overflow-y: auto; position: relative; }
+.modal-close-x { position: absolute; top: 8px; right: 12px; font-size: 18px; color: #ccc; cursor: pointer; }
 .modal h3 { font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8e8e8; }
 .modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }
 .modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
@@ -390,6 +391,7 @@ var pendingReplyImages = {};
 var mapayAppid = '1940';
 var mapayAppkey = '762799bfa7162585793944c651af8057';
 var mapayRedirect = 'https://jyez-wall.github.io/jyez-wall';
+var mapayProxyUrl = 'https://byokxdqvxtdshsdoagtm.supabase.co/functions/v1/hyper-responder';
 var isSubmitting = false;
 
 function updateCountdown() {
@@ -461,7 +463,7 @@ playRandomSong();
 function showPlaylist() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><h3>🎵 播放列表</h3><div class="user-list">';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 播放列表</h3><div class="user-list">';
     songNames.forEach(function(name, index) {
         html += '<div class="reply-item" style="cursor:pointer;font-size:10px;color:#999;" onclick="playSong(' + index + ')">' + (index === currentSong ? '▶ ' : '') + escapeHtml(name) + '</div>';
     });
@@ -572,8 +574,12 @@ async function loadRepliesForPost(postId) {
     return replies;
 }
 async function loadPosts() {
-    var result = await supabaseClient.from('posts').select('*').order('id', { ascending: false }).limit(100);
-    if (result.data) { allPosts = result.data.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '', image: p.image || null }; }); updateStats(); renderPosts(); checkUnreadReplies(); }
+    var pinnedResult = await supabaseClient.from('posts').select('*').eq('pinned', true).order('id', { ascending: false });
+    var normalResult = await supabaseClient.from('posts').select('*').eq('pinned', false).order('id', { ascending: false }).limit(100);
+    var pinnedPosts = pinnedResult.data || [];
+    var normalPosts = normalResult.data || [];
+    var allData = pinnedPosts.concat(normalPosts);
+    if (allData.length > 0) { allPosts = allData.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '', image: p.image || null }; }); updateStats(); renderPosts(); checkUnreadReplies(); }
 }
 async function loadFoods() {
     var result = await supabaseClient.from('foods').select('*').order('id', { ascending: false }).limit(100);
@@ -726,7 +732,7 @@ async function pickBottle() {
     var bottle = result.data[Math.floor(Math.random() * result.data.length)];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><h3>🍾 你捞到一个瓶子</h3><p>' + escapeHtml(bottle.content) + '</p><p style="font-size:10px;color:#ccc;">' + escapeHtml(bottle.author) + ' · ' + escapeHtml(bottle.time) + '</p><textarea id="bottleReply" placeholder="回复这个瓶子..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="replyBottle(' + bottle.id + ')">回复</button><br><button class="link-btn" onclick="closeModal()">扔回海里</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🍾 你捞到一个瓶子</h3><p>' + escapeHtml(bottle.content) + '</p><p style="font-size:10px;color:#ccc;">' + escapeHtml(bottle.author) + ' · ' + escapeHtml(bottle.time) + '</p><textarea id="bottleReply" placeholder="回复这个瓶子..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="replyBottle(' + bottle.id + ')">回复</button><br><button class="link-btn" onclick="closeModal()">扔回海里</button></div>';
     document.body.appendChild(overlay);
 }
 async function replyBottle(bottleId) {
@@ -742,8 +748,9 @@ function renderPosts() {
     postsList.innerHTML = '';
     var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
     filteredPosts.sort(function(a, b) {
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
+        if (a.pinned && b.pinned) return b.id - a.id;
+        if (a.pinned) return -1;
+        if (b.pinned) return 1;
         return b.id - a.id;
     });
     if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
@@ -832,7 +839,7 @@ async function showClassList() {
     var classes = result.data || [];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><h3>🏠 班级小窝</h3><div class="class-list">';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🏠 班级小窝</h3><div class="class-list">';
     classes.forEach(function(c) {
         html += '<div class="class-item"><div class="class-info"><span class="class-name">' + escapeHtml(c.name) + '</span></div><button class="class-action-btn" onclick="enterClassRoom(\'' + c.id + '\',\'' + escapeHtml(c.name) + '\')">进入</button></div>';
     });
@@ -863,7 +870,7 @@ async function showTeacherList() {
     var teachers = result.data || [];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><h3>👨‍🏫 老师评价</h3><div class="teacher-list">';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>👨‍🏫 老师评价</h3><div class="teacher-list">';
     teachers.forEach(function(t) {
         html += '<div class="teacher-item"><div class="teacher-info"><span class="teacher-name">' + escapeHtml(t.name) + '</span><span class="teacher-subject">' + escapeHtml(t.subject || '') + '</span></div><button class="teacher-action-btn" onclick="showTeacherReviews(' + t.id + ',\'' + escapeHtml(t.name) + '\')">查看</button></div>';
     });
@@ -887,7 +894,7 @@ async function showTeacherReviews(teacherId, teacherName) {
     var avgRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : '暂无';
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><h3>' + escapeHtml(teacherName) + '</h3><p>⭐ 平均评分：' + avgRating + '（' + reviews.length + '人评价）</p><div class="user-list">';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>' + escapeHtml(teacherName) + '</h3><p>⭐ 平均评分：' + avgRating + '（' + reviews.length + '人评价）</p><div class="user-list">';
     reviews.forEach(function(r) {
         var stars = '';
         for (var i = 0; i < r.rating; i++) stars += '⭐';
@@ -926,21 +933,21 @@ function handleRegisterClick() { if (userNickname) { showUserCenter(); } else { 
 function showRegister() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><h3>✏️ 注册</h3><input type="text" id="nicknameInput" placeholder="输入昵称..."><input type="password" id="passwordInput" placeholder="设置密码..."><input type="password" id="koulingInput" placeholder="口令（选填）"><button class="close-btn" onclick="saveNickname()">完成注册</button><button class="link-btn uid-tab-btn" onclick="showUidLogin()">已有账号？用UID登录 →</button><br><button class="social-btn qq" onclick="socialLogin(\'qq\')">QQ登录</button><button class="social-btn wx" onclick="socialLogin(\'wx\')">微信登录</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>✏️ 注册</h3><input type="text" id="nicknameInput" placeholder="输入昵称..."><input type="password" id="passwordInput" placeholder="设置密码..."><input type="password" id="koulingInput" placeholder="口令（选填）"><button class="close-btn" onclick="saveNickname()">完成注册</button><button class="link-btn uid-tab-btn" onclick="showUidLogin()">已有账号？用UID登录 →</button><br><button class="social-btn qq" onclick="socialLogin(\'qq\')">QQ登录</button><button class="social-btn wx" onclick="socialLogin(\'wx\')">微信登录</button></div>';
     document.body.appendChild(overlay);
 }
 function showUidLogin() {
     closeModal();
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><h3>🔑 UID登录</h3><input type="text" id="uidInput" placeholder="输入UID..." style="font-size:12px !important;"><input type="password" id="uidPasswordInput" placeholder="输入密码..." style="font-size:12px !important;"><button class="close-btn" onclick="verifyUidLogin()">登录</button><button class="link-btn uid-tab-btn" onclick="showRegister()">没有账号？去注册 →</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🔑 UID登录</h3><input type="text" id="uidInput" placeholder="输入UID..." style="font-size:12px !important;"><input type="password" id="uidPasswordInput" placeholder="输入密码..." style="font-size:12px !important;"><button class="close-btn" onclick="verifyUidLogin()">登录</button><button class="link-btn uid-tab-btn" onclick="showRegister()">没有账号？去注册 →</button></div>';
     document.body.appendChild(overlay);
 }
 function showUserCenter() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     var socialStatus = socialUid ? (socialType === 'qq' ? '已绑定 QQ' : '已绑定微信') : '未绑定第三方';
-    var html = '<div class="modal"><h3>' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</h3><p>UID: ' + escapeHtml(userUid) + '</p><p>身份：' + (isOwner ? '站长' : (isAdmin ? '管理员' : '普通用户')) + '</p><p>第三方：' + socialStatus + '</p>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</h3><p>UID: ' + escapeHtml(userUid) + '</p><p>身份：' + (isOwner ? '站长' : (isAdmin ? '管理员' : '普通用户')) + '</p><p>第三方：' + socialStatus + '</p>';
     if (!socialUid) {
         html += '<button class="social-btn qq" onclick="bindSocial(\'qq\')">绑定 QQ</button><button class="social-btn wx" onclick="bindSocial(\'wx\')">绑定微信</button><br>';
     }
@@ -951,8 +958,7 @@ function showUserCenter() {
     document.body.appendChild(overlay);
 }
 function socialLogin(type) {
-    var loginUrl = 'https://login.mapay.cn/connect.php?act=login&appid=' + mapayAppid + '&appkey=' + mapayAppkey + '&type=' + type + '&redirect_uri=' + encodeURIComponent(mapayRedirect);
-    fetch(loginUrl)
+    fetch(mapayProxyUrl + '?act=login&type=' + type)
     .then(function(res) { return res.json(); })
     .then(function(data) {
         if (data.code === 0 && data.url) {
@@ -965,8 +971,7 @@ function socialLogin(type) {
 }
 function bindSocial(type) {
     if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
-    var loginUrl = 'https://login.mapay.cn/connect.php?act=login&appid=' + mapayAppid + '&appkey=' + mapayAppkey + '&type=' + type + '&redirect_uri=' + encodeURIComponent(mapayRedirect + '?bind=1&type=' + type);
-    fetch(loginUrl)
+    fetch(mapayProxyUrl + '?act=login&type=' + type)
     .then(function(res) { return res.json(); })
     .then(function(data) {
         if (data.code === 0 && data.url) {
@@ -983,8 +988,7 @@ function handleSocialCallback() {
     var type = params.get('type');
     var bind = params.get('bind');
     if (!code || !type) return;
-    var callbackUrl = 'https://login.mapay.cn/connect.php?act=callback&appid=' + mapayAppid + '&appkey=' + mapayAppkey + '&type=' + type + '&code=' + code;
-    fetch(callbackUrl)
+    fetch(mapayProxyUrl + '?act=callback&type=' + type + '&code=' + code)
     .then(function(res) { return res.json(); })
     .then(function(data) {
         if (data.code === 0 && data.social_uid) {
@@ -1039,7 +1043,7 @@ async function showUserList() {
     var users = result.data || [];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><h3>📋 用户列表</h3><input type="text" class="search-input" id="userSearch" placeholder="搜索UID或昵称..." oninput="filterUsers()"><div class="user-list" id="userList">';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📋 用户列表</h3><input type="text" class="search-input" id="userSearch" placeholder="搜索UID或昵称..." oninput="filterUsers()"><div class="user-list" id="userList">';
     users.forEach(function(u) {
         html += '<div class="user-item" data-uid="' + escapeHtml(u.uid) + '" data-name="' + escapeHtml(u.nickname) + '"><div class="user-info"><span class="user-name">' + escapeHtml(u.nickname) + (u.isadmin ? ' ⭐' : '') + '</span><span class="user-uid">UID: ' + escapeHtml(u.uid) + '</span></div>';
         if (u.isadmin) { html += '<button class="user-action-btn remove" onclick="toggleAdmin(\'' + u.uid + '\', false)">取消管理员</button>'; }
@@ -1139,13 +1143,13 @@ function updateRegisterBtn() {
 function showAbout() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v9.0（当前版本）</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· 美食删除</div><div class="update-item">· 防重复提交</div><div class="update-item">· 置顶排序修复</div><div class="update-item">· 回复提醒升级</div><div class="update-item">· QQ/微信登录</div><div class="update-item">· 用户中心</div><div class="update-item">· Toast动画修复</div><div class="update-item">· 开屏动画停留</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v9.0（当前版本）</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· 美食删除</div><div class="update-item">· 防重复提交</div><div class="update-item">· 置顶排序修复</div><div class="update-item">· 回复提醒升级</div><div class="update-item">· QQ/微信登录</div><div class="update-item">· 用户中心</div><div class="update-item">· Toast动画修复</div><div class="update-item">· 开屏动画停留</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
