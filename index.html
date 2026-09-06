@@ -24,6 +24,7 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
 .music-bar { font-size: 11px; color: #999; letter-spacing: 1px; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 10px; display: inline-block; cursor: pointer; }
+.activity-bar { font-size: 11px; color: #888; letter-spacing: 1px; background: rgba(255,255,255,0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 5px 10px; border-radius: 10px; display: inline-block; cursor: pointer; margin-top: 4px; }
 .top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
 .register-row { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 #countdown { font-size: 10px; color: #999; letter-spacing: 1px; white-space: nowrap; }
@@ -86,6 +87,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .tag-寻人 { background: #f0fff4; color: #5aa86a; }
 .tag-出物 { background: #f0f0f0; color: #1a1a1a; }
 .tag-其他 { background: #f5f0ff; color: #9a7ac9; }
+.tag-活动 { background: #f0f0f0; color: #555; }
 .pin-tag { background: #fff8e8; color: #c9a44a; }
 .post-emoji { font-size: 13px; color: #ccc; margin-bottom: 8px; }
 .post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }
@@ -150,6 +152,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .modal h3 { font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8e8e8; }
 .modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }
 .modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
+.modal .gray-btn { margin-top: 12px; border: 1px solid #888; background: none; color: #666; padding: 6px 20px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
 .modal input, .modal select { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; font-size: 14px !important; }
 .modal .link-btn { border: none; background: none; color: #8ecae6; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; margin-top: 8px; }
 .modal .social-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #ddd; background: none; color: #666; padding: 8px 20px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 4px; margin: 4px; }
@@ -207,6 +210,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
         <div class="top-left">
             <div class="site-title">二中·集</div>
             <div class="music-bar" onclick="showPlaylist()">🎵 <span id="musicLabel">One Last Kiss</span></div>
+            <div class="activity-bar" onclick="showActivityDetail()">🎨 二中拟人计划 · 为二中取一个名字</div>
         </div>
         <div class="top-right">
             <div class="register-row">
@@ -251,6 +255,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
                 <button class="category-btn" data-tag="树洞">◌ 树洞</button>
                 <button class="category-btn" data-tag="寻人">? 寻人</button>
                 <button class="category-btn" data-tag="出物">◆ 出物</button>
+                <button class="category-btn" data-tag="活动">✦ 活动</button>
                 <button class="category-btn" data-tag="其他">· 其他</button>
             </div>
             <div class="identity-switch" id="identitySwitch">
@@ -274,6 +279,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
             <button class="filter-btn" data-filter="树洞">◌ 树洞</button>
             <button class="filter-btn" data-filter="寻人">? 寻人</button>
             <button class="filter-btn" data-filter="出物">◆ 出物</button>
+            <button class="filter-btn" data-filter="活动">✦ 活动</button>
             <button class="filter-btn" data-filter="其他">· 其他</button>
         </div>
         <div class="posts-list" id="postsList">
@@ -394,6 +400,7 @@ var mapayAppkey = '251f50340c05184bec75a98dfdb7b1d6';
 var mapayRedirect = 'https://jyez-wall.github.io/jyez-/';
 var mapayProxyUrl = 'https://byokxdqvxtdshsdoagtm.supabase.co/functions/v1/hyper-responder';
 var isSubmitting = false;
+var activityTopic = '#二中拟人';
 
 function updateCountdown() {
     var now = new Date();
@@ -480,6 +487,34 @@ function playSong(index) {
     closeModal();
 }
 
+function showActivityDetail() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>二中拟人 · 名字征集</h3>';
+    html += '<p>如果二中变成一个人，<br>会叫什么名字？</p>';
+    html += '<p>或许像风，或许像树，<br>或许只是某天傍晚，<br>你在校门口回头时，<br>心里忽然想到的那个词。</p>';
+    html += '<p>心事箱发帖，开头带上：<br>#二中拟人</p>';
+    html += '<p>例：<br>#二中拟人 · 林知夏</p>';
+    html += '<p style="font-size:11px;color:#bbb;">征集截止：9 月 20 日</p>';
+    html += '<button class="gray-btn" onclick="closeModal();goActivityPost()">去投稿</button><br>';
+    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+function goActivityPost() {
+    switchMode('post');
+    selectedTag = '活动';
+    var categoryBtns = document.querySelectorAll('.category-btn');
+    categoryBtns.forEach(function(btn) {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-tag') === '活动') btn.classList.add('active');
+    });
+    var textarea = document.getElementById('postContent');
+    textarea.value = activityTopic + ' ';
+    textarea.focus();
+}
+
 function switchMode(mode) {
     document.getElementById('postSection').style.display = 'none';
     document.getElementById('foodSection').style.display = 'none';
@@ -537,6 +572,9 @@ async function submitPost() {
     if (isSubmitting) return;
     var content = document.getElementById('postContent').value.trim();
     if (!content) { showToast('(´･ω･`)', '写点什么再送出去吧'); return; }
+    if (selectedTag === '活动' && content.indexOf('#') === -1) {
+        content = activityTopic + ' ' + content;
+    }
     if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
     if (!isAdmin && !isOwner && containsLink(content)) { showToast('(｡•́︿•̀｡)', '非管理员不能发链接'); return; }
     isSubmitting = true;
@@ -707,7 +745,7 @@ async function submitReply(postId) {
     isSubmitting = false;
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '回复成功');
-}
+}<script>
 async function throwBottle() {
     if (isSubmitting) return;
     var content = document.getElementById('bottleContent').value.trim();
@@ -1144,13 +1182,13 @@ function updateRegisterBtn() {
 function showAbout() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>✦ 活动 — 参与校园活动<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v9.1（当前版本）</div><div class="update-item">· 置顶排序修复</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· 美食删除</div><div class="update-item">· 防重复提交</div><div class="update-item">· 回复提醒升级</div><div class="update-item">· QQ/微信登录</div><div class="update-item">· 用户中心</div><div class="update-item">· Toast动画修复</div><div class="update-item">· 开屏动画停留</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v9.2（当前版本）</div><div class="update-item">· 置顶排序修复</div><div class="update-item">· 活动分类上线</div><div class="update-item">· 二中拟人计划启动</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· 美食删除</div><div class="update-item">· 防重复提交</div><div class="update-item">· 回复提醒升级</div><div class="update-item">· QQ/微信登录</div><div class="update-item">· 用户中心</div><div class="update-item">· Toast动画修复</div><div class="update-item">· 开屏动画停留</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
