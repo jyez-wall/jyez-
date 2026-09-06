@@ -745,7 +745,7 @@ async function submitReply(postId) {
     isSubmitting = false;
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '回复成功');
-}<script>
+}
 async function throwBottle() {
     if (isSubmitting) return;
     var content = document.getElementById('bottleContent').value.trim();
