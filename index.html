@@ -8,7 +8,8 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href='data:application/manifest+json,{"name":"二中·集","short_name":"二中·集","start_url":".","display":"standalone","background_color":"%23fafafa","theme_color":"%238b1a1a","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]}'>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
 <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 <style>
@@ -909,7 +910,7 @@ async function saveEdit(postId) {
     closeModal();
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '已保存');
-}<script>
+}
 async function toggleLike(postId) {
     if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
     if (myLikes[postId]) {
@@ -1089,256 +1090,179 @@ async function showReports() {
 async function handleReport(reportId, status) {
     var result = await supabaseClient.from('reports').update({ status: status }).eq('id', reportId);
     if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已处理'); showReports(); }
-}<script>
-async function loadMyProfile() {
-    if (!userUid) return;
-    var result = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
-    if (result.data) {
-        userAvatar = result.data.avatar || '';
-        userBio = result.data.bio || '';
-    }
 }
 
-async function showMyProfile() {
-    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
-    await loadMyProfile();
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    var avatarHtml = userAvatar ? '<img src="' + escapeHtml(userAvatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="profile-card">' + avatarHtml + '<div class="profile-name">' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</div><div class="profile-bio">' + escapeHtml(userBio || '这个人很懒，什么都没写') + '</div><div class="profile-uid">UID: ' + escapeHtml(userUid) + '</div></div>';
-    html += '<button class="gray-btn" onclick="closeModal();uploadAvatar()">更换头像</button> ';
-    html += '<button class="gray-btn" onclick="closeModal();editBio()">编辑签名</button><br>';
-    html += '<button class="link-btn" onclick="closeModal();showMyFavs()">⭐ 我的收藏</button><br>';
-    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
-    overlay.innerHTML = html;
-    document.body.appendChild(overlay);
-}
-
-function uploadAvatar() {
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async function(e) {
-        var file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) { showToast('(｡•́︿•̀｡)', '图片不能超过5MB'); return; }
-        var url = await uploadImage(file, 'avatars');
-        if (!url) { showToast('(｡•́︿•̀｡)', '上传失败'); return; }
-        var check = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
-        if (check.data) {
-            await supabaseClient.from('profiles').update({ avatar: url }).eq('uid', userUid);
-        } else {
-            await supabaseClient.from('profiles').insert([{ uid: userUid, avatar: url, bio: '' }]);
-        }
-        userAvatar = url;
-        showToast('(｡•̀ᴗ-)✧', '头像已更新');
-    };
-    input.click();
-}
-
-function editBio() {
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>✏️ 编辑签名</h3><textarea id="bioInput" placeholder="写一句话...">' + escapeHtml(userBio) + '</textarea><button class="close-btn" onclick="saveBio()">保存</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
-    document.body.appendChild(overlay);
-}
-
-async function saveBio() {
-    var bio = document.getElementById('bioInput').value.trim();
-    var check = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
-    if (check.data) {
-        await supabaseClient.from('profiles').update({ bio: bio }).eq('uid', userUid);
-    } else {
-        await supabaseClient.from('profiles').insert([{ uid: userUid, avatar: '', bio: bio }]);
-    }
-    userBio = bio;
-    closeModal();
-    showToast('(｡•̀ᴗ-)✧', '已保存');
-}
-
-async function showUserProfile(uid) {
-    var userResult = await supabaseClient.from('users').select('*').eq('uid', uid).single();
-    if (!userResult.data) { showToast('(｡•́︿•̀｡)', '用户不存在'); return; }
-    var profileResult = await supabaseClient.from('profiles').select('*').eq('uid', uid).single();
-    var avatar = profileResult.data ? profileResult.data.avatar : '';
-    var bio = profileResult.data ? profileResult.data.bio : '';
-    var postResult = await supabaseClient.from('posts').select('*').eq('author_uid', uid).order('id', { ascending: false }).limit(20);
-    var posts = postResult.data || [];
-    var avatarHtml = avatar ? '<img src="' + escapeHtml(avatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="profile-card">' + avatarHtml + '<div class="profile-name">' + escapeHtml(userResult.data.nickname) + (userResult.data.isowner ? ' 👑' : (userResult.data.isadmin ? ' ⭐' : '')) + '</div><div class="profile-bio">' + escapeHtml(bio || '这个人很懒') + '</div><div class="profile-uid">UID: ' + escapeHtml(uid) + '</div></div>';
-    if (userUid && uid !== userUid) {
-        html += '<button class="gray-btn" onclick="closeModal();openChat(\'' + uid + '\')">发私信</button><br>';
-    }
-    html += '<div class="user-list" style="margin-top:12px;">';
-    posts.forEach(function(p) {
-        html += '<div class="reply-item"><div class="reply-content">' + escapeHtml(p.content.slice(0, 40)) + (p.content.length > 40 ? '...' : '') + '</div><div class="reply-time">' + escapeHtml(p.time) + '</div></div>';
-    });
-    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
-    overlay.innerHTML = html;
-    document.body.appendChild(overlay);
-}
-
-function switchRank(type) {
-    currentRank = type;
-    var tabs = document.querySelectorAll('.rank-tab');
-    tabs.forEach(function(t) { t.classList.remove('active'); if (t.getAttribute('data-rank') === type) t.classList.add('active'); });
-    renderRank();
-}
-
-async function renderRank() {
-    var list = document.getElementById('rankList');
-    if (!list) return;
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>加载中...</p></div>';
-    if (currentRank === 'like') {
-        var likeResult = await supabaseClient.from('likes').select('post_id').eq('type', 'like');
-        var counts = {};
-        (likeResult.data || []).forEach(function(l) { counts[l.post_id] = (counts[l.post_id] || 0) + 1; });
-        var sorted = Object.keys(counts).map(function(pid) { return { id: pid, count: counts[pid] }; }).sort(function(a, b) { return b.count - a.count; }).slice(0, 20);
-        list.innerHTML = '';
-        if (sorted.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有数据</p></div>'; return; }
-        for (var i = 0; i < sorted.length; i++) {
-            var item = sorted[i];
-            var postResult = await supabaseClient.from('posts').select('*').eq('id', item.id).single();
-            if (postResult.data) {
-                var p = postResult.data;
-                var div = document.createElement('div');
-                div.className = 'rank-item';
-                div.innerHTML = '<div class="rank-content"><span class="rank-num">#' + (i + 1) + '</span>' + escapeHtml(p.content.slice(0, 50)) + (p.content.length > 50 ? '...' : '') + '</div><div class="rank-meta">❤️ ' + item.count + ' 赞 · ' + escapeHtml(p.time) + '</div>';
-                list.appendChild(div);
-            }
-        }
-    } else {
-        var postResult2 = await supabaseClient.from('posts').select('*').order('views', { ascending: false }).limit(20);
-        var posts = postResult2.data || [];
-        list.innerHTML = '';
-        if (posts.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有数据</p></div>'; return; }
-        posts.forEach(function(p, i) {
-            var div = document.createElement('div');
-            div.className = 'rank-item';
-            div.innerHTML = '<div class="rank-content"><span class="rank-num">#' + (i + 1) + '</span>' + escapeHtml(p.content.slice(0, 50)) + (p.content.length > 50 ? '...' : '') + '</div><div class="rank-meta">👁️ ' + (p.views || 0) + ' 浏览 · ' + escapeHtml(p.time) + '</div>';
-            list.appendChild(div);
-        });
-    }
-}
-
-function switchSongTab(tab) {
-    currentSongTab = tab;
-    var tabs = document.querySelectorAll('.rank-tab[data-songtab]');
-    tabs.forEach(function(t) { t.classList.remove('active'); if (t.getAttribute('data-songtab') === tab) t.classList.add('active'); });
-    loadSongs();
-}
-
-async function loadSongs() {
-    var list = document.getElementById('songList');
-    if (!list) return;
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>加载中...</p></div>';
-    var result;
-    if (currentSongTab === 'mine') {
-        if (!userUid) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>请先登录</p></div>'; return; }
-        result = await supabaseClient.from('songs').select('*').eq('uploader_uid', userUid).order('id', { ascending: false });
-    } else {
-        result = await supabaseClient.from('songs').select('*').eq('is_public', true).order('id', { ascending: false }).limit(100);
-    }
-    var songs = result.data || [];
-    list.innerHTML = '';
-    if (songs.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有歌曲</p><p class="empty-sub">来添加一首吧</p></div>'; return; }
-    songs.forEach(function(s) {
-        var div = document.createElement('div');
-        div.className = 'song-item';
-        var canDelete = (isAdmin || isOwner || s.uploader_uid === userUid);
-        div.innerHTML = '<div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + ' · ' + escapeHtml(s.time) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSong(' + s.id + ')">删除</button>' : '');
-        list.appendChild(div);
-    });
-}
-
-async function addSong() {
-    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
-    var input = document.getElementById('songIdInput');
-    var neteaseId = input.value.trim();
-    if (!neteaseId) { showToast('(´･ω･`)', '请输入歌曲 ID'); return; }
-    if (!/^\d+$/.test(neteaseId)) { showToast('(｡•́︿•̀｡)', 'ID 必须是数字'); return; }
-    var dupCheck = await supabaseClient.from('songs').select('*').eq('netease_id', neteaseId).eq('is_public', true).single();
-    if (dupCheck.data) { showToast('(´･ω･`)', '这首歌已经在公共歌单了'); return; }
-    var nameRes = await fetch(neteaseApi + '?type=name&id=' + neteaseId);
-    var songName = await nameRes.text();
-    if (!songName || songName.indexOf('error') !== -1) { showToast('(｡•́︿•̀｡)', '获取歌曲失败'); return; }
+async function throwBottle() {
+    if (isSubmitting) return;
+    var content = document.getElementById('bottleContent').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    isSubmitting = true;
+    var btn = document.getElementById('bottleBtn');
+    btn.textContent = '扔出中...';
     var now = new Date();
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var result = await supabaseClient.from('songs').insert([{ name: songName.trim(), netease_id: neteaseId, uploader_uid: userUid, uploader_name: userNickname || '匿名', is_public: true, time: timeStr }]);
-    if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
-    input.value = '';
-    showToast('(｡•̀ᴗ-)✧', '已添加');
-    loadSongs();
+    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    var result = await supabaseClient.from('bottles').insert([{ content: content, author: randomEmoji, time: timeStr, is_replied: false, reply: '', reply_time: '' }]);
+    if (result.error) { isSubmitting = false; btn.textContent = '扔瓶子'; showToast('(｡•́︿•̀｡)', '扔瓶子失败'); return; }
+    document.getElementById('bottleContent').value = '';
+    isSubmitting = false;
+    btn.textContent = '扔瓶子';
+    showToast('🍾', '瓶子已扔进海里');
 }
 
-async function deleteSong(id) {
-    if (!confirm('确认删除这首歌？')) return;
-    var result = await supabaseClient.from('songs').delete().eq('id', id);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); loadSongs(); }
-}
-
-function playNetease(neteaseId, name) {
+async function pickBottle() {
+    if (isSubmitting) return;
+    var result = await supabaseClient.from('bottles').select('*').eq('is_replied', false).limit(10);
+    if (!result.data || result.data.length === 0) { showToast('🌊', '海里没有瓶子了'); return; }
+    var bottle = result.data[Math.floor(Math.random() * result.data.length)];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 ' + escapeHtml(name) + '</h3><div style="margin:10px 0;"><meting-js server="netease" type="song" id="' + escapeHtml(neteaseId) + '" auto="true"></meting-js></div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🍾 你捞到一个瓶子</h3><p>' + escapeHtml(bottle.content) + '</p><p style="font-size:10px;color:#ccc;">' + escapeHtml(bottle.author) + ' · ' + escapeHtml(bottle.time) + '</p><textarea id="bottleReply" placeholder="回复这个瓶子..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="replyBottle(' + bottle.id + ')">回复</button><br><button class="link-btn" onclick="closeModal()">扔回海里</button></div>';
     document.body.appendChild(overlay);
 }
 
-async function loadDevelopers() {
-    var result = await supabaseClient.from('developers').select('*').order('id', { ascending: true });
-    return result.data || [];
+async function replyBottle(bottleId) {
+    var content = document.getElementById('bottleReply').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var result = await supabaseClient.from('bottles').update({ is_replied: true, reply: content, reply_time: timeStr }).eq('id', bottleId);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已回复'); closeModal(); }
 }
 
-async function showDevelopers() {
-    var devs = await loadDevelopers();
+function renderPosts() {
+    var postsList = document.getElementById('postsList');
+    postsList.innerHTML = '';
+    var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
+    filteredPosts.sort(function(a, b) {
+        if (a.pinned && b.pinned) return b.id - a.id;
+        if (a.pinned) return -1;
+        if (b.pinned) return 1;
+        return b.id - a.id;
+    });
+    if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
+    filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
+}
+
+async function submitFood() {
+    if (isSubmitting) return;
+    var name = document.getElementById('foodName').value.trim();
+    var recommend = document.getElementById('foodRecommend').value.trim();
+    var price = document.getElementById('foodPrice').value.trim();
+    var comment = document.getElementById('foodComment').value.trim();
+    if (!name || !recommend) { showToast('(´･ω･`)', '至少填店名和推荐菜'); return; }
+    if (containsBanned(name) || containsBanned(recommend) || containsBanned(comment)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    isSubmitting = true;
+    var btn = document.getElementById('foodBtn');
+    btn.textContent = '推荐中...';
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var result = await supabaseClient.from('foods').insert([{ name: name, recommend: recommend, price: price || '未知', distance: selectedDistance, rating: selectedRating, comment: comment || '暂无评价', time: timeStr }]);
+    if (result.error) { isSubmitting = false; btn.textContent = '推荐'; showToast('(｡•́︿•̀｡)', '推荐失败'); return; }
+    document.getElementById('foodName').value = '';
+    document.getElementById('foodRecommend').value = '';
+    document.getElementById('foodPrice').value = '';
+    document.getElementById('foodComment').value = '';
+    isSubmitting = false;
+    btn.textContent = '推荐';
+    await loadFoods();
+    showToast('(｡•̀ᴗ-)✧', '推荐成功！');
+}
+
+async function deleteFood(id) {
+    var result = await supabaseClient.from('foods').delete().eq('id', id);
+    if (!result.error) { await loadFoods(); showToast('(｡•̀ᴗ-)✧', '已删除'); }
+}
+
+function updateStats() { document.getElementById('postCount').textContent = allPosts.length; document.getElementById('foodCount').textContent = allFoods.length; }
+
+function renderFoods() {
+    var foodList = document.getElementById('foodList');
+    foodList.innerHTML = '';
+    if (allFoods.length === 0) { foodList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有美食推荐</p><p class="empty-sub">快来推荐你爱的店吧！</p></div>'; return; }
+    allFoods.forEach(function(food) {
+        var card = document.createElement('div');
+        card.className = 'food-card';
+        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span><div class="food-name">' + escapeHtml(food.name) + '</div><div class="food-detail">⭐ ' + escapeHtml(food.recommend) + '</div><div class="food-detail">💰 ' + escapeHtml(food.price) + '</div><div class="food-tags"><span class="food-tag distance">🚶 ' + escapeHtml(food.distance) + '</span><span class="food-tag rating">⭐ ' + escapeHtml(food.rating) + '</span></div><div class="food-comment">📝 ' + escapeHtml(food.comment) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(food.time) + '</span><span class="post-number">#' + food.id + '</span></div>';
+        if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deleteFood(' + food.id + ')">删除</button></div>'; }
+        foodList.appendChild(card);
+    });
+}
+
+async function enterRoom(name) {
+    currentRoom = name;
+    currentClassRoom = '';
+    if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];
+    document.getElementById('teaRoomList').style.display = 'none';
+    document.getElementById('chatRoom').style.display = '';
+    var chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = '';
+    var result = await supabaseClient.from('chat_messages').select('*').eq('room', name).order('id', { ascending: true }).limit(50);
+    var msgs = result.data || [];
+    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function backToRooms() { document.getElementById('teaRoomList').style.display = ''; document.getElementById('chatRoom').style.display = 'none'; currentClassRoom = ''; }
+
+async function sendChat() {
+    if (isSubmitting) return;
+    var input = document.getElementById('chatInput');
+    var text = input.value.trim();
+    if (!text) return;
+    if (!currentRoom) return;
+    if (containsBanned(text)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    isSubmitting = true;
+    var btn = document.getElementById('chatBtn');
+    btn.textContent = '发送中...';
+    var now = new Date();
+    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;
+    if (currentClassRoom) {
+        var classResult = await supabaseClient.from('class_messages').insert([{ class_id: String(currentClassRoom), content: text, author: displayName, time: timeStr }]);
+        if (!classResult.error) { input.value = ''; enterClassRoom(currentClassRoom, ''); }
+    } else {
+        var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
+        if (!result.error) { input.value = ''; enterRoom(currentRoom); }
+    }
+    isSubmitting = false;
+    btn.textContent = '发送';
+}
+
+async function showClassList() {
+    var result = await supabaseClient.from('classes').select('*').order('id', { ascending: true });
+    var classes = result.data || [];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>💻 开发者名单</h3><div class="dev-list">';
-    if (devs.length === 0) {
-        html += '<p style="text-align:center;color:#ccc;">暂无开发者</p>';
-    } else {
-        devs.forEach(function(d) {
-            html += '<div class="dev-item"><div class="dev-info"><span class="dev-name">' + escapeHtml(d.name) + '</span><span class="dev-role">' + escapeHtml(d.role) + '</span><span class="user-uid">' + escapeHtml(d.bio || '') + '</span></div>';
-            if (isOwner) { html += '<button class="dev-action-btn" onclick="deleteDeveloper(' + d.id + ')">删除</button>'; }
-            html += '</div>';
-        });
-    }
-    html += '</div>';
-    if (isOwner) { html += '<button class="gray-btn" onclick="closeModal();addDeveloper()">添加开发者</button><br>'; }
-    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🏠 班级小窝</h3><div class="class-list">';
+    classes.forEach(function(c) {
+        html += '<div class="class-item"><div class="class-info"><span class="class-name">' + escapeHtml(c.name) + '</span></div><button class="class-action-btn" onclick="enterClassRoom(\'' + c.id + '\',\'' + escapeHtml(c.name) + '\')">进入</button></div>';
+    });
+    html += '</div><input type="text" id="newClassName" placeholder="创建新班级（如：高一1班）"><button class="close-btn" onclick="createClass()">创建班级</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
 }
 
-function addDeveloper() {
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>💻 添加开发者</h3><input type="text" id="devName" placeholder="名字"><input type="text" id="devRole" placeholder="角色（站长/运维/管理员）"><input type="text" id="devBio" placeholder="一句话简介"><button class="close-btn" onclick="saveDeveloper()">保存</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
-    document.body.appendChild(overlay);
+async function createClass() {
+    var name = document.getElementById('newClassName').value.trim();
+    if (!name) { showToast('(´･ω･`)', '请输入班级名'); return; }
+    var result = await supabaseClient.from('classes').insert([{ name: name }]);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '班级创建成功'); showClassList(); }
 }
 
-async function saveDeveloper() {
-    var name = document.getElementById('devName').value.trim();
-    var role = document.getElementById('devRole').value.trim();
-    var bio = document.getElementById('devBio').value.trim();
-    if (!name || !role) { showToast('(´･ω･`)', '名字和角色必填'); return; }
-    var now = new Date();
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate();
-    var result = await supabaseClient.from('developers').insert([{ name: name, role: role, bio: bio, time: timeStr, uid: '' }]);
-    if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
+async function enterClassRoom(classId, className) {
     closeModal();
-    showToast('(｡•̀ᴗ-)✧', '已添加');
-    showDevelopers();
-}
-
-async function deleteDeveloper(id) {
-    if (!confirm('确认删除？')) return;
-    var result = await supabaseClient.from('developers').delete().eq('id', id);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); showDevelopers(); }
-}<script>
-function handleRegisterClick() { if (userNickname) { showUserCenter(); } else { showRegister(); } }
+    currentClassRoom = classId;
+    currentRoom = 'class_' + classId;
+    document.getElementById('teaRoomList').style.display = 'none';
+    document.getElementById('chatRoom').style.display = '';
+    var chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = '<div style="text-align:center;color:#ccc;font-size:12px;margin-bottom:10px;">🏠 ' + escapeHtml(className) + '</div>';
+    var result = await supabaseClient.from('class_messages').select('*').eq('class_id', String(classId)).order('id', { ascending: true }).limit(50);
+    var msgs = result.data || [];
+    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
+}function handleRegisterClick() { if (userNickname) { showUserCenter(); } else { showRegister(); } }
 
 function showRegister() {
     var overlay = document.createElement('div');
@@ -1565,176 +1489,253 @@ function updateRegisterBtn() {
     if (userNickname) { btn.textContent = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); btn.classList.add('logged-in'); if (isAdmin || isOwner) btn.classList.add('admin'); } else { btn.textContent = '点击注册'; btn.classList.remove('logged-in'); btn.classList.remove('admin'); }
 }
 
-async function throwBottle() {
-    if (isSubmitting) return;
-    var content = document.getElementById('bottleContent').value.trim();
-    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
-    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
-    isSubmitting = true;
-    var btn = document.getElementById('bottleBtn');
-    btn.textContent = '扔出中...';
-    var now = new Date();
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    var result = await supabaseClient.from('bottles').insert([{ content: content, author: randomEmoji, time: timeStr, is_replied: false, reply: '', reply_time: '' }]);
-    if (result.error) { isSubmitting = false; btn.textContent = '扔瓶子'; showToast('(｡•́︿•̀｡)', '扔瓶子失败'); return; }
-    document.getElementById('bottleContent').value = '';
-    isSubmitting = false;
-    btn.textContent = '扔瓶子';
-    showToast('🍾', '瓶子已扔进海里');
-}
-
-async function pickBottle() {
-    if (isSubmitting) return;
-    var result = await supabaseClient.from('bottles').select('*').eq('is_replied', false).limit(10);
-    if (!result.data || result.data.length === 0) { showToast('🌊', '海里没有瓶子了'); return; }
-    var bottle = result.data[Math.floor(Math.random() * result.data.length)];
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🍾 你捞到一个瓶子</h3><p>' + escapeHtml(bottle.content) + '</p><p style="font-size:10px;color:#ccc;">' + escapeHtml(bottle.author) + ' · ' + escapeHtml(bottle.time) + '</p><textarea id="bottleReply" placeholder="回复这个瓶子..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="replyBottle(' + bottle.id + ')">回复</button><br><button class="link-btn" onclick="closeModal()">扔回海里</button></div>';
-    document.body.appendChild(overlay);
-}
-
-async function replyBottle(bottleId) {
-    var content = document.getElementById('bottleReply').value.trim();
-    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
-    var now = new Date();
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var result = await supabaseClient.from('bottles').update({ is_replied: true, reply: content, reply_time: timeStr }).eq('id', bottleId);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已回复'); closeModal(); }
-}
-
-function renderPosts() {
-    var postsList = document.getElementById('postsList');
-    postsList.innerHTML = '';
-    var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
-    filteredPosts.sort(function(a, b) {
-        if (a.pinned && b.pinned) return b.id - a.id;
-        if (a.pinned) return -1;
-        if (b.pinned) return 1;
-        return b.id - a.id;
-    });
-    if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
-    filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
-}
-
-async function submitFood() {
-    if (isSubmitting) return;
-    var name = document.getElementById('foodName').value.trim();
-    var recommend = document.getElementById('foodRecommend').value.trim();
-    var price = document.getElementById('foodPrice').value.trim();
-    var comment = document.getElementById('foodComment').value.trim();
-    if (!name || !recommend) { showToast('(´･ω･`)', '至少填店名和推荐菜'); return; }
-    if (containsBanned(name) || containsBanned(recommend) || containsBanned(comment)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
-    isSubmitting = true;
-    var btn = document.getElementById('foodBtn');
-    btn.textContent = '推荐中...';
-    var now = new Date();
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var result = await supabaseClient.from('foods').insert([{ name: name, recommend: recommend, price: price || '未知', distance: selectedDistance, rating: selectedRating, comment: comment || '暂无评价', time: timeStr }]);
-    if (result.error) { isSubmitting = false; btn.textContent = '推荐'; showToast('(｡•́︿•̀｡)', '推荐失败'); return; }
-    document.getElementById('foodName').value = '';
-    document.getElementById('foodRecommend').value = '';
-    document.getElementById('foodPrice').value = '';
-    document.getElementById('foodComment').value = '';
-    isSubmitting = false;
-    btn.textContent = '推荐';
-    await loadFoods();
-    showToast('(｡•̀ᴗ-)✧', '推荐成功！');
-}
-
-async function deleteFood(id) {
-    var result = await supabaseClient.from('foods').delete().eq('id', id);
-    if (!result.error) { await loadFoods(); showToast('(｡•̀ᴗ-)✧', '已删除'); }
-}
-
-function updateStats() { document.getElementById('postCount').textContent = allPosts.length; document.getElementById('foodCount').textContent = allFoods.length; }
-
-function renderFoods() {
-    var foodList = document.getElementById('foodList');
-    foodList.innerHTML = '';
-    if (allFoods.length === 0) { foodList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有美食推荐</p><p class="empty-sub">快来推荐你爱的店吧！</p></div>'; return; }
-    allFoods.forEach(function(food) {
-        var card = document.createElement('div');
-        card.className = 'food-card';
-        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span><div class="food-name">' + escapeHtml(food.name) + '</div><div class="food-detail">⭐ ' + escapeHtml(food.recommend) + '</div><div class="food-detail">💰 ' + escapeHtml(food.price) + '</div><div class="food-tags"><span class="food-tag distance">🚶 ' + escapeHtml(food.distance) + '</span><span class="food-tag rating">⭐ ' + escapeHtml(food.rating) + '</span></div><div class="food-comment">📝 ' + escapeHtml(food.comment) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(food.time) + '</span><span class="post-number">#' + food.id + '</span></div>';
-        if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deleteFood(' + food.id + ')">删除</button></div>'; }
-        foodList.appendChild(card);
-    });
-}
-
-async function enterRoom(name) {
-    currentRoom = name;
-    currentClassRoom = '';
-    if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];
-    document.getElementById('teaRoomList').style.display = 'none';
-    document.getElementById('chatRoom').style.display = '';
-    var chatBox = document.getElementById('chatBox');
-    chatBox.innerHTML = '';
-    var result = await supabaseClient.from('chat_messages').select('*').eq('room', name).order('id', { ascending: true }).limit(50);
-    var msgs = result.data || [];
-    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function backToRooms() { document.getElementById('teaRoomList').style.display = ''; document.getElementById('chatRoom').style.display = 'none'; currentClassRoom = ''; }
-
-async function sendChat() {
-    if (isSubmitting) return;
-    var input = document.getElementById('chatInput');
-    var text = input.value.trim();
-    if (!text) return;
-    if (!currentRoom) return;
-    if (containsBanned(text)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
-    isSubmitting = true;
-    var btn = document.getElementById('chatBtn');
-    btn.textContent = '发送中...';
-    var now = new Date();
-    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;
-    if (currentClassRoom) {
-        var classResult = await supabaseClient.from('class_messages').insert([{ class_id: String(currentClassRoom), content: text, author: displayName, time: timeStr }]);
-        if (!classResult.error) { input.value = ''; enterClassRoom(currentClassRoom, ''); }
-    } else {
-        var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
-        if (!result.error) { input.value = ''; enterRoom(currentRoom); }
+async function loadMyProfile() {
+    if (!userUid) return;
+    var result = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
+    if (result.data) {
+        userAvatar = result.data.avatar || '';
+        userBio = result.data.bio || '';
     }
-    isSubmitting = false;
-    btn.textContent = '发送';
 }
 
-async function showClassList() {
-    var result = await supabaseClient.from('classes').select('*').order('id', { ascending: true });
-    var classes = result.data || [];
+async function showMyProfile() {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    await loadMyProfile();
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🏠 班级小窝</h3><div class="class-list">';
-    classes.forEach(function(c) {
-        html += '<div class="class-item"><div class="class-info"><span class="class-name">' + escapeHtml(c.name) + '</span></div><button class="class-action-btn" onclick="enterClassRoom(\'' + c.id + '\',\'' + escapeHtml(c.name) + '\')">进入</button></div>';
-    });
-    html += '</div><input type="text" id="newClassName" placeholder="创建新班级（如：高一1班）"><button class="close-btn" onclick="createClass()">创建班级</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    var avatarHtml = userAvatar ? '<img src="' + escapeHtml(userAvatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="profile-card">' + avatarHtml + '<div class="profile-name">' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</div><div class="profile-bio">' + escapeHtml(userBio || '这个人很懒，什么都没写') + '</div><div class="profile-uid">UID: ' + escapeHtml(userUid) + '</div></div>';
+    html += '<button class="gray-btn" onclick="closeModal();uploadAvatar()">更换头像</button> ';
+    html += '<button class="gray-btn" onclick="closeModal();editBio()">编辑签名</button><br>';
+    html += '<button class="link-btn" onclick="closeModal();showMyFavs()">⭐ 我的收藏</button><br>';
+    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
 }
 
-async function createClass() {
-    var name = document.getElementById('newClassName').value.trim();
-    if (!name) { showToast('(´･ω･`)', '请输入班级名'); return; }
-    var result = await supabaseClient.from('classes').insert([{ name: name }]);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '班级创建成功'); showClassList(); }
+function uploadAvatar() {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { showToast('(｡•́︿•̀｡)', '图片不能超过5MB'); return; }
+        var url = await uploadImage(file, 'avatars');
+        if (!url) { showToast('(｡•́︿•̀｡)', '上传失败'); return; }
+        var check = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
+        if (check.data) {
+            await supabaseClient.from('profiles').update({ avatar: url }).eq('uid', userUid);
+        } else {
+            await supabaseClient.from('profiles').insert([{ uid: userUid, avatar: url, bio: '' }]);
+        }
+        userAvatar = url;
+        showToast('(｡•̀ᴗ-)✧', '头像已更新');
+    };
+    input.click();
 }
 
-async function enterClassRoom(classId, className) {
+function editBio() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>✏️ 编辑签名</h3><textarea id="bioInput" placeholder="写一句话...">' + escapeHtml(userBio) + '</textarea><button class="close-btn" onclick="saveBio()">保存</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function saveBio() {
+    var bio = document.getElementById('bioInput').value.trim();
+    var check = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
+    if (check.data) {
+        await supabaseClient.from('profiles').update({ bio: bio }).eq('uid', userUid);
+    } else {
+        await supabaseClient.from('profiles').insert([{ uid: userUid, avatar: '', bio: bio }]);
+    }
+    userBio = bio;
     closeModal();
-    currentClassRoom = classId;
-    currentRoom = 'class_' + classId;
-    document.getElementById('teaRoomList').style.display = 'none';
-    document.getElementById('chatRoom').style.display = '';
-    var chatBox = document.getElementById('chatBox');
-    chatBox.innerHTML = '<div style="text-align:center;color:#ccc;font-size:12px;margin-bottom:10px;">🏠 ' + escapeHtml(className) + '</div>';
-    var result = await supabaseClient.from('class_messages').select('*').eq('class_id', String(classId)).order('id', { ascending: true }).limit(50);
-    var msgs = result.data || [];
-    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
+    showToast('(｡•̀ᴗ-)✧', '已保存');
+}
+
+async function showUserProfile(uid) {
+    var userResult = await supabaseClient.from('users').select('*').eq('uid', uid).single();
+    if (!userResult.data) { showToast('(｡•́︿•̀｡)', '用户不存在'); return; }
+    var profileResult = await supabaseClient.from('profiles').select('*').eq('uid', uid).single();
+    var avatar = profileResult.data ? profileResult.data.avatar : '';
+    var bio = profileResult.data ? profileResult.data.bio : '';
+    var postResult = await supabaseClient.from('posts').select('*').eq('author_uid', uid).order('id', { ascending: false }).limit(20);
+    var posts = postResult.data || [];
+    var avatarHtml = avatar ? '<img src="' + escapeHtml(avatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="profile-card">' + avatarHtml + '<div class="profile-name">' + escapeHtml(userResult.data.nickname) + (userResult.data.isowner ? ' 👑' : (userResult.data.isadmin ? ' ⭐' : '')) + '</div><div class="profile-bio">' + escapeHtml(bio || '这个人很懒') + '</div><div class="profile-uid">UID: ' + escapeHtml(uid) + '</div></div>';
+    if (userUid && uid !== userUid) {
+        html += '<button class="gray-btn" onclick="closeModal();openChat(\'' + uid + '\')">发私信</button><br>';
+    }
+    html += '<div class="user-list" style="margin-top:12px;">';
+    posts.forEach(function(p) {
+        html += '<div class="reply-item"><div class="reply-content">' + escapeHtml(p.content.slice(0, 40)) + (p.content.length > 40 ? '...' : '') + '</div><div class="reply-time">' + escapeHtml(p.time) + '</div></div>';
+    });
+    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+function switchRank(type) {
+    currentRank = type;
+    var tabs = document.querySelectorAll('.rank-tab[data-rank]');
+    tabs.forEach(function(t) { t.classList.remove('active'); if (t.getAttribute('data-rank') === type) t.classList.add('active'); });
+    renderRank();
+}
+
+async function renderRank() {
+    var list = document.getElementById('rankList');
+    if (!list) return;
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>加载中...</p></div>';
+    if (currentRank === 'like') {
+        var likeResult = await supabaseClient.from('likes').select('post_id').eq('type', 'like');
+        var counts = {};
+        (likeResult.data || []).forEach(function(l) { counts[l.post_id] = (counts[l.post_id] || 0) + 1; });
+        var sorted = Object.keys(counts).map(function(pid) { return { id: pid, count: counts[pid] }; }).sort(function(a, b) { return b.count - a.count; }).slice(0, 20);
+        list.innerHTML = '';
+        if (sorted.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有数据</p></div>'; return; }
+        for (var i = 0; i < sorted.length; i++) {
+            var item = sorted[i];
+            var postResult = await supabaseClient.from('posts').select('*').eq('id', item.id).single();
+            if (postResult.data) {
+                var p = postResult.data;
+                var div = document.createElement('div');
+                div.className = 'rank-item';
+                div.innerHTML = '<div class="rank-content"><span class="rank-num">#' + (i + 1) + '</span>' + escapeHtml(p.content.slice(0, 50)) + (p.content.length > 50 ? '...' : '') + '</div><div class="rank-meta">❤️ ' + item.count + ' 赞 · ' + escapeHtml(p.time) + '</div>';
+                list.appendChild(div);
+            }
+        }
+    } else {
+        var postResult2 = await supabaseClient.from('posts').select('*').order('views', { ascending: false }).limit(20);
+        var posts = postResult2.data || [];
+        list.innerHTML = '';
+        if (posts.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有数据</p></div>'; return; }
+        posts.forEach(function(p, i) {
+            var div = document.createElement('div');
+            div.className = 'rank-item';
+            div.innerHTML = '<div class="rank-content"><span class="rank-num">#' + (i + 1) + '</span>' + escapeHtml(p.content.slice(0, 50)) + (p.content.length > 50 ? '...' : '') + '</div><div class="rank-meta">👁️ ' + (p.views || 0) + ' 浏览 · ' + escapeHtml(p.time) + '</div>';
+            list.appendChild(div);
+        });
+    }
+}
+
+function switchSongTab(tab) {
+    currentSongTab = tab;
+    var tabs = document.querySelectorAll('.rank-tab[data-songtab]');
+    tabs.forEach(function(t) { t.classList.remove('active'); if (t.getAttribute('data-songtab') === tab) t.classList.add('active'); });
+    loadSongs();
+}
+
+async function loadSongs() {
+    var list = document.getElementById('songList');
+    if (!list) return;
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>加载中...</p></div>';
+    var result;
+    if (currentSongTab === 'mine') {
+        if (!userUid) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>请先登录</p></div>'; return; }
+        result = await supabaseClient.from('songs').select('*').eq('uploader_uid', userUid).order('id', { ascending: false });
+    } else {
+        result = await supabaseClient.from('songs').select('*').eq('is_public', true).order('id', { ascending: false }).limit(100);
+    }
+    var songs = result.data || [];
+    list.innerHTML = '';
+    if (songs.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有歌曲</p><p class="empty-sub">来添加一首吧</p></div>'; return; }
+    songs.forEach(function(s) {
+        var div = document.createElement('div');
+        div.className = 'song-item';
+        var canDelete = (isAdmin || isOwner || s.uploader_uid === userUid);
+        div.innerHTML = '<div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + ' · ' + escapeHtml(s.time) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSong(' + s.id + ')">删除</button>' : '');
+        list.appendChild(div);
+    });
+}
+
+async function addSong() {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    var input = document.getElementById('songIdInput');
+    var neteaseId = input.value.trim();
+    if (!neteaseId) { showToast('(´･ω･`)', '请输入歌曲 ID'); return; }
+    if (!/^\d+$/.test(neteaseId)) { showToast('(｡•́︿•̀｡)', 'ID 必须是数字'); return; }
+    var dupCheck = await supabaseClient.from('songs').select('*').eq('netease_id', neteaseId).eq('is_public', true).single();
+    if (dupCheck.data) { showToast('(´･ω･`)', '这首歌已经在公共歌单了'); return; }
+    var nameRes = await fetch(neteaseApi + '?type=name&id=' + neteaseId);
+    var songName = await nameRes.text();
+    if (!songName || songName.indexOf('error') !== -1) { showToast('(｡•́︿•̀｡)', '获取歌曲失败'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var result = await supabaseClient.from('songs').insert([{ name: songName.trim(), netease_id: neteaseId, uploader_uid: userUid, uploader_name: userNickname || '匿名', is_public: true, time: timeStr }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
+    input.value = '';
+    showToast('(｡•̀ᴗ-)✧', '已添加');
+    loadSongs();
+}
+
+async function deleteSong(id) {
+    if (!confirm('确认删除这首歌？')) return;
+    var result = await supabaseClient.from('songs').delete().eq('id', id);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); loadSongs(); }
+}
+
+function playNetease(neteaseId, name) {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 ' + escapeHtml(name) + '</h3><div style="margin:10px 0;"><meting-js server="netease" type="song" id="' + escapeHtml(neteaseId) + '" auto="true"></meting-js></div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function loadDevelopers() {
+    var result = await supabaseClient.from('developers').select('*').order('id', { ascending: true });
+    return result.data || [];
+}
+
+async function showDevelopers() {
+    var devs = await loadDevelopers();
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>💻 开发者名单</h3><div class="dev-list">';
+    if (devs.length === 0) {
+        html += '<p style="text-align:center;color:#ccc;">暂无开发者</p>';
+    } else {
+        devs.forEach(function(d) {
+            html += '<div class="dev-item"><div class="dev-info"><span class="dev-name">' + escapeHtml(d.name) + '</span><span class="dev-role">' + escapeHtml(d.role) + '</span><span class="user-uid">' + escapeHtml(d.bio || '') + '</span></div>';
+            if (isOwner) { html += '<button class="dev-action-btn" onclick="deleteDeveloper(' + d.id + ')">删除</button>'; }
+            html += '</div>';
+        });
+    }
+    html += '</div>';
+    if (isOwner) { html += '<button class="gray-btn" onclick="closeModal();addDeveloper()">添加开发者</button><br>'; }
+    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+function addDeveloper() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>💻 添加开发者</h3><input type="text" id="devName" placeholder="名字"><input type="text" id="devRole" placeholder="角色（站长/运维/管理员）"><input type="text" id="devBio" placeholder="一句话简介"><button class="close-btn" onclick="saveDeveloper()">保存</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function saveDeveloper() {
+    var name = document.getElementById('devName').value.trim();
+    var role = document.getElementById('devRole').value.trim();
+    var bio = document.getElementById('devBio').value.trim();
+    if (!name || !role) { showToast('(´･ω･`)', '名字和角色必填'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate();
+    var result = await supabaseClient.from('developers').insert([{ name: name, role: role, bio: bio, time: timeStr, uid: '' }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
+    closeModal();
+    showToast('(｡•̀ᴗ-)✧', '已添加');
+    showDevelopers();
+}
+
+async function deleteDeveloper(id) {
+    if (!confirm('确认删除？')) return;
+    var result = await supabaseClient.from('developers').delete().eq('id', id);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); showDevelopers(); }
 }
 
 async function showTeacherList() {
