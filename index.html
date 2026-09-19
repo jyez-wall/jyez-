@@ -96,7 +96,6 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .tag-活动 { background: #f0f0f0; color: #555; }
 .pin-tag { background: #fff8e8; color: #c9a44a; }
 .edited-tag { font-size: 10px; color: #ccc; letter-spacing: 1px; margin-left: 6px; }
-.post-emoji { font-size: 13px; color: #ccc; margin-bottom: 8px; }
 .post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }
 .post-author { font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 .post-author.nickname { color: #6a8cc9; }
@@ -121,7 +120,6 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .admin-btn.delete { color: #d4677a; border-color: #f0c0c8; }
 .admin-btn.pin { color: #c9a44a; border-color: #f0e0c0; }
 .admin-btn.edit { color: #6a8cc9; border-color: #c0d0e8; }
-.admin-btn.report { color: #999; border-color: #ddd; }
 .food-badge { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; background: #fff5e8; color: #c98a4a; }
 .food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .food-tag { font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: #f5f5f5; color: #888; }
@@ -223,6 +221,9 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .song-name { font-size: 13px; color: #333; letter-spacing: 1px; }
 .song-uploader { font-size: 10px; color: #ccc; }
 .song-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
+.song-tab-row { display: flex; justify-content: center; gap: 8px; margin: 12px 0; }
+.song-tab-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 14px; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 20px; }
+.song-tab-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
@@ -277,8 +278,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
         <button class="mode-btn" data-mode="food" onclick="switchMode('food')">🍜 必吃榜</button>
         <button class="mode-btn" data-mode="chat" onclick="switchMode('chat')">💬 小茶馆</button>
         <button class="mode-btn" data-mode="bottle" onclick="switchMode('bottle')">🍾 漂流瓶</button>
-        <button class="mode-btn" data-mode="rank" onclick="switchMode('rank')">🔥 热门</button>
-        <button class="mode-btn" data-mode="song" onclick="switchMode('song')">🎵 歌单</button>
+        <button class="mode-btn" data-mode="rank" onclick="switchMode('rank')">🔥 热门榜</button>
     </div>
     <div id="postSection">
         <div class="search-bar">
@@ -407,21 +407,6 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
         <div class="rank-list" id="rankList"></div>
         <div class="food-spacer"></div>
     </div>
-    <div id="songSection" style="display:none;">
-        <div class="rank-tabs">
-            <button class="rank-tab active" data-songtab="public" onclick="switchSongTab('public')">🌍 公共歌单</button>
-            <button class="rank-tab" data-songtab="mine" onclick="switchSongTab('mine')">🎧 我的歌单</button>
-        </div>
-        <div class="input-area" style="padding:16px 20px;">
-            <input type="text" id="songIdInput" placeholder="输入网易云歌曲 ID（如 416892104）" style="width:100%;border:1px solid #e8e8e8;border-radius:4px;padding:10px 14px;outline:none;font-family:inherit;color:#333;margin-bottom:10px;font-size:14px !important;">
-            <div class="input-footer" style="margin-top:0;">
-                <span class="anonymous">🎵 添加歌曲</span>
-                <button class="publish-btn" onclick="addSong()">添加</button>
-            </div>
-        </div>
-        <div class="food-list" id="songList"></div>
-        <div class="food-spacer"></div>
-    </div>
     <div class="footer">
         <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p>
     </div>
@@ -539,20 +524,107 @@ playRandomSong();
 function showPlaylist() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 播放列表</h3><div class="user-list">';
-    songNames.forEach(function(name, index) {
-        html += '<div class="reply-item" style="cursor:pointer;font-size:10px;color:#999;" onclick="playSong(' + index + ')">' + (index === currentSong ? '▶ ' : '') + escapeHtml(name) + '</div>';
-    });
-    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    var html = '<div class="modal" style="max-width:380px;"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 歌单</h3>';
+    html += '<div class="song-tab-row"><button class="song-tab-btn active" id="songTabPublic" onclick="switchSongTabInModal(\'public\')">🌍 公共歌单</button><button class="song-tab-btn" id="songTabMine" onclick="switchSongTabInModal(\'mine\')">🎧 我的歌单</button></div>';
+    html += '<div id="playlistContent" style="text-align:left;max-height:300px;overflow-y:auto;"></div>';
+    html += '<div style="margin-top:12px;"><input type="text" id="modalSongIdInput" placeholder="输入网易云歌曲 ID" style="width:100%;border:1px solid #e8e8e8;border-radius:4px;padding:8px 12px;outline:none;font-family:inherit;color:#333;margin-bottom:8px;font-size:12px !important;"><button class="gray-btn" onclick="addSongFromModal()">添加歌曲</button></div>';
+    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
+    currentSongTab = 'public';
+    renderPlaylistContent();
 }
+
+function switchSongTabInModal(tab) {
+    currentSongTab = tab;
+    var btnPublic = document.getElementById('songTabPublic');
+    var btnMine = document.getElementById('songTabMine');
+    if (btnPublic) btnPublic.classList.remove('active');
+    if (btnMine) btnMine.classList.remove('active');
+    if (tab === 'public' && btnPublic) btnPublic.classList.add('active');
+    if (tab === 'mine' && btnMine) btnMine.classList.add('active');
+    renderPlaylistContent();
+}
+
+async function renderPlaylistContent() {
+    var container = document.getElementById('playlistContent');
+    if (!container) return;
+    container.innerHTML = '<div style="text-align:center;color:#ccc;font-size:12px;padding:10px;">加载中...</div>';
+    var html = '';
+    if (currentSongTab === 'public') {
+        html += '<div style="font-size:11px;color:#999;letter-spacing:1px;padding:6px 0;">本地歌</div>';
+        songNames.forEach(function(name, index) {
+            html += '<div class="reply-item" style="cursor:pointer;font-size:12px;color:#666;" onclick="playSong(' + index + ')">' + (index === currentSong ? '▶ ' : '') + escapeHtml(name) + '</div>';
+        });
+        var result = await supabaseClient.from('songs').select('*').eq('is_public', true).order('id', { ascending: false }).limit(100);
+        var songs = result.data || [];
+        html += '<div style="font-size:11px;color:#999;letter-spacing:1px;padding:6px 0;margin-top:8px;">用户上传</div>';
+        if (songs.length === 0) {
+            html += '<div style="font-size:11px;color:#ccc;padding:4px 0;">暂无</div>';
+        } else {
+            songs.forEach(function(s) {
+                var canDelete = (isAdmin || isOwner || s.uploader_uid === userUid);
+                html += '<div class="song-item" style="padding:8px 0;border-bottom:1px solid #f5f5f5;"><div class="song-info"><span class="song-name" style="font-size:12px;">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删</button>' : '') + '</div>';
+            });
+        }
+    } else {
+        if (!userUid) {
+            html += '<div style="text-align:center;color:#ccc;font-size:12px;padding:20px;">请先登录</div>';
+        } else {
+            var result2 = await supabaseClient.from('songs').select('*').eq('uploader_uid', userUid).order('id', { ascending: false });
+            var mySongs = result2.data || [];
+            if (mySongs.length === 0) {
+                html += '<div style="text-align:center;color:#ccc;font-size:12px;padding:20px;">还没有上传</div>';
+            } else {
+                mySongs.forEach(function(s) {
+                    html += '<div class="song-item" style="padding:8px 0;border-bottom:1px solid #f5f5f5;"><div class="song-info"><span class="song-name" style="font-size:12px;">' + escapeHtml(s.name) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button> <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删</button></div>';
+                });
+            }
+        }
+    }
+    container.innerHTML = html;
+}
+
+async function addSongFromModal() {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    var input = document.getElementById('modalSongIdInput');
+    var neteaseId = input.value.trim();
+    if (!neteaseId) { showToast('(´･ω･`)', '请输入歌曲 ID'); return; }
+    if (!/^\d+$/.test(neteaseId)) { showToast('(｡•́︿•̀｡)', 'ID 必须是数字'); return; }
+    var dupCheck = await supabaseClient.from('songs').select('*').eq('netease_id', neteaseId).eq('is_public', true).single();
+    if (dupCheck.data) { showToast('(´･ω･`)', '这首歌已经在公共歌单了'); return; }
+    var nameRes = await fetch(neteaseApi + '?type=name&id=' + neteaseId);
+    var songName = await nameRes.text();
+    if (!songName || songName.indexOf('error') !== -1) { showToast('(｡•́︿•̀｡)', '获取歌曲失败'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var result = await supabaseClient.from('songs').insert([{ name: songName.trim(), netease_id: neteaseId, uploader_uid: userUid, uploader_name: userNickname || '匿名', is_public: true, time: timeStr }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
+    input.value = '';
+    showToast('(｡•̀ᴗ-)✧', '已添加');
+    renderPlaylistContent();
+}
+
+async function deleteSongFromModal(id) {
+    if (!confirm('确认删除？')) return;
+    var result = await supabaseClient.from('songs').delete().eq('id', id);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); renderPlaylistContent(); }
+}
+
+function playNetease(neteaseId, name) {
+    closeModal();
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 ' + escapeHtml(name) + '</h3><div style="margin:10px 0;"><meting-js server="netease" type="song" id="' + escapeHtml(neteaseId) + '" auto="true"></meting-js></div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    document.body.appendChild(overlay);
+}
+
 function playSong(index) {
     currentSong = index;
     bgm.src = playlist[index];
     document.getElementById('musicLabel').textContent = songNames[index];
     bgm.play();
-    closeModal();
+    renderPlaylistContent();
 }
 
 function showActivityDetail() {
@@ -589,15 +661,13 @@ function switchMode(mode) {
     document.getElementById('chatSection').style.display = 'none';
     document.getElementById('bottleSection').style.display = 'none';
     document.getElementById('rankSection').style.display = 'none';
-    document.getElementById('songSection').style.display = 'none';
     var modeBtns = document.querySelectorAll('.mode-btn');
     modeBtns.forEach(function(btn) { btn.classList.remove('active'); if (btn.getAttribute('data-mode') === mode) btn.classList.add('active'); });
     if (mode === 'post') { document.getElementById('postSection').style.display = ''; document.getElementById('headerIcon').textContent = '📮'; document.getElementById('headerTitle').textContent = '二中心事箱'; document.getElementById('headerSubtitle').textContent = '把不敢说的话，悄悄放进这里'; }
     else if (mode === 'food') { document.getElementById('foodSection').style.display = ''; document.getElementById('headerIcon').textContent = '🍜'; document.getElementById('headerTitle').textContent = '二中必吃榜'; document.getElementById('headerSubtitle').textContent = '学校周围的美食指南'; }
     else if (mode === 'chat') { document.getElementById('chatSection').style.display = ''; document.getElementById('headerIcon').textContent = '💬'; document.getElementById('headerTitle').textContent = '二中小茶馆'; document.getElementById('headerSubtitle').textContent = '找个桌位，坐下聊聊'; }
     else if (mode === 'bottle') { document.getElementById('bottleSection').style.display = ''; document.getElementById('headerIcon').textContent = '🍾'; document.getElementById('headerTitle').textContent = '漂流瓶'; document.getElementById('headerSubtitle').textContent = '把心事扔进海里，或捞起别人的瓶子'; }
-    else if (mode === 'rank') { document.getElementById('rankSection').style.display = ''; document.getElementById('headerIcon').textContent = '🔥'; document.getElementById('headerTitle').textContent = '二中热门'; document.getElementById('headerSubtitle').textContent = '点赞榜 · 浏览量榜'; renderRank(); }
-    else if (mode === 'song') { document.getElementById('songSection').style.display = ''; document.getElementById('headerIcon').textContent = '🎵'; document.getElementById('headerTitle').textContent = '二中歌单'; document.getElementById('headerSubtitle').textContent = '公共歌单 · 我的歌单'; loadSongs(); }
+    else if (mode === 'rank') { document.getElementById('rankSection').style.display = ''; document.getElementById('headerIcon').textContent = '🔥'; document.getElementById('headerTitle').textContent = '二中热门榜'; document.getElementById('headerSubtitle').textContent = '点赞榜 · 浏览量榜'; renderRank(); }
 }
 
 var categoryBtns = document.querySelectorAll('.category-btn');
@@ -910,8 +980,7 @@ async function saveEdit(postId) {
     closeModal();
     await loadPosts();
     showToast('(｡•̀ᴗ-)✧', '已保存');
-}
-async function toggleLike(postId) {
+}async function toggleLike(postId) {
     if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
     if (myLikes[postId]) {
         await supabaseClient.from('likes').delete().eq('post_id', String(postId)).eq('user_uid', userUid).eq('type', 'like');
@@ -1555,30 +1624,6 @@ async function saveBio() {
     showToast('(｡•̀ᴗ-)✧', '已保存');
 }
 
-async function showUserProfile(uid) {
-    var userResult = await supabaseClient.from('users').select('*').eq('uid', uid).single();
-    if (!userResult.data) { showToast('(｡•́︿•̀｡)', '用户不存在'); return; }
-    var profileResult = await supabaseClient.from('profiles').select('*').eq('uid', uid).single();
-    var avatar = profileResult.data ? profileResult.data.avatar : '';
-    var bio = profileResult.data ? profileResult.data.bio : '';
-    var postResult = await supabaseClient.from('posts').select('*').eq('author_uid', uid).order('id', { ascending: false }).limit(20);
-    var posts = postResult.data || [];
-    var avatarHtml = avatar ? '<img src="' + escapeHtml(avatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="profile-card">' + avatarHtml + '<div class="profile-name">' + escapeHtml(userResult.data.nickname) + (userResult.data.isowner ? ' 👑' : (userResult.data.isadmin ? ' ⭐' : '')) + '</div><div class="profile-bio">' + escapeHtml(bio || '这个人很懒') + '</div><div class="profile-uid">UID: ' + escapeHtml(uid) + '</div></div>';
-    if (userUid && uid !== userUid) {
-        html += '<button class="gray-btn" onclick="closeModal();openChat(\'' + uid + '\')">发私信</button><br>';
-    }
-    html += '<div class="user-list" style="margin-top:12px;">';
-    posts.forEach(function(p) {
-        html += '<div class="reply-item"><div class="reply-content">' + escapeHtml(p.content.slice(0, 40)) + (p.content.length > 40 ? '...' : '') + '</div><div class="reply-time">' + escapeHtml(p.time) + '</div></div>';
-    });
-    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
-    overlay.innerHTML = html;
-    document.body.appendChild(overlay);
-}
-
 function switchRank(type) {
     currentRank = type;
     var tabs = document.querySelectorAll('.rank-tab[data-rank]');
@@ -1622,76 +1667,9 @@ async function renderRank() {
     }
 }
 
-function switchSongTab(tab) {
-    currentSongTab = tab;
-    var tabs = document.querySelectorAll('.rank-tab[data-songtab]');
-    tabs.forEach(function(t) { t.classList.remove('active'); if (t.getAttribute('data-songtab') === tab) t.classList.add('active'); });
-    loadSongs();
-}
-
-async function loadSongs() {
-    var list = document.getElementById('songList');
-    if (!list) return;
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>加载中...</p></div>';
-    var result;
-    if (currentSongTab === 'mine') {
-        if (!userUid) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>请先登录</p></div>'; return; }
-        result = await supabaseClient.from('songs').select('*').eq('uploader_uid', userUid).order('id', { ascending: false });
-    } else {
-        result = await supabaseClient.from('songs').select('*').eq('is_public', true).order('id', { ascending: false }).limit(100);
-    }
-    var songs = result.data || [];
-    list.innerHTML = '';
-    if (songs.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有歌曲</p><p class="empty-sub">来添加一首吧</p></div>'; return; }
-    songs.forEach(function(s) {
-        var div = document.createElement('div');
-        div.className = 'song-item';
-        var canDelete = (isAdmin || isOwner || s.uploader_uid === userUid);
-        div.innerHTML = '<div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + ' · ' + escapeHtml(s.time) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSong(' + s.id + ')">删除</button>' : '');
-        list.appendChild(div);
-    });
-}
-
-async function addSong() {
-    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
-    var input = document.getElementById('songIdInput');
-    var neteaseId = input.value.trim();
-    if (!neteaseId) { showToast('(´･ω･`)', '请输入歌曲 ID'); return; }
-    if (!/^\d+$/.test(neteaseId)) { showToast('(｡•́︿•̀｡)', 'ID 必须是数字'); return; }
-    var dupCheck = await supabaseClient.from('songs').select('*').eq('netease_id', neteaseId).eq('is_public', true).single();
-    if (dupCheck.data) { showToast('(´･ω･`)', '这首歌已经在公共歌单了'); return; }
-    var nameRes = await fetch(neteaseApi + '?type=name&id=' + neteaseId);
-    var songName = await nameRes.text();
-    if (!songName || songName.indexOf('error') !== -1) { showToast('(｡•́︿•̀｡)', '获取歌曲失败'); return; }
-    var now = new Date();
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var result = await supabaseClient.from('songs').insert([{ name: songName.trim(), netease_id: neteaseId, uploader_uid: userUid, uploader_name: userNickname || '匿名', is_public: true, time: timeStr }]);
-    if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
-    input.value = '';
-    showToast('(｡•̀ᴗ-)✧', '已添加');
-    loadSongs();
-}
-
-async function deleteSong(id) {
-    if (!confirm('确认删除这首歌？')) return;
-    var result = await supabaseClient.from('songs').delete().eq('id', id);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); loadSongs(); }
-}
-
-function playNetease(neteaseId, name) {
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 ' + escapeHtml(name) + '</h3><div style="margin:10px 0;"><meting-js server="netease" type="song" id="' + escapeHtml(neteaseId) + '" auto="true"></meting-js></div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
-    document.body.appendChild(overlay);
-}
-
-async function loadDevelopers() {
-    var result = await supabaseClient.from('developers').select('*').order('id', { ascending: true });
-    return result.data || [];
-}
-
 async function showDevelopers() {
-    var devs = await loadDevelopers();
+    var result = await supabaseClient.from('developers').select('*').order('id', { ascending: true });
+    var devs = result.data || [];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>💻 开发者名单</h3><div class="dev-list">';
@@ -1809,7 +1787,7 @@ async function submitTeacherReview(teacherId) {
 function showAbout() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>✦ 活动 — 参与校园活动<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>🔥 热门 — 点赞榜 + 浏览量榜</p><p>🎵 歌单 — 公共歌单 + 我的歌单</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>✦ 活动 — 参与校园活动<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>🔥 热门榜 — 点赞榜 + 浏览量榜</p><p>🎵 歌单 — 点顶部音乐条查看</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p>';
     html += '<button class="gray-btn" onclick="closeModal();showDevelopers()">💻 开发者名单</button><br>';
     html += '<button class="close-btn" onclick="closeModal()">知道了</button></div>';
     overlay.innerHTML = html;
@@ -1819,7 +1797,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v10.0（当前版本）</div><div class="update-item">· 点赞 / 收藏</div><div class="update-item">· 私信系统</div><div class="update-item">· 举报处理</div><div class="update-item">· 编辑帖子</div><div class="update-item">· 头像 + 个性签名</div><div class="update-item">· 用户主页</div><div class="update-item">· 热门榜（点赞 / 浏览量）</div><div class="update-item">· 歌单（公共 / 我的）</div><div class="update-item">· 开发者名单</div><div class="update-item">· 图片自动压缩</div><div class="update-item">· 置顶排序修复</div><div class="update-version">v9.2</div><div class="update-item">· 活动分类上线</div><div class="update-item">· 二中拟人计划</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· QQ/微信登录</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v10.1（当前版本）</div><div class="update-item">· 歌单合并进音乐条</div><div class="update-item">· 本地歌曲 + 用户上传</div><div class="update-item">· 热门榜</div><div class="update-item">· 点赞 / 收藏</div><div class="update-item">· 私信系统</div><div class="update-item">· 举报处理</div><div class="update-item">· 编辑帖子</div><div class="update-item">· 头像 + 个性签名</div><div class="update-item">· 用户主页</div><div class="update-item">· 开发者名单</div><div class="update-item">· 图片自动压缩</div><div class="update-item">· 置顶排序修复</div><div class="update-version">v9.2</div><div class="update-item">· 活动分类上线</div><div class="update-item">· 二中拟人计划</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· QQ/微信登录</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 
