@@ -1626,7 +1626,7 @@ async function showUserProfile(uid) {
     var profileResult = await supabaseClient.from('profiles').select('*').eq('uid', uid).single();
     var avatar = profileResult.data ? profileResult.data.avatar : '';
     var bio = profileResult.data ? profileResult.data.bio : '';
-    var postResult = await supabaseClient.from('posts').select('*').eq('author_uid', uid).order('id', { ascending: false }).limit(20);
+    var postResult = await supabaseClient.from('posts').select('*').eq('author_uid', uid).eq('authorclass', 'admin').order('id', { ascending: false }).limit(20);
     var posts = postResult.data || [];
     var avatarHtml = avatar ? '<img src="' + escapeHtml(avatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
     var overlay = document.createElement('div');
