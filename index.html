@@ -8,7 +8,9 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href='data:application/manifest+json,{"name":"二中·集","short_name":"二中·集","start_url":".","display":"standalone","background_color":"%23fafafa","theme_color":"%238b1a1a","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]}'>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
 <style>
 @font-face { font-family: 'ZhiMangXing'; src: url('zhimangxing.woff2') format('woff2'); font-display: swap; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -45,7 +47,7 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .header { text-align: center; margin-bottom: 20px; }
 .header-icon { font-size: 36px; margin-bottom: 12px; }
 .header h1 { font-size: 22px; font-weight: 300; letter-spacing: 6px; color: #1a1a1a; margin-bottom: 10px; }
-.header .line { width: 24px; height: 1px; background: #1a1a1a; margin: 0 auto 12px; }
+.header .line { width: 24px; height: 1px; background: linear-gradient(to right, transparent, #8b1a1a, transparent); margin: 0 auto 12px; }
 .header .subtitle { font-size: 12px; color: #999; letter-spacing: 2px; }
 .stats-bar { display: flex; justify-content: center; gap: 16px; margin-bottom: 16px; font-size: 11px; color: #bbb; letter-spacing: 1px; }
 .mode-switch { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -56,7 +58,8 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .search-btn { border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 14px; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
 .input-area { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 24px; margin-bottom: 20px; }
 .categories { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.category-btn { border: 1px solid #ddd; background: none; color: #999; padding: 5px 14px; font-size: 12px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }
+.category-btn { border: 1px solid #ddd; background: none; color: #999; padding: 5px 14px; font-size: 12px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; transition: all 0.3s ease; }
+.category-btn:hover { border-color: #8b1a1a; color: #8b1a1a; }
 .category-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
 .identity-switch { display: flex; gap: 8px; margin-bottom: 10px; }
 .identity-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 12px; font-size: 11px; letter-spacing: 1px; cursor: pointer; border-radius: 20px; font-family: inherit; }
@@ -73,13 +76,15 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .food-select-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
 .input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
 .anonymous { font-size: 12px; color: #bbb; letter-spacing: 1px; }
-.publish-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 28px; font-size: 13px; letter-spacing: 3px; cursor: pointer; font-family: inherit; border-radius: 2px; }
+.publish-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 28px; font-size: 13px; letter-spacing: 3px; cursor: pointer; font-family: inherit; border-radius: 2px; transition: all 0.3s ease; }
+.publish-btn:hover { background: #1a1a1a; color: #fff; }
 .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .filter-btn { border: none; background: none; color: #bbb; padding: 4px 10px; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; }
 .filter-btn.active { color: #1a1a1a; font-weight: 600; }
 .posts-list, .food-list { display: flex; flex-direction: column; gap: 14px; }
-.post-card, .food-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 18px 22px; animation: fadeIn 0.4s ease; position: relative; }
-.post-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; margin-right: 4px; }
+.post-card, .food-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 18px 22px; animation: fadeIn 0.4s ease; position: relative; border-left: 2px solid transparent; transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease; }
+.post-card:hover, .food-card:hover { box-shadow: 0 4px 16px rgba(139,26,26,0.06); transform: translateY(-2px); border-left-color: #8b1a1a; }
+.post-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; margin-right: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
 .tag-表白 { background: #fff0f0; color: #d4677a; }
 .tag-吐槽 { background: #f0f0f0; color: #888; }
 .tag-祝福 { background: #fff8e8; color: #c9a44a; }
@@ -89,12 +94,14 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .tag-其他 { background: #f5f0ff; color: #9a7ac9; }
 .tag-活动 { background: #f0f0f0; color: #555; }
 .pin-tag { background: #fff8e8; color: #c9a44a; }
+.edited-tag { font-size: 10px; color: #ccc; letter-spacing: 1px; margin-left: 6px; }
 .post-emoji { font-size: 13px; color: #ccc; margin-bottom: 8px; }
 .post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }
-.post-author { font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; }
+.post-author { font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 .post-author.nickname { color: #6a8cc9; }
 .post-author.anon { color: #ccc; }
 .post-author.admin { color: #b8860b; }
+.post-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
 .replies-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
 .reply-item { padding: 6px 0; border-bottom: 1px solid #fafafa; }
 .reply-author { font-size: 10px; color: #ccc; letter-spacing: 1px; }
@@ -104,10 +111,16 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .reply-input-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
 .reply-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 6px 10px; outline: none; font-family: inherit; color: #333; }
 .reply-send-btn { border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 4px 12px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
+.action-row { display: flex; gap: 12px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; align-items: center; flex-wrap: wrap; }
+.action-btn { border: none; background: none; color: #bbb; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 2px 0; }
+.action-btn.liked { color: #d4677a; }
+.action-btn.faved { color: #c9a44a; }
 .admin-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; flex-wrap: wrap; }
 .admin-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
 .admin-btn.delete { color: #d4677a; border-color: #f0c0c8; }
 .admin-btn.pin { color: #c9a44a; border-color: #f0e0c0; }
+.admin-btn.edit { color: #6a8cc9; border-color: #c0d0e8; }
+.admin-btn.report { color: #999; border-color: #ddd; }
 .food-badge { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; background: #fff5e8; color: #c98a4a; }
 .food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .food-tag { font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: #f5f5f5; color: #888; }
@@ -126,7 +139,8 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .post-highlight { animation: highlightFlash 2s ease; }
 @keyframes highlightFlash { 0% { background: #fff8e8; } 100% { background: #fff; } }
 .empty-state { text-align: center; padding: 40px 20px; color: #ccc; }
-.empty-icon { font-size: 15px; margin-bottom: 12px; letter-spacing: 2px; }
+.empty-icon { font-size: 15px; margin-bottom: 12px; letter-spacing: 2px; animation: breathe 3s ease-in-out infinite; }
+@keyframes breathe { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
 .empty-state p { font-size: 13px; letter-spacing: 2px; }
 .empty-state .empty-sub { font-size: 11px; color: #ddd; margin-top: 6px; letter-spacing: 1px; }
 .bottle-area { text-align: center; padding: 30px 0; }
@@ -153,18 +167,27 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }
 .modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
 .modal .gray-btn { margin-top: 12px; border: 1px solid #888; background: none; color: #666; padding: 6px 20px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
-.modal input, .modal select { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; font-size: 14px !important; }
+.modal input, .modal select, .modal textarea { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; font-size: 14px !important; }
+.modal textarea { min-height: 80px; text-align: left; }
 .modal .link-btn { border: none; background: none; color: #8ecae6; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; margin-top: 8px; }
 .modal .social-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #ddd; background: none; color: #666; padding: 8px 20px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 4px; margin: 4px; }
 .modal .social-btn.qq { color: #6a8cc9; border-color: #c0d0e8; }
 .modal .social-btn.wx { color: #5aa86a; border-color: #c0e8c8; }
 .uid-tab-btn { font-size: 10px !important; color: #999; }
-.user-list, .teacher-list, .class-list { max-height: 300px; overflow-y: auto; text-align: left; }
-.user-item, .teacher-item, .class-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; }
-.user-info, .teacher-info, .class-info { display: flex; flex-direction: column; gap: 2px; }
-.user-name, .teacher-name, .class-name { font-size: 13px; color: #333; letter-spacing: 1px; }
-.user-uid, .teacher-subject, .class-desc { font-size: 11px; color: #ccc; }
-.user-action-btn, .teacher-action-btn, .class-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
+.rank-tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
+.rank-tab { border: none; background: none; font-size: 12px; color: #bbb; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 6px 12px; border-bottom: 2px solid transparent; }
+.rank-tab.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
+.rank-list { display: flex; flex-direction: column; gap: 10px; }
+.rank-item { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 14px 18px; }
+.rank-num { font-size: 13px; color: #c9a44a; font-weight: 600; margin-right: 8px; }
+.rank-content { font-size: 13px; color: #333; line-height: 1.6; word-break: break-word; }
+.rank-meta { font-size: 10px; color: #ccc; margin-top: 6px; }
+.user-list, .teacher-list, .class-list, .msg-list, .report-list, .dev-list { max-height: 300px; overflow-y: auto; text-align: left; }
+.user-item, .teacher-item, .class-item, .msg-item, .report-item, .dev-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; }
+.user-info, .teacher-info, .class-info, .msg-info, .report-info, .dev-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.user-name, .teacher-name, .class-name, .dev-name { font-size: 13px; color: #333; letter-spacing: 1px; }
+.user-uid, .teacher-subject, .class-desc, .dev-role { font-size: 11px; color: #ccc; }
+.user-action-btn, .teacher-action-btn, .class-action-btn, .msg-action-btn, .report-action-btn, .dev-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
 .user-action-btn.set { color: #6a8cc9; border-color: #c0d0e8; }
 .user-action-btn.remove { color: #c9a44a; border-color: #f0e0c0; }
 .rating-stars { font-size: 16px; cursor: pointer; letter-spacing: 2px; }
@@ -172,7 +195,8 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .update-version { font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 1px; margin: 12px 0 6px; }
 .update-item { font-size: 12px; color: #888; line-height: 2; letter-spacing: 1px; padding-left: 12px; }
 .tea-room-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
-.tea-room-card { flex: 1 1 45%; background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 16px; text-align: center; cursor: pointer; }
+.tea-room-card { flex: 1 1 45%; background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 16px; text-align: center; cursor: pointer; transition: box-shadow 0.3s ease, transform 0.3s ease; }
+.tea-room-card:hover { box-shadow: 0 4px 16px rgba(139,26,26,0.06); transform: translateY(-2px); }
 .tea-room-icon { font-size: 28px; margin-bottom: 8px; }
 .tea-room-name { font-size: 14px; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 4px; }
 .tea-room-desc { font-size: 11px; color: #bbb; letter-spacing: 1px; }
@@ -188,6 +212,16 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .back-link { font-size: 12px; color: #bbb; letter-spacing: 1px; cursor: pointer; margin-bottom: 12px; display: inline-block; }
 .chat-spacer { height: 250px; }
 .food-spacer { height: 150px; }
+.profile-card { text-align: center; padding: 20px 0; }
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; }
+.profile-name { font-size: 18px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; margin-bottom: 6px; }
+.profile-bio { font-size: 12px; color: #999; letter-spacing: 1px; margin-bottom: 12px; }
+.profile-uid { font-size: 10px; color: #ccc; letter-spacing: 1px; }
+.song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; }
+.song-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.song-name { font-size: 13px; color: #333; letter-spacing: 1px; }
+.song-uploader { font-size: 10px; color: #ccc; }
+.song-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
@@ -218,6 +252,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
                 <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
             </div>
             <div class="top-btns-row">
+                <button class="top-btn" onclick="showMessages()">✉️ 私信</button>
                 <button class="top-btn" onclick="showUpdate()">📢 更新</button>
                 <button class="top-btn" onclick="showTeacherList()">👨‍🏫 评价</button>
                 <button class="top-btn" onclick="showAbout()">关于</button>
@@ -241,6 +276,8 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
         <button class="mode-btn" data-mode="food" onclick="switchMode('food')">🍜 必吃榜</button>
         <button class="mode-btn" data-mode="chat" onclick="switchMode('chat')">💬 小茶馆</button>
         <button class="mode-btn" data-mode="bottle" onclick="switchMode('bottle')">🍾 漂流瓶</button>
+        <button class="mode-btn" data-mode="rank" onclick="switchMode('rank')">🔥 热门</button>
+        <button class="mode-btn" data-mode="song" onclick="switchMode('song')">🎵 歌单</button>
     </div>
     <div id="postSection">
         <div class="search-bar">
@@ -361,6 +398,29 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
             <button class="publish-btn" onclick="pickBottle()" style="margin-top:10px;">🌊 捞一个瓶子</button>
         </div>
     </div>
+    <div id="rankSection" style="display:none;">
+        <div class="rank-tabs">
+            <button class="rank-tab active" data-rank="like" onclick="switchRank('like')">❤️ 点赞榜</button>
+            <button class="rank-tab" data-rank="view" onclick="switchRank('view')">👁️ 浏览量榜</button>
+        </div>
+        <div class="rank-list" id="rankList"></div>
+        <div class="food-spacer"></div>
+    </div>
+    <div id="songSection" style="display:none;">
+        <div class="rank-tabs">
+            <button class="rank-tab active" data-songtab="public" onclick="switchSongTab('public')">🌍 公共歌单</button>
+            <button class="rank-tab" data-songtab="mine" onclick="switchSongTab('mine')">🎧 我的歌单</button>
+        </div>
+        <div class="input-area" style="padding:16px 20px;">
+            <input type="text" id="songIdInput" placeholder="输入网易云歌曲 ID（如 416892104）" style="width:100%;border:1px solid #e8e8e8;border-radius:4px;padding:10px 14px;outline:none;font-family:inherit;color:#333;margin-bottom:10px;font-size:14px !important;">
+            <div class="input-footer" style="margin-top:0;">
+                <span class="anonymous">🎵 添加歌曲</span>
+                <button class="publish-btn" onclick="addSong()">添加</button>
+            </div>
+        </div>
+        <div class="food-list" id="songList"></div>
+        <div class="food-spacer"></div>
+    </div>
     <div class="footer">
         <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p>
     </div>
@@ -370,6 +430,7 @@ var selectedTag = '表白';
 var currentFilter = '全部';
 var allPosts = [];
 var allFoods = [];
+var allSongs = [];
 var selectedDistance = '校门口';
 var selectedRating = '必吃';
 var currentRoom = '';
@@ -383,8 +444,13 @@ var isOwner = false;
 var userUid = '';
 var socialUid = '';
 var socialType = '';
+var userAvatar = '';
+var userBio = '';
+var myLikes = {};
+var myFavs = {};
+var currentRank = 'like';
+var currentSongTab = 'public';
 var emojis = ['(´･ω･`)','(´｡• ᵕ •｡`)','(´∀`)','(・ω・)','(^-^)','(｡•̀ᴗ•́｡)','(◍•ᴗ•◍)','(´｡✪ω✪｡`)'];
-var chatMessages = {};
 var bannedWords = ['傻逼','垃圾','去死','滚蛋','废物','白痴','智障','脑残','操你','妈的','他妈','尼玛','fuck','shit','sb','cnm','nmsl'];
 var linkPatterns = ['http','www','.com','.cn','.net','.org','.xyz','.top','.vip','.cc'];
 var playlist = ['song1.mp3','song2.mp3','song3.mp3','song4.mp3','song5.mp3','song6.mp3','song7.mp3','song8.mp3','song9.mp3','song10.mp3','song11.mp3','song12.mp3','song13.mp3','song14.mp3'];
@@ -401,6 +467,7 @@ var mapayRedirect = 'https://jyez-wall.github.io/jyez-/';
 var mapayProxyUrl = 'https://byokxdqvxtdshsdoagtm.supabase.co/functions/v1/hyper-responder';
 var isSubmitting = false;
 var activityTopic = '#二中拟人';
+var neteaseApi = 'https://api.injahow.cn/meting/';
 
 function updateCountdown() {
     var now = new Date();
@@ -520,12 +587,16 @@ function switchMode(mode) {
     document.getElementById('foodSection').style.display = 'none';
     document.getElementById('chatSection').style.display = 'none';
     document.getElementById('bottleSection').style.display = 'none';
+    document.getElementById('rankSection').style.display = 'none';
+    document.getElementById('songSection').style.display = 'none';
     var modeBtns = document.querySelectorAll('.mode-btn');
     modeBtns.forEach(function(btn) { btn.classList.remove('active'); if (btn.getAttribute('data-mode') === mode) btn.classList.add('active'); });
     if (mode === 'post') { document.getElementById('postSection').style.display = ''; document.getElementById('headerIcon').textContent = '📮'; document.getElementById('headerTitle').textContent = '二中心事箱'; document.getElementById('headerSubtitle').textContent = '把不敢说的话，悄悄放进这里'; }
     else if (mode === 'food') { document.getElementById('foodSection').style.display = ''; document.getElementById('headerIcon').textContent = '🍜'; document.getElementById('headerTitle').textContent = '二中必吃榜'; document.getElementById('headerSubtitle').textContent = '学校周围的美食指南'; }
     else if (mode === 'chat') { document.getElementById('chatSection').style.display = ''; document.getElementById('headerIcon').textContent = '💬'; document.getElementById('headerTitle').textContent = '二中小茶馆'; document.getElementById('headerSubtitle').textContent = '找个桌位，坐下聊聊'; }
-    else { document.getElementById('bottleSection').style.display = ''; document.getElementById('headerIcon').textContent = '🍾'; document.getElementById('headerTitle').textContent = '漂流瓶'; document.getElementById('headerSubtitle').textContent = '把心事扔进海里，或捞起别人的瓶子'; }
+    else if (mode === 'bottle') { document.getElementById('bottleSection').style.display = ''; document.getElementById('headerIcon').textContent = '🍾'; document.getElementById('headerTitle').textContent = '漂流瓶'; document.getElementById('headerSubtitle').textContent = '把心事扔进海里，或捞起别人的瓶子'; }
+    else if (mode === 'rank') { document.getElementById('rankSection').style.display = ''; document.getElementById('headerIcon').textContent = '🔥'; document.getElementById('headerTitle').textContent = '二中热门'; document.getElementById('headerSubtitle').textContent = '点赞榜 · 浏览量榜'; renderRank(); }
+    else if (mode === 'song') { document.getElementById('songSection').style.display = ''; document.getElementById('headerIcon').textContent = '🎵'; document.getElementById('headerTitle').textContent = '二中歌单'; document.getElementById('headerSubtitle').textContent = '公共歌单 · 我的歌单'; loadSongs(); }
 }
 
 var categoryBtns = document.querySelectorAll('.category-btn');
@@ -559,10 +630,35 @@ function handlePostImageSelect(event) {
     event.target.value = '';
 }
 
+function compressImage(file, maxWidth) {
+    return new Promise(function(resolve) {
+        maxWidth = maxWidth || 800;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                var w = img.width, h = img.height;
+                if (w > maxWidth) { h = h * maxWidth / w; w = maxWidth; }
+                canvas.width = w;
+                canvas.height = h;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                canvas.toBlob(function(blob) {
+                    resolve(new File([blob], 'img.jpg', { type: 'image/jpeg' }));
+                }, 'image/jpeg', 0.7);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
 async function uploadImage(file, folder) {
-    var ext = file.name.split('.').pop() || 'jpg';
+    var compressed = await compressImage(file);
+    var ext = 'jpg';
     var fileName = folder + '/' + Date.now() + '_' + Math.floor(Math.random() * 10000) + '.' + ext;
-    var result = await supabaseClient.storage.from('post-images').upload(fileName, file, { contentType: file.type, upsert: false });
+    var result = await supabaseClient.storage.from('post-images').upload(fileName, compressed, { contentType: 'image/jpeg', upsert: false });
     if (result.error) return null;
     var urlResult = supabaseClient.storage.from('post-images').getPublicUrl(fileName);
     return urlResult.data ? urlResult.data.publicUrl : null;
@@ -612,18 +708,41 @@ async function loadRepliesForPost(postId) {
     allRepliesCache[postId] = replies;
     return replies;
 }
+
 async function loadPosts() {
     var pinnedResult = await supabaseClient.from('posts').select('*').eq('pinned', true).order('id', { ascending: false });
     var normalResult = await supabaseClient.from('posts').select('*').eq('pinned', false).order('id', { ascending: false }).limit(100);
     var pinnedPosts = pinnedResult.data || [];
     var normalPosts = normalResult.data || [];
     var allData = pinnedPosts.concat(normalPosts);
-    if (allData.length > 0) { allPosts = allData.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '', image: p.image || null }; }); updateStats(); renderPosts(); checkUnreadReplies(); }
+    allPosts = allData.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '', image: p.image || null, edited: p.edited || false, views: p.views || 0 }; });
+    allPosts.sort(function(a, b) {
+        if (a.pinned && b.pinned) return b.id - a.id;
+        if (a.pinned) return -1;
+        if (b.pinned) return 1;
+        return b.id - a.id;
+    });
+    updateStats();
+    renderPosts();
+    checkUnreadReplies();
+    if (userUid) await loadMyLikes();
 }
+
+async function loadMyLikes() {
+    var result = await supabaseClient.from('likes').select('*').eq('user_uid', userUid);
+    myLikes = {};
+    myFavs = {};
+    (result.data || []).forEach(function(l) {
+        if (l.type === 'like') myLikes[l.post_id] = true;
+        if (l.type === 'fav') myFavs[l.post_id] = true;
+    });
+}
+
 async function loadFoods() {
     var result = await supabaseClient.from('foods').select('*').order('id', { ascending: false }).limit(100);
     if (result.data) { allFoods = result.data.map(function(f) { return { id: f.id, name: f.name, recommend: f.recommend, price: f.price, distance: f.distance, rating: f.rating, comment: f.comment, time: f.time }; }); updateStats(); renderFoods(); }
 }
+
 async function checkUnreadReplies() {
     if (!userUid) return;
     var result = await supabaseClient.from('replies').select('*').eq('is_read', false);
@@ -632,18 +751,30 @@ async function checkUnreadReplies() {
     var unreadCount = unreadReplies.filter(function(r) { return myPostIds.indexOf(r.post_id) !== -1; }).length;
     if (unreadCount > 0) { showToast('💬', '你有 ' + unreadCount + ' 条新回复', '去查看', function() { switchMode('post'); currentFilter = '全部'; document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); if (b.getAttribute('data-filter') === '全部') b.classList.add('active'); }); loadPosts().then(function() { var firstUnread = unreadReplies.find(function(r) { return myPostIds.indexOf(r.post_id) !== -1; }); if (firstUnread) { locatePost(firstUnread.post_id); } }); }); }
 }
+
 function locatePost(postId) {
     var postCard = document.querySelector('.post-card[data-post-id="' + postId + '"]');
     if (postCard) { postCard.scrollIntoView({ behavior: 'smooth', block: 'center' }); postCard.classList.add('post-highlight'); setTimeout(function() { postCard.classList.remove('post-highlight'); }, 2000); }
 }
+
 async function deletePost(id) {
     var result = await supabaseClient.from('posts').delete().eq('id', id);
     if (!result.error) { await loadPosts(); showToast('(｡•̀ᴗ-)✧', '已删除'); }
 }
+
 async function togglePin(id, pinStatus) {
     var result = await supabaseClient.from('posts').update({ pinned: pinStatus }).eq('id', id);
     if (!result.error) { await loadPosts(); showToast('(｡•̀ᴗ-)✧', pinStatus ? '已置顶' : '已取消置顶'); }
 }
+
+async function increaseViews(postId) {
+    var post = allPosts.find(function(p) { return String(p.id) === String(postId); });
+    if (!post) return;
+    var newViews = (post.views || 0) + 1;
+    await supabaseClient.from('posts').update({ views: newViews }).eq('id', postId);
+    post.views = newViews;
+}
+
 function searchPosts() {
     var query = document.getElementById('searchInput').value.trim().toLowerCase();
     if (!query) { renderPosts(); return; }
@@ -653,18 +784,20 @@ function searchPosts() {
     if (filtered.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>没有找到相关帖子</p></div>'; return; }
     filtered.forEach(function(post) { renderPostCard(post, postsList); });
 }
+
 async function renderPostCard(post, container) {
     var card = document.createElement('div');
     card.className = 'post-card';
     card.setAttribute('data-post-id', post.id);
-    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + escapeHtml(post.tag) + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + '<div class="post-author ' + post.authorClass + '">' + escapeHtml(post.author) + '</div><div class="post-content">' + escapeHtml(post.content) + '</div>';
+    var editedTag = post.edited ? '<span class="edited-tag">已编辑</span>' : '';
+    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + escapeHtml(post.tag) + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + editedTag + '<div class="post-author ' + post.authorClass + '">' + escapeHtml(post.author) + '</div><div class="post-content">' + escapeHtml(post.content) + '</div>';
     if (post.image) {
         var images = post.image.split(',');
         images.forEach(function(imgUrl) {
             if (imgUrl.trim()) { card.innerHTML += '<img src="' + escapeHtml(imgUrl.trim()) + '" class="post-image" onclick="window.open(\'' + escapeHtml(imgUrl.trim()) + '\',\'_blank\')">'; }
         });
     }
-    card.innerHTML += '<div class="post-meta"><span class="post-time">' + escapeHtml(post.time) + '</span><span class="post-number">#' + post.id + '</span></div>';
+    card.innerHTML += '<div class="post-meta"><span class="post-time">' + escapeHtml(post.time) + ' · ' + (post.views || 0) + ' 浏览</span><span class="post-number">#' + post.id + '</span></div>';
     var replies = await loadRepliesForPost(post.id);
     card.innerHTML += '<div class="replies-section">';
     replies.forEach(function(r) {
@@ -672,9 +805,17 @@ async function renderPostCard(post, container) {
     });
     card.innerHTML += '<div class="reply-input-row"><input type="text" class="reply-input" id="replyInput-' + post.id + '" placeholder="匿名回复..."><button class="image-upload-btn" onclick="document.getElementById(\'replyImageInput-' + post.id + '\').click()">📷</button><input type="file" id="replyImageInput-' + post.id + '" accept="image/*" multiple style="display:none;" onchange="handleReplyImageSelect(event,' + post.id + ')"><button class="reply-send-btn" onclick="submitReply(' + post.id + ')">发送</button></div><div id="replyImagePreview-' + post.id + '"></div>';
     card.innerHTML += '</div>';
-    if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button><button class="admin-btn pin" onclick="togglePin(' + post.id + ', ' + (post.pinned ? 'false' : 'true') + ')">' + (post.pinned ? '取消置顶' : '置顶') + '</button></div>'; }
+    var likedClass = myLikes[post.id] ? 'liked' : '';
+    var favedClass = myFavs[post.id] ? 'faved' : '';
+    card.innerHTML += '<div class="action-row"><button class="action-btn ' + likedClass + '" id="likeBtn-' + post.id + '" onclick="toggleLike(' + post.id + ')">❤️ 点赞</button><button class="action-btn ' + favedClass + '" id="favBtn-' + post.id + '" onclick="toggleFav(' + post.id + ')">⭐ 收藏</button><button class="action-btn" onclick="showReportPost(' + post.id + ')">🚩 举报</button></div>';
+    var adminHtml = '';
+    if (isAdmin || isOwner) { adminHtml += '<button class="admin-btn delete" onclick="deletePost(' + post.id + ')">删除</button><button class="admin-btn pin" onclick="togglePin(' + post.id + ', ' + (post.pinned ? 'false' : 'true') + ')">' + (post.pinned ? '取消置顶' : '置顶') + '</button>'; }
+    if (userUid && post.author_uid === userUid) { adminHtml += '<button class="admin-btn edit" onclick="editPost(' + post.id + ')">编辑</button>'; }
+    if (adminHtml) { card.innerHTML += '<div class="admin-actions">' + adminHtml + '</div>'; }
     container.appendChild(card);
+    increaseViews(post.id);
 }
+
 function buildReplyHtml(r) {
     var quoteHtml = '';
     if (r.reply_to_author) {
@@ -687,8 +828,9 @@ function buildReplyHtml(r) {
             if (imgUrl.trim()) { imageHtml += '<img src="' + escapeHtml(imgUrl.trim()) + '" class="reply-image" onclick="window.open(\'' + escapeHtml(imgUrl.trim()) + '\',\'_blank\')">'; }
         });
     }
-    return '<div class="reply-item">' + quoteHtml + '<span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div>' + imageHtml + '<button class="reply-send-btn" style="font-size:9px;padding:2px 8px;" onclick="setReplyTarget(' + r.id + ',\'' + escapeHtml(r.author) + '\',' + r.post_id + ')">回复</button></div>';
+    return '<div class="reply-item">' + quoteHtml + '<span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div>' + imageHtml + '<button class="reply-send-btn" style="font-size:9px;padding:2px 8px;" onclick="setReplyTarget(' + r.id + ',\'' + escapeHtml(r.author) + '\',' + r.post_id + ')">回复</button> <button class="reply-send-btn" style="font-size:9px;padding:2px 8px;" onclick="showReportReply(' + r.id + ')">举报</button></div>';
 }
+
 function handleReplyImageSelect(event, postId) {
     var files = event.target.files;
     if (!pendingReplyImages[postId]) pendingReplyImages[postId] = [];
@@ -709,11 +851,13 @@ function handleReplyImageSelect(event, postId) {
     }
     event.target.value = '';
 }
+
 function setReplyTarget(replyId, replyAuthor, postId) {
     replyTarget = { reply_id: replyId, reply_author: replyAuthor };
     var input = document.getElementById('replyInput-' + postId);
     if (input) { input.placeholder = '回复 @' + replyAuthor + '...'; input.focus(); }
 }
+
 async function submitReply(postId) {
     if (isSubmitting) return;
     var input = document.getElementById('replyInput-' + postId);
@@ -747,235 +891,462 @@ async function submitReply(postId) {
     showToast('(｡•̀ᴗ-)✧', '回复成功');
 }
 
-async function throwBottle() {
-    if (isSubmitting) return;
-    var content = document.getElementById('bottleContent').value.trim();
-    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+async function editPost(postId) {
+    var post = allPosts.find(function(p) { return String(p.id) === String(postId); });
+    if (!post) return;
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>✏️ 编辑帖子</h3><textarea id="editContent">' + escapeHtml(post.content) + '</textarea><button class="close-btn" onclick="saveEdit(' + postId + ')">保存</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function saveEdit(postId) {
+    var content = document.getElementById('editContent').value.trim();
+    if (!content) { showToast('(´･ω･`)', '不能为空'); return; }
     if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
-    isSubmitting = true;
-    var btn = document.getElementById('bottleBtn');
-    btn.textContent = '扔出中...';
-    var now = new Date();
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    var result = await supabaseClient.from('bottles').insert([{ content: content, author: randomEmoji, time: timeStr, is_replied: false, reply: '', reply_time: '' }]);
-    if (result.error) { isSubmitting = false; btn.textContent = '扔瓶子'; showToast('(｡•́︿•̀｡)', '扔瓶子失败'); return; }
-    document.getElementById('bottleContent').value = '';
-    isSubmitting = false;
-    btn.textContent = '扔瓶子';
-    showToast('🍾', '瓶子已扔进海里');
-}
-async function pickBottle() {
-    if (isSubmitting) return;
-    var result = await supabaseClient.from('bottles').select('*').eq('is_replied', false).limit(10);
-    if (!result.data || result.data.length === 0) { showToast('🌊', '海里没有瓶子了'); return; }
-    var bottle = result.data[Math.floor(Math.random() * result.data.length)];
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🍾 你捞到一个瓶子</h3><p>' + escapeHtml(bottle.content) + '</p><p style="font-size:10px;color:#ccc;">' + escapeHtml(bottle.author) + ' · ' + escapeHtml(bottle.time) + '</p><textarea id="bottleReply" placeholder="回复这个瓶子..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="replyBottle(' + bottle.id + ')">回复</button><br><button class="link-btn" onclick="closeModal()">扔回海里</button></div>';
-    document.body.appendChild(overlay);
-}
-async function replyBottle(bottleId) {
-    var content = document.getElementById('bottleReply').value.trim();
-    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
-    var now = new Date();
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var result = await supabaseClient.from('bottles').update({ is_replied: true, reply: content, reply_time: timeStr }).eq('id', bottleId);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已回复'); closeModal(); }
-}
-function renderPosts() {
-    var postsList = document.getElementById('postsList');
-    postsList.innerHTML = '';
-    var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
-    filteredPosts.sort(function(a, b) {
-        if (a.pinned && b.pinned) return b.id - a.id;
-        if (a.pinned) return -1;
-        if (b.pinned) return 1;
-        return b.id - a.id;
-    });
-    if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
-    filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
-}
-async function submitFood() {
-    if (isSubmitting) return;
-    var name = document.getElementById('foodName').value.trim();
-    var recommend = document.getElementById('foodRecommend').value.trim();
-    var price = document.getElementById('foodPrice').value.trim();
-    var comment = document.getElementById('foodComment').value.trim();
-    if (!name || !recommend) { showToast('(´･ω･`)', '至少填店名和推荐菜'); return; }
-    if (containsBanned(name) || containsBanned(recommend) || containsBanned(comment)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
-    isSubmitting = true;
-    var btn = document.getElementById('foodBtn');
-    btn.textContent = '推荐中...';
-    var now = new Date();
-    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var result = await supabaseClient.from('foods').insert([{ name: name, recommend: recommend, price: price || '未知', distance: selectedDistance, rating: selectedRating, comment: comment || '暂无评价', time: timeStr }]);
-    if (result.error) { isSubmitting = false; btn.textContent = '推荐'; showToast('(｡•́︿•̀｡)', '推荐失败'); return; }
-    document.getElementById('foodName').value = '';
-    document.getElementById('foodRecommend').value = '';
-    document.getElementById('foodPrice').value = '';
-    document.getElementById('foodComment').value = '';
-    isSubmitting = false;
-    btn.textContent = '推荐';
-    await loadFoods();
-    showToast('(｡•̀ᴗ-)✧', '推荐成功！');
-}
-async function deleteFood(id) {
-    var result = await supabaseClient.from('foods').delete().eq('id', id);
-    if (!result.error) { await loadFoods(); showToast('(｡•̀ᴗ-)✧', '已删除'); }
-}
-function updateStats() { document.getElementById('postCount').textContent = allPosts.length; document.getElementById('foodCount').textContent = allFoods.length; }
-function renderFoods() {
-    var foodList = document.getElementById('foodList');
-    foodList.innerHTML = '';
-    if (allFoods.length === 0) { foodList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有美食推荐</p><p class="empty-sub">快来推荐你爱的店吧！</p></div>'; return; }
-    allFoods.forEach(function(food) {
-        var card = document.createElement('div');
-        card.className = 'food-card';
-        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span><div class="food-name">' + escapeHtml(food.name) + '</div><div class="food-detail">⭐ ' + escapeHtml(food.recommend) + '</div><div class="food-detail">💰 ' + escapeHtml(food.price) + '</div><div class="food-tags"><span class="food-tag distance">🚶 ' + escapeHtml(food.distance) + '</span><span class="food-tag rating">⭐ ' + escapeHtml(food.rating) + '</span></div><div class="food-comment">📝 ' + escapeHtml(food.comment) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(food.time) + '</span><span class="post-number">#' + food.id + '</span></div>';
-        if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deleteFood(' + food.id + ')">删除</button></div>'; }
-        foodList.appendChild(card);
-    });
-}
-async function enterRoom(name) {
-    currentRoom = name;
-    currentClassRoom = '';
-    if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];
-    document.getElementById('teaRoomList').style.display = 'none';
-    document.getElementById('chatRoom').style.display = '';
-    var chatBox = document.getElementById('chatBox');
-    chatBox.innerHTML = '';
-    var result = await supabaseClient.from('chat_messages').select('*').eq('room', name).order('id', { ascending: true }).limit(50);
-    var msgs = result.data || [];
-    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-function backToRooms() { document.getElementById('teaRoomList').style.display = ''; document.getElementById('chatRoom').style.display = 'none'; currentClassRoom = ''; }
-async function sendChat() {
-    if (isSubmitting) return;
-    var input = document.getElementById('chatInput');
-    var text = input.value.trim();
-    if (!text) return;
-    if (!currentRoom) return;
-    if (containsBanned(text)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
-    isSubmitting = true;
-    var btn = document.getElementById('chatBtn');
-    btn.textContent = '发送中...';
-    var now = new Date();
-    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;
-    if (currentClassRoom) {
-        var classResult = await supabaseClient.from('class_messages').insert([{ class_id: String(currentClassRoom), content: text, author: displayName, time: timeStr }]);
-        if (!classResult.error) { input.value = ''; enterClassRoom(currentClassRoom, ''); }
+    var result = await supabaseClient.from('posts').update({ content: content, edited: true }).eq('id', postId);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '保存失败'); return; }
+    closeModal();
+    await loadPosts();
+    showToast('(｡•̀ᴗ-)✧', '已保存');
+}<script>
+async function toggleLike(postId) {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    if (myLikes[postId]) {
+        await supabaseClient.from('likes').delete().eq('post_id', String(postId)).eq('user_uid', userUid).eq('type', 'like');
+        delete myLikes[postId];
     } else {
-        var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
-        if (!result.error) { input.value = ''; enterRoom(currentRoom); }
+        await supabaseClient.from('likes').insert([{ post_id: String(postId), user_uid: userUid, type: 'like', time: new Date().toLocaleString() }]);
+        myLikes[postId] = true;
     }
-    isSubmitting = false;
-    btn.textContent = '发送';
+    var btn = document.getElementById('likeBtn-' + postId);
+    if (btn) { if (myLikes[postId]) btn.classList.add('liked'); else btn.classList.remove('liked'); }
 }
-async function showClassList() {
-    var result = await supabaseClient.from('classes').select('*').order('id', { ascending: true });
-    var classes = result.data || [];
+
+async function toggleFav(postId) {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    if (myFavs[postId]) {
+        await supabaseClient.from('likes').delete().eq('post_id', String(postId)).eq('user_uid', userUid).eq('type', 'fav');
+        delete myFavs[postId];
+        showToast('(｡•̀ᴗ-)✧', '已取消收藏');
+    } else {
+        await supabaseClient.from('likes').insert([{ post_id: String(postId), user_uid: userUid, type: 'fav', time: new Date().toLocaleString() }]);
+        myFavs[postId] = true;
+        showToast('(｡•̀ᴗ-)✧', '已收藏');
+    }
+    var btn = document.getElementById('favBtn-' + postId);
+    if (btn) { if (myFavs[postId]) btn.classList.add('faved'); else btn.classList.remove('faved'); }
+}
+
+async function showMyFavs() {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    var result = await supabaseClient.from('likes').select('*').eq('user_uid', userUid).eq('type', 'fav');
+    var favs = result.data || [];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🏠 班级小窝</h3><div class="class-list">';
-    classes.forEach(function(c) {
-        html += '<div class="class-item"><div class="class-info"><span class="class-name">' + escapeHtml(c.name) + '</span></div><button class="class-action-btn" onclick="enterClassRoom(\'' + c.id + '\',\'' + escapeHtml(c.name) + '\')">进入</button></div>';
-    });
-    html += '</div><input type="text" id="newClassName" placeholder="创建新班级（如：高一1班）"><button class="close-btn" onclick="createClass()">创建班级</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>⭐ 我的收藏</h3><div class="user-list">';
+    if (favs.length === 0) {
+        html += '<p style="text-align:center;color:#ccc;">还没有收藏</p>';
+    } else {
+        for (var i = 0; i < favs.length; i++) {
+            var fav = favs[i];
+            var postResult = await supabaseClient.from('posts').select('*').eq('id', fav.post_id).single();
+            if (postResult.data) {
+                var p = postResult.data;
+                html += '<div class="reply-item" style="cursor:pointer;" onclick="closeModal();locatePost(' + p.id + ')"><div class="reply-content">' + escapeHtml(p.content.slice(0, 40)) + (p.content.length > 40 ? '...' : '') + '</div><div class="reply-time">' + escapeHtml(p.time) + '</div></div>';
+            }
+        }
+    }
+    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
 }
-async function createClass() {
-    var name = document.getElementById('newClassName').value.trim();
-    if (!name) { showToast('(´･ω･`)', '请输入班级名'); return; }
-    var result = await supabaseClient.from('classes').insert([{ name: name }]);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '班级创建成功'); showClassList(); }
-}
-async function enterClassRoom(classId, className) {
-    closeModal();
-    currentClassRoom = classId;
-    currentRoom = 'class_' + classId;
-    document.getElementById('teaRoomList').style.display = 'none';
-    document.getElementById('chatRoom').style.display = '';
-    var chatBox = document.getElementById('chatBox');
-    chatBox.innerHTML = '<div style="text-align:center;color:#ccc;font-size:12px;margin-bottom:10px;">🏠 ' + escapeHtml(className) + '</div>';
-    var result = await supabaseClient.from('class_messages').select('*').eq('class_id', String(classId)).order('id', { ascending: true }).limit(50);
+
+async function showMessages() {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    var result = await supabaseClient.from('messages').select('*').or('from_uid.eq.' + userUid + ',to_uid.eq.' + userUid).order('id', { ascending: false }).limit(50);
     var msgs = result.data || [];
-    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
-}
-async function showTeacherList() {
-    var result = await supabaseClient.from('teachers').select('*').order('id', { ascending: true });
-    var teachers = result.data || [];
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>👨‍🏫 老师评价</h3><div class="teacher-list">';
-    teachers.forEach(function(t) {
-        html += '<div class="teacher-item"><div class="teacher-info"><span class="teacher-name">' + escapeHtml(t.name) + '</span><span class="teacher-subject">' + escapeHtml(t.subject || '') + '</span></div><button class="teacher-action-btn" onclick="showTeacherReviews(' + t.id + ',\'' + escapeHtml(t.name) + '\')">查看</button></div>';
-    });
-    html += '</div><input type="text" id="newTeacherName" placeholder="添加老师姓名"><input type="text" id="newTeacherSubject" placeholder="科目（选填）"><button class="close-btn" onclick="addTeacher()">添加老师</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
-    overlay.innerHTML = html;
-    document.body.appendChild(overlay);
-}
-async function addTeacher() {
-    var name = document.getElementById('newTeacherName').value.trim();
-    var subject = document.getElementById('newTeacherSubject').value.trim();
-    if (!name) { showToast('(´･ω･`)', '请输入老师姓名'); return; }
-    var result = await supabaseClient.from('teachers').insert([{ name: name, subject: subject }]);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '老师添加成功'); showTeacherList(); }
-}
-async function showTeacherReviews(teacherId, teacherName) {
-    closeModal();
-    var result = await supabaseClient.from('teacher_reviews').select('*').eq('teacher_id', String(teacherId)).order('id', { ascending: false });
-    var reviews = result.data || [];
-    var totalRating = 0;
-    reviews.forEach(function(r) { totalRating += r.rating; });
-    var avgRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : '暂无';
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>' + escapeHtml(teacherName) + '</h3><p>⭐ 平均评分：' + avgRating + '（' + reviews.length + '人评价）</p><div class="user-list">';
-    reviews.forEach(function(r) {
-        var stars = '';
-        for (var i = 0; i < r.rating; i++) stars += '⭐';
-        html += '<div class="reply-item"><span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + stars + ' ' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div></div>';
-    });
-    html += '</div><p>我要评价：</p><div class="rating-stars" id="ratingStars"></div><textarea id="reviewContent" placeholder="写下你的评价..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="submitTeacherReview(' + teacherId + ')">提交评价</button><br><button class="link-btn" onclick="showTeacherList()">← 返回列表</button></div>';
-    overlay.innerHTML = html;
-    document.body.appendChild(overlay);
-    window._selectedRating = 5;
-    var stars = document.getElementById('ratingStars');
-    stars.innerHTML = '';
-    for (var i = 1; i <= 5; i++) {
-        (function(idx) {
-            var span = document.createElement('span');
-            span.textContent = '⭐';
-            span.style.cursor = 'pointer';
-            span.style.opacity = '1';
-            span.onclick = function() { window._selectedRating = idx; var spans = stars.children; for (var j = 0; j < spans.length; j++) { spans[j].style.opacity = j < idx ? '1' : '0.3'; } };
-            stars.appendChild(span);
-        })(i);
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>✉️ 私信</h3><button class="gray-btn" onclick="closeModal();showNewMessage()">写私信</button><div class="msg-list">';
+    if (msgs.length === 0) {
+        html += '<p style="text-align:center;color:#ccc;">还没有私信</p>';
+    } else {
+        msgs.forEach(function(m) {
+            var other = m.from_uid === userUid ? m.to_uid : m.from_uid;
+            var label = m.from_uid === userUid ? '我 → ' + other : other + ' → 我';
+            var unread = (!m.is_read && m.to_uid === userUid) ? ' · 未读' : '';
+            html += '<div class="msg-item" style="cursor:pointer;" onclick="closeModal();openChat(\'' + other + '\')"><div class="msg-info"><span class="user-name">' + escapeHtml(label) + '</span><span class="user-uid">' + escapeHtml(m.content.slice(0, 20)) + (m.content.length > 20 ? '...' : '') + unread + '</span></div></div>';
+        });
     }
+    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+    await supabaseClient.from('messages').update({ is_read: true }).eq('to_uid', userUid);
 }
-async function submitTeacherReview(teacherId) {
-    if (isSubmitting) return;
-    var content = document.getElementById('reviewContent').value.trim();
-    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
-    isSubmitting = true;
+
+function showNewMessage() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>✉️ 写私信</h3><input type="text" id="msgToUid" placeholder="对方 UID..."><textarea id="msgContent" placeholder="写点什么..."></textarea><button class="close-btn" onclick="sendNewMessage()">发送</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function sendNewMessage() {
+    var toUid = document.getElementById('msgToUid').value.trim();
+    var content = document.getElementById('msgContent').value.trim();
+    if (!toUid || !content) { showToast('(´･ω･`)', 'UID 和内容都要填'); return; }
+    if (toUid === userUid) { showToast('(´･ω･`)', '不能给自己发'); return; }
+    var checkUser = await supabaseClient.from('users').select('*').eq('uid', toUid).single();
+    if (!checkUser.data) { showToast('(｡•́︿•̀｡)', '对方不存在'); return; }
+    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
     var now = new Date();
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    var result = await supabaseClient.from('teacher_reviews').insert([{ teacher_id: String(teacherId), rating: window._selectedRating || 5, content: content, author: randomEmoji, time: timeStr }]);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '评价成功'); showTeacherReviews(teacherId, ''); }
-    isSubmitting = false;
+    var result = await supabaseClient.from('messages').insert([{ from_uid: userUid, to_uid: toUid, content: content, time: timeStr, is_read: false }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '发送失败'); return; }
+    showToast('(｡•̀ᴗ-)✧', '已发送');
+    closeModal();
 }
+
+async function openChat(otherUid) {
+    var result = await supabaseClient.from('messages').select('*').or('and(from_uid.eq.' + userUid + ',to_uid.eq.' + otherUid + '),and(from_uid.eq.' + otherUid + ',to_uid.eq.' + userUid + ')').order('id', { ascending: true }).limit(50);
+    var msgs = result.data || [];
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>与 ' + escapeHtml(otherUid) + ' 的对话</h3><div class="chat-box" id="msgChatBox" style="max-height:250px;">';
+    msgs.forEach(function(m) {
+        var isMine = m.from_uid === userUid;
+        html += '<div class="chat-message" style="text-align:' + (isMine ? 'right' : 'left') + ';"><span class="chat-text">' + escapeHtml(m.content) + '</span> <span class="chat-time">' + escapeHtml(m.time) + '</span></div>';
+    });
+    html += '</div><div class="chat-input-row"><input type="text" class="chat-input" id="msgChatInput" placeholder="说点什么..."><button class="chat-send-btn" onclick="sendChatMessage(\'' + otherUid + '\')">发送</button></div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+    var box = document.getElementById('msgChatBox');
+    if (box) box.scrollTop = box.scrollHeight;
+}
+
+async function sendChatMessage(otherUid) {
+    var input = document.getElementById('msgChatInput');
+    var content = input.value.trim();
+    if (!content) return;
+    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    await supabaseClient.from('messages').insert([{ from_uid: userUid, to_uid: otherUid, content: content, time: timeStr, is_read: false }]);
+    input.value = '';
+    closeModal();
+    openChat(otherUid);
+}
+
+function showReportPost(postId) {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🚩 举报帖子</h3><textarea id="reportReason" placeholder="请写举报理由..."></textarea><button class="close-btn" onclick="submitReport(' + postId + ', null)">提交</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
+    document.body.appendChild(overlay);
+}
+
+function showReportReply(replyId) {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🚩 举报回复</h3><textarea id="reportReason" placeholder="请写举报理由..."></textarea><button class="close-btn" onclick="submitReport(null, ' + replyId + ')">提交</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function submitReport(postId, replyId) {
+    var reason = document.getElementById('reportReason').value.trim();
+    if (!reason) { showToast('(´･ω･`)', '请写理由'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var data = { post_id: postId ? String(postId) : null, reply_id: replyId ? String(replyId) : null, reason: reason, reporter_uid: userUid, time: timeStr, status: 'pending' };
+    var result = await supabaseClient.from('reports').insert([data]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '举报失败'); return; }
+    closeModal();
+    showToast('(｡•̀ᴗ-)✧', '已举报，管理员会处理');
+}
+
+async function showReports() {
+    if (!isAdmin && !isOwner) { showToast('(｡•́︿•̀｡)', '无权访问'); return; }
+    var result = await supabaseClient.from('reports').select('*').eq('status', 'pending').order('id', { ascending: false });
+    var reports = result.data || [];
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🚩 待处理举报</h3><div class="report-list">';
+    if (reports.length === 0) {
+        html += '<p style="text-align:center;color:#ccc;">暂无举报</p>';
+    } else {
+        reports.forEach(function(r) {
+            var target = r.post_id ? '帖子 #' + r.post_id : ('回复 #' + r.reply_id);
+            html += '<div class="report-item"><div class="report-info"><span class="user-name">' + escapeHtml(target) + '</span><span class="user-uid">' + escapeHtml(r.reason) + '</span><span class="user-uid">举报人：' + escapeHtml(r.reporter_uid) + '</span></div><button class="report-action-btn" onclick="handleReport(' + r.id + ',\'resolved\')">已处理</button><button class="report-action-btn" onclick="handleReport(' + r.id + ',\'ignored\')">忽略</button></div>';
+        });
+    }
+    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+async function handleReport(reportId, status) {
+    var result = await supabaseClient.from('reports').update({ status: status }).eq('id', reportId);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已处理'); showReports(); }
+}<script>
+async function loadMyProfile() {
+    if (!userUid) return;
+    var result = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
+    if (result.data) {
+        userAvatar = result.data.avatar || '';
+        userBio = result.data.bio || '';
+    }
+}
+
+async function showMyProfile() {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    await loadMyProfile();
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var avatarHtml = userAvatar ? '<img src="' + escapeHtml(userAvatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="profile-card">' + avatarHtml + '<div class="profile-name">' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</div><div class="profile-bio">' + escapeHtml(userBio || '这个人很懒，什么都没写') + '</div><div class="profile-uid">UID: ' + escapeHtml(userUid) + '</div></div>';
+    html += '<button class="gray-btn" onclick="closeModal();uploadAvatar()">更换头像</button> ';
+    html += '<button class="gray-btn" onclick="closeModal();editBio()">编辑签名</button><br>';
+    html += '<button class="link-btn" onclick="closeModal();showMyFavs()">⭐ 我的收藏</button><br>';
+    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+function uploadAvatar() {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { showToast('(｡•́︿•̀｡)', '图片不能超过5MB'); return; }
+        var url = await uploadImage(file, 'avatars');
+        if (!url) { showToast('(｡•́︿•̀｡)', '上传失败'); return; }
+        var check = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
+        if (check.data) {
+            await supabaseClient.from('profiles').update({ avatar: url }).eq('uid', userUid);
+        } else {
+            await supabaseClient.from('profiles').insert([{ uid: userUid, avatar: url, bio: '' }]);
+        }
+        userAvatar = url;
+        showToast('(｡•̀ᴗ-)✧', '头像已更新');
+    };
+    input.click();
+}
+
+function editBio() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>✏️ 编辑签名</h3><textarea id="bioInput" placeholder="写一句话...">' + escapeHtml(userBio) + '</textarea><button class="close-btn" onclick="saveBio()">保存</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function saveBio() {
+    var bio = document.getElementById('bioInput').value.trim();
+    var check = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
+    if (check.data) {
+        await supabaseClient.from('profiles').update({ bio: bio }).eq('uid', userUid);
+    } else {
+        await supabaseClient.from('profiles').insert([{ uid: userUid, avatar: '', bio: bio }]);
+    }
+    userBio = bio;
+    closeModal();
+    showToast('(｡•̀ᴗ-)✧', '已保存');
+}
+
+async function showUserProfile(uid) {
+    var userResult = await supabaseClient.from('users').select('*').eq('uid', uid).single();
+    if (!userResult.data) { showToast('(｡•́︿•̀｡)', '用户不存在'); return; }
+    var profileResult = await supabaseClient.from('profiles').select('*').eq('uid', uid).single();
+    var avatar = profileResult.data ? profileResult.data.avatar : '';
+    var bio = profileResult.data ? profileResult.data.bio : '';
+    var postResult = await supabaseClient.from('posts').select('*').eq('author_uid', uid).order('id', { ascending: false }).limit(20);
+    var posts = postResult.data || [];
+    var avatarHtml = avatar ? '<img src="' + escapeHtml(avatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="profile-card">' + avatarHtml + '<div class="profile-name">' + escapeHtml(userResult.data.nickname) + (userResult.data.isowner ? ' 👑' : (userResult.data.isadmin ? ' ⭐' : '')) + '</div><div class="profile-bio">' + escapeHtml(bio || '这个人很懒') + '</div><div class="profile-uid">UID: ' + escapeHtml(uid) + '</div></div>';
+    if (userUid && uid !== userUid) {
+        html += '<button class="gray-btn" onclick="closeModal();openChat(\'' + uid + '\')">发私信</button><br>';
+    }
+    html += '<div class="user-list" style="margin-top:12px;">';
+    posts.forEach(function(p) {
+        html += '<div class="reply-item"><div class="reply-content">' + escapeHtml(p.content.slice(0, 40)) + (p.content.length > 40 ? '...' : '') + '</div><div class="reply-time">' + escapeHtml(p.time) + '</div></div>';
+    });
+    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+function switchRank(type) {
+    currentRank = type;
+    var tabs = document.querySelectorAll('.rank-tab');
+    tabs.forEach(function(t) { t.classList.remove('active'); if (t.getAttribute('data-rank') === type) t.classList.add('active'); });
+    renderRank();
+}
+
+async function renderRank() {
+    var list = document.getElementById('rankList');
+    if (!list) return;
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>加载中...</p></div>';
+    if (currentRank === 'like') {
+        var likeResult = await supabaseClient.from('likes').select('post_id').eq('type', 'like');
+        var counts = {};
+        (likeResult.data || []).forEach(function(l) { counts[l.post_id] = (counts[l.post_id] || 0) + 1; });
+        var sorted = Object.keys(counts).map(function(pid) { return { id: pid, count: counts[pid] }; }).sort(function(a, b) { return b.count - a.count; }).slice(0, 20);
+        list.innerHTML = '';
+        if (sorted.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有数据</p></div>'; return; }
+        for (var i = 0; i < sorted.length; i++) {
+            var item = sorted[i];
+            var postResult = await supabaseClient.from('posts').select('*').eq('id', item.id).single();
+            if (postResult.data) {
+                var p = postResult.data;
+                var div = document.createElement('div');
+                div.className = 'rank-item';
+                div.innerHTML = '<div class="rank-content"><span class="rank-num">#' + (i + 1) + '</span>' + escapeHtml(p.content.slice(0, 50)) + (p.content.length > 50 ? '...' : '') + '</div><div class="rank-meta">❤️ ' + item.count + ' 赞 · ' + escapeHtml(p.time) + '</div>';
+                list.appendChild(div);
+            }
+        }
+    } else {
+        var postResult2 = await supabaseClient.from('posts').select('*').order('views', { ascending: false }).limit(20);
+        var posts = postResult2.data || [];
+        list.innerHTML = '';
+        if (posts.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有数据</p></div>'; return; }
+        posts.forEach(function(p, i) {
+            var div = document.createElement('div');
+            div.className = 'rank-item';
+            div.innerHTML = '<div class="rank-content"><span class="rank-num">#' + (i + 1) + '</span>' + escapeHtml(p.content.slice(0, 50)) + (p.content.length > 50 ? '...' : '') + '</div><div class="rank-meta">👁️ ' + (p.views || 0) + ' 浏览 · ' + escapeHtml(p.time) + '</div>';
+            list.appendChild(div);
+        });
+    }
+}
+
+function switchSongTab(tab) {
+    currentSongTab = tab;
+    var tabs = document.querySelectorAll('.rank-tab[data-songtab]');
+    tabs.forEach(function(t) { t.classList.remove('active'); if (t.getAttribute('data-songtab') === tab) t.classList.add('active'); });
+    loadSongs();
+}
+
+async function loadSongs() {
+    var list = document.getElementById('songList');
+    if (!list) return;
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>加载中...</p></div>';
+    var result;
+    if (currentSongTab === 'mine') {
+        if (!userUid) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>请先登录</p></div>'; return; }
+        result = await supabaseClient.from('songs').select('*').eq('uploader_uid', userUid).order('id', { ascending: false });
+    } else {
+        result = await supabaseClient.from('songs').select('*').eq('is_public', true).order('id', { ascending: false }).limit(100);
+    }
+    var songs = result.data || [];
+    list.innerHTML = '';
+    if (songs.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有歌曲</p><p class="empty-sub">来添加一首吧</p></div>'; return; }
+    songs.forEach(function(s) {
+        var div = document.createElement('div');
+        div.className = 'song-item';
+        var canDelete = (isAdmin || isOwner || s.uploader_uid === userUid);
+        div.innerHTML = '<div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + ' · ' + escapeHtml(s.time) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSong(' + s.id + ')">删除</button>' : '');
+        list.appendChild(div);
+    });
+}
+
+async function addSong() {
+    if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
+    var input = document.getElementById('songIdInput');
+    var neteaseId = input.value.trim();
+    if (!neteaseId) { showToast('(´･ω･`)', '请输入歌曲 ID'); return; }
+    if (!/^\d+$/.test(neteaseId)) { showToast('(｡•́︿•̀｡)', 'ID 必须是数字'); return; }
+    var dupCheck = await supabaseClient.from('songs').select('*').eq('netease_id', neteaseId).eq('is_public', true).single();
+    if (dupCheck.data) { showToast('(´･ω･`)', '这首歌已经在公共歌单了'); return; }
+    var nameRes = await fetch(neteaseApi + '?type=name&id=' + neteaseId);
+    var songName = await nameRes.text();
+    if (!songName || songName.indexOf('error') !== -1) { showToast('(｡•́︿•̀｡)', '获取歌曲失败'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var result = await supabaseClient.from('songs').insert([{ name: songName.trim(), netease_id: neteaseId, uploader_uid: userUid, uploader_name: userNickname || '匿名', is_public: true, time: timeStr }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
+    input.value = '';
+    showToast('(｡•̀ᴗ-)✧', '已添加');
+    loadSongs();
+}
+
+async function deleteSong(id) {
+    if (!confirm('确认删除这首歌？')) return;
+    var result = await supabaseClient.from('songs').delete().eq('id', id);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); loadSongs(); }
+}
+
+function playNetease(neteaseId, name) {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 ' + escapeHtml(name) + '</h3><div style="margin:10px 0;"><meting-js server="netease" type="song" id="' + escapeHtml(neteaseId) + '" auto="true"></meting-js></div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function loadDevelopers() {
+    var result = await supabaseClient.from('developers').select('*').order('id', { ascending: true });
+    return result.data || [];
+}
+
+async function showDevelopers() {
+    var devs = await loadDevelopers();
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>💻 开发者名单</h3><div class="dev-list">';
+    if (devs.length === 0) {
+        html += '<p style="text-align:center;color:#ccc;">暂无开发者</p>';
+    } else {
+        devs.forEach(function(d) {
+            html += '<div class="dev-item"><div class="dev-info"><span class="dev-name">' + escapeHtml(d.name) + '</span><span class="dev-role">' + escapeHtml(d.role) + '</span><span class="user-uid">' + escapeHtml(d.bio || '') + '</span></div>';
+            if (isOwner) { html += '<button class="dev-action-btn" onclick="deleteDeveloper(' + d.id + ')">删除</button>'; }
+            html += '</div>';
+        });
+    }
+    html += '</div>';
+    if (isOwner) { html += '<button class="gray-btn" onclick="closeModal();addDeveloper()">添加开发者</button><br>'; }
+    html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+function addDeveloper() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>💻 添加开发者</h3><input type="text" id="devName" placeholder="名字"><input type="text" id="devRole" placeholder="角色（站长/运维/管理员）"><input type="text" id="devBio" placeholder="一句话简介"><button class="close-btn" onclick="saveDeveloper()">保存</button><br><button class="link-btn" onclick="closeModal()">取消</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function saveDeveloper() {
+    var name = document.getElementById('devName').value.trim();
+    var role = document.getElementById('devRole').value.trim();
+    var bio = document.getElementById('devBio').value.trim();
+    if (!name || !role) { showToast('(´･ω･`)', '名字和角色必填'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate();
+    var result = await supabaseClient.from('developers').insert([{ name: name, role: role, bio: bio, time: timeStr, uid: '' }]);
+    if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
+    closeModal();
+    showToast('(｡•̀ᴗ-)✧', '已添加');
+    showDevelopers();
+}
+
+async function deleteDeveloper(id) {
+    if (!confirm('确认删除？')) return;
+    var result = await supabaseClient.from('developers').delete().eq('id', id);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); showDevelopers(); }
+}<script>
 function handleRegisterClick() { if (userNickname) { showUserCenter(); } else { showRegister(); } }
+
 function showRegister() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>✏️ 注册</h3><input type="text" id="nicknameInput" placeholder="输入昵称..."><input type="password" id="passwordInput" placeholder="设置密码..."><input type="password" id="koulingInput" placeholder="口令（选填）"><button class="close-btn" onclick="saveNickname()">完成注册</button><button class="link-btn uid-tab-btn" onclick="showUidLogin()">已有账号？用UID登录 →</button><br><button class="social-btn qq" onclick="socialLogin(\'qq\')">QQ登录</button><button class="social-btn wx" onclick="socialLogin(\'wx\')">微信登录</button></div>';
     document.body.appendChild(overlay);
 }
+
 function showUidLogin() {
     closeModal();
     var overlay = document.createElement('div');
@@ -983,45 +1354,47 @@ function showUidLogin() {
     overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🔑 UID登录</h3><input type="text" id="uidInput" placeholder="输入UID..." style="font-size:12px !important;"><input type="password" id="uidPasswordInput" placeholder="输入密码..." style="font-size:12px !important;"><button class="close-btn" onclick="verifyUidLogin()">登录</button><button class="link-btn uid-tab-btn" onclick="showRegister()">没有账号？去注册 →</button></div>';
     document.body.appendChild(overlay);
 }
+
 function showUserCenter() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     var socialStatus = socialUid ? (socialType === 'qq' ? '已绑定 QQ' : '已绑定微信') : '未绑定第三方';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</h3><p>UID: ' + escapeHtml(userUid) + '</p><p>身份：' + (isOwner ? '站长' : (isAdmin ? '管理员' : '普通用户')) + '</p><p>第三方：' + socialStatus + '</p>';
+    var avatarHtml = userAvatar ? '<img src="' + escapeHtml(userAvatar) + '" class="profile-avatar" style="width:50px;height:50px;">' : '';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span>' + avatarHtml + '<h3>' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</h3><p>UID: ' + escapeHtml(userUid) + '</p><p>身份：' + (isOwner ? '站长' : (isAdmin ? '管理员' : '普通用户')) + '</p><p>第三方：' + socialStatus + '</p>';
+    html += '<button class="gray-btn" onclick="closeModal();showMyProfile()">👤 我的主页</button><br>';
+    html += '<button class="gray-btn" onclick="closeModal();showMyFavs()">⭐ 我的收藏</button><br>';
     if (!socialUid) {
         html += '<button class="social-btn qq" onclick="bindSocial(\'qq\')">绑定 QQ</button><button class="social-btn wx" onclick="bindSocial(\'wx\')">绑定微信</button><br>';
     }
-    if (isOwner) { html += '<button class="close-btn" onclick="showUserList()">📋 用户列表</button><br>'; }
+    if (isOwner) { html += '<button class="close-btn" onclick="showUserList()">📋 用户列表</button> '; }
+    if (isAdmin || isOwner) { html += '<button class="close-btn" onclick="showReports()">🚩 举报处理</button><br>'; }
     html += '<button class="close-btn" onclick="logout()">退出登录</button>';
     html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
 }
+
 function socialLogin(type) {
     fetch(mapayProxyUrl + '?act=login&type=' + type + '&redirect=' + encodeURIComponent(mapayRedirect))
     .then(function(res) { return res.json(); })
     .then(function(data) {
-        if (data.code === 0 && data.url) {
-            window.location.href = data.url;
-        } else {
-            showToast('(｡•́︿•̀｡)', data.msg || '获取登录地址失败');
-        }
+        if (data.code === 0 && data.url) { window.location.href = data.url; }
+        else { showToast('(｡•́︿•̀｡)', data.msg || '获取登录地址失败'); }
     })
     .catch(function() { showToast('(｡•́︿•̀｡)', '网络错误'); });
 }
+
 function bindSocial(type) {
     if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
     fetch(mapayProxyUrl + '?act=login&type=' + type + '&redirect=' + encodeURIComponent(mapayRedirect + '?bind=1&type=' + type))
     .then(function(res) { return res.json(); })
     .then(function(data) {
-        if (data.code === 0 && data.url) {
-            window.location.href = data.url;
-        } else {
-            showToast('(｡•́︿•̀｡)', data.msg || '获取登录地址失败');
-        }
+        if (data.code === 0 && data.url) { window.location.href = data.url; }
+        else { showToast('(｡•́︿•̀｡)', data.msg || '获取登录地址失败'); }
     })
     .catch(function() { showToast('(｡•́︿•̀｡)', '网络错误'); });
 }
+
 function handleSocialCallback() {
     var params = new URLSearchParams(window.location.search);
     var code = params.get('code');
@@ -1071,12 +1444,11 @@ function handleSocialCallback() {
                     }
                 });
             }
-        } else {
-            showToast('(｡•́︿•̀｡)', '第三方登录失败');
-        }
+        } else { showToast('(｡•́︿•̀｡)', '第三方登录失败'); }
     })
     .catch(function() { showToast('(｡•́︿•̀｡)', '网络错误'); });
 }
+
 async function showUserList() {
     closeModal();
     var result = await supabaseClient.from('users').select('*').order('uid', { ascending: true });
@@ -1095,6 +1467,7 @@ async function showUserList() {
     document.body.appendChild(overlay);
     window._allUsers = users;
 }
+
 function filterUsers() {
     var query = document.getElementById('userSearch').value.toLowerCase();
     var items = document.querySelectorAll('.user-item');
@@ -1104,6 +1477,7 @@ function filterUsers() {
         if (name.indexOf(query) !== -1 || uid.indexOf(query) !== -1) { item.style.display = ''; } else { item.style.display = 'none'; }
     });
 }
+
 async function toggleAdmin(uid, makeAdmin) {
     if (makeAdmin) {
         var count = window._allUsers.filter(function(u) { return u.isadmin; }).length;
@@ -1112,6 +1486,7 @@ async function toggleAdmin(uid, makeAdmin) {
     var result = await supabaseClient.from('users').update({ isadmin: makeAdmin }).eq('uid', uid);
     if (!result.error) { showToast('(｡•̀ᴗ-)✧', makeAdmin ? '已设为管理员' : '已取消管理员'); showUserList(); }
 }
+
 async function verifyUidLogin() {
     var uid = document.getElementById('uidInput').value.trim();
     var password = document.getElementById('uidPasswordInput').value.trim();
@@ -1129,8 +1504,11 @@ async function verifyUidLogin() {
         closeModal();
         updateRegisterBtn();
         showWelcomeToast();
+        await loadMyProfile();
+        await loadMyLikes();
     } else { showToast('(｡•́︿•̀｡)', 'UID或密码错误'); }
 }
+
 function logout() {
     userNickname = '';
     userUid = '';
@@ -1138,12 +1516,17 @@ function logout() {
     isOwner = false;
     socialUid = '';
     socialType = '';
+    userAvatar = '';
+    userBio = '';
+    myLikes = {};
+    myFavs = {};
     localStorage.removeItem('erzhong_uid');
     localStorage.removeItem('erzhong_password');
     closeModal();
     updateRegisterBtn();
     showToast('(´･ω･`)', '已退出');
 }
+
 async function saveNickname() {
     var nickname = document.getElementById('nicknameInput').value.trim();
     var password = document.getElementById('passwordInput').value.trim();
@@ -1176,27 +1559,275 @@ async function saveNickname() {
     updateRegisterBtn();
     showWelcomeToast();
 }
+
 function updateRegisterBtn() {
     var btn = document.getElementById('registerBtn');
     if (userNickname) { btn.textContent = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); btn.classList.add('logged-in'); if (isAdmin || isOwner) btn.classList.add('admin'); } else { btn.textContent = '点击注册'; btn.classList.remove('logged-in'); btn.classList.remove('admin'); }
 }
+
+async function throwBottle() {
+    if (isSubmitting) return;
+    var content = document.getElementById('bottleContent').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    if (containsBanned(content)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    isSubmitting = true;
+    var btn = document.getElementById('bottleBtn');
+    btn.textContent = '扔出中...';
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    var result = await supabaseClient.from('bottles').insert([{ content: content, author: randomEmoji, time: timeStr, is_replied: false, reply: '', reply_time: '' }]);
+    if (result.error) { isSubmitting = false; btn.textContent = '扔瓶子'; showToast('(｡•́︿•̀｡)', '扔瓶子失败'); return; }
+    document.getElementById('bottleContent').value = '';
+    isSubmitting = false;
+    btn.textContent = '扔瓶子';
+    showToast('🍾', '瓶子已扔进海里');
+}
+
+async function pickBottle() {
+    if (isSubmitting) return;
+    var result = await supabaseClient.from('bottles').select('*').eq('is_replied', false).limit(10);
+    if (!result.data || result.data.length === 0) { showToast('🌊', '海里没有瓶子了'); return; }
+    var bottle = result.data[Math.floor(Math.random() * result.data.length)];
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🍾 你捞到一个瓶子</h3><p>' + escapeHtml(bottle.content) + '</p><p style="font-size:10px;color:#ccc;">' + escapeHtml(bottle.author) + ' · ' + escapeHtml(bottle.time) + '</p><textarea id="bottleReply" placeholder="回复这个瓶子..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="replyBottle(' + bottle.id + ')">回复</button><br><button class="link-btn" onclick="closeModal()">扔回海里</button></div>';
+    document.body.appendChild(overlay);
+}
+
+async function replyBottle(bottleId) {
+    var content = document.getElementById('bottleReply').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var result = await supabaseClient.from('bottles').update({ is_replied: true, reply: content, reply_time: timeStr }).eq('id', bottleId);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已回复'); closeModal(); }
+}
+
+function renderPosts() {
+    var postsList = document.getElementById('postsList');
+    postsList.innerHTML = '';
+    var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
+    filteredPosts.sort(function(a, b) {
+        if (a.pinned && b.pinned) return b.id - a.id;
+        if (a.pinned) return -1;
+        if (b.pinned) return 1;
+        return b.id - a.id;
+    });
+    if (filteredPosts.length === 0) { postsList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有' + (currentFilter === '全部' ? '小纸条' : currentFilter + '帖子') + '</p><p class="empty-sub">来做第一个勇敢的人吧！</p></div>'; return; }
+    filteredPosts.forEach(function(post) { renderPostCard(post, postsList); });
+}
+
+async function submitFood() {
+    if (isSubmitting) return;
+    var name = document.getElementById('foodName').value.trim();
+    var recommend = document.getElementById('foodRecommend').value.trim();
+    var price = document.getElementById('foodPrice').value.trim();
+    var comment = document.getElementById('foodComment').value.trim();
+    if (!name || !recommend) { showToast('(´･ω･`)', '至少填店名和推荐菜'); return; }
+    if (containsBanned(name) || containsBanned(recommend) || containsBanned(comment)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    isSubmitting = true;
+    var btn = document.getElementById('foodBtn');
+    btn.textContent = '推荐中...';
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var result = await supabaseClient.from('foods').insert([{ name: name, recommend: recommend, price: price || '未知', distance: selectedDistance, rating: selectedRating, comment: comment || '暂无评价', time: timeStr }]);
+    if (result.error) { isSubmitting = false; btn.textContent = '推荐'; showToast('(｡•́︿•̀｡)', '推荐失败'); return; }
+    document.getElementById('foodName').value = '';
+    document.getElementById('foodRecommend').value = '';
+    document.getElementById('foodPrice').value = '';
+    document.getElementById('foodComment').value = '';
+    isSubmitting = false;
+    btn.textContent = '推荐';
+    await loadFoods();
+    showToast('(｡•̀ᴗ-)✧', '推荐成功！');
+}
+
+async function deleteFood(id) {
+    var result = await supabaseClient.from('foods').delete().eq('id', id);
+    if (!result.error) { await loadFoods(); showToast('(｡•̀ᴗ-)✧', '已删除'); }
+}
+
+function updateStats() { document.getElementById('postCount').textContent = allPosts.length; document.getElementById('foodCount').textContent = allFoods.length; }
+
+function renderFoods() {
+    var foodList = document.getElementById('foodList');
+    foodList.innerHTML = '';
+    if (allFoods.length === 0) { foodList.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>还没有美食推荐</p><p class="empty-sub">快来推荐你爱的店吧！</p></div>'; return; }
+    allFoods.forEach(function(food) {
+        var card = document.createElement('div');
+        card.className = 'food-card';
+        card.innerHTML = '<span class="food-badge">🍜 必吃榜</span><div class="food-name">' + escapeHtml(food.name) + '</div><div class="food-detail">⭐ ' + escapeHtml(food.recommend) + '</div><div class="food-detail">💰 ' + escapeHtml(food.price) + '</div><div class="food-tags"><span class="food-tag distance">🚶 ' + escapeHtml(food.distance) + '</span><span class="food-tag rating">⭐ ' + escapeHtml(food.rating) + '</span></div><div class="food-comment">📝 ' + escapeHtml(food.comment) + '</div><div class="post-meta"><span class="post-time">' + escapeHtml(food.time) + '</span><span class="post-number">#' + food.id + '</span></div>';
+        if (isAdmin || isOwner) { card.innerHTML += '<div class="admin-actions"><button class="admin-btn delete" onclick="deleteFood(' + food.id + ')">删除</button></div>'; }
+        foodList.appendChild(card);
+    });
+}
+
+async function enterRoom(name) {
+    currentRoom = name;
+    currentClassRoom = '';
+    if (!myChatName) myChatName = emojis[Math.floor(Math.random() * emojis.length)];
+    document.getElementById('teaRoomList').style.display = 'none';
+    document.getElementById('chatRoom').style.display = '';
+    var chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = '';
+    var result = await supabaseClient.from('chat_messages').select('*').eq('room', name).order('id', { ascending: true }).limit(50);
+    var msgs = result.data || [];
+    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function backToRooms() { document.getElementById('teaRoomList').style.display = ''; document.getElementById('chatRoom').style.display = 'none'; currentClassRoom = ''; }
+
+async function sendChat() {
+    if (isSubmitting) return;
+    var input = document.getElementById('chatInput');
+    var text = input.value.trim();
+    if (!text) return;
+    if (!currentRoom) return;
+    if (containsBanned(text)) { showToast('(｡•́︿•̀｡)', '内容包含不当词汇'); return; }
+    isSubmitting = true;
+    var btn = document.getElementById('chatBtn');
+    btn.textContent = '发送中...';
+    var now = new Date();
+    var timeStr = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var displayName = userNickname ? userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) : myChatName;
+    if (currentClassRoom) {
+        var classResult = await supabaseClient.from('class_messages').insert([{ class_id: String(currentClassRoom), content: text, author: displayName, time: timeStr }]);
+        if (!classResult.error) { input.value = ''; enterClassRoom(currentClassRoom, ''); }
+    } else {
+        var result = await supabaseClient.from('chat_messages').insert([{ room: currentRoom, content: text, author: displayName, time: timeStr }]);
+        if (!result.error) { input.value = ''; enterRoom(currentRoom); }
+    }
+    isSubmitting = false;
+    btn.textContent = '发送';
+}
+
+async function showClassList() {
+    var result = await supabaseClient.from('classes').select('*').order('id', { ascending: true });
+    var classes = result.data || [];
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🏠 班级小窝</h3><div class="class-list">';
+    classes.forEach(function(c) {
+        html += '<div class="class-item"><div class="class-info"><span class="class-name">' + escapeHtml(c.name) + '</span></div><button class="class-action-btn" onclick="enterClassRoom(\'' + c.id + '\',\'' + escapeHtml(c.name) + '\')">进入</button></div>';
+    });
+    html += '</div><input type="text" id="newClassName" placeholder="创建新班级（如：高一1班）"><button class="close-btn" onclick="createClass()">创建班级</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+async function createClass() {
+    var name = document.getElementById('newClassName').value.trim();
+    if (!name) { showToast('(´･ω･`)', '请输入班级名'); return; }
+    var result = await supabaseClient.from('classes').insert([{ name: name }]);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '班级创建成功'); showClassList(); }
+}
+
+async function enterClassRoom(classId, className) {
+    closeModal();
+    currentClassRoom = classId;
+    currentRoom = 'class_' + classId;
+    document.getElementById('teaRoomList').style.display = 'none';
+    document.getElementById('chatRoom').style.display = '';
+    var chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = '<div style="text-align:center;color:#ccc;font-size:12px;margin-bottom:10px;">🏠 ' + escapeHtml(className) + '</div>';
+    var result = await supabaseClient.from('class_messages').select('*').eq('class_id', String(classId)).order('id', { ascending: true }).limit(50);
+    var msgs = result.data || [];
+    msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
+}
+
+async function showTeacherList() {
+    var result = await supabaseClient.from('teachers').select('*').order('id', { ascending: true });
+    var teachers = result.data || [];
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>👨‍🏫 老师评价</h3><div class="teacher-list">';
+    teachers.forEach(function(t) {
+        html += '<div class="teacher-item"><div class="teacher-info"><span class="teacher-name">' + escapeHtml(t.name) + '</span><span class="teacher-subject">' + escapeHtml(t.subject || '') + '</span></div><button class="teacher-action-btn" onclick="showTeacherReviews(' + t.id + ',\'' + escapeHtml(t.name) + '\')">查看</button></div>';
+    });
+    html += '</div><input type="text" id="newTeacherName" placeholder="添加老师姓名"><input type="text" id="newTeacherSubject" placeholder="科目（选填）"><button class="close-btn" onclick="addTeacher()">添加老师</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
+async function addTeacher() {
+    var name = document.getElementById('newTeacherName').value.trim();
+    var subject = document.getElementById('newTeacherSubject').value.trim();
+    if (!name) { showToast('(´･ω･`)', '请输入老师姓名'); return; }
+    var result = await supabaseClient.from('teachers').insert([{ name: name, subject: subject }]);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '老师添加成功'); showTeacherList(); }
+}
+
+async function showTeacherReviews(teacherId, teacherName) {
+    closeModal();
+    var result = await supabaseClient.from('teacher_reviews').select('*').eq('teacher_id', String(teacherId)).order('id', { ascending: false });
+    var reviews = result.data || [];
+    var totalRating = 0;
+    reviews.forEach(function(r) { totalRating += r.rating; });
+    var avgRating = reviews.length > 0 ? (totalRating / reviews.length).toFixed(1) : '暂无';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>' + escapeHtml(teacherName) + '</h3><p>⭐ 平均评分：' + avgRating + '（' + reviews.length + '人评价）</p><div class="user-list">';
+    reviews.forEach(function(r) {
+        var stars = '';
+        for (var i = 0; i < r.rating; i++) stars += '⭐';
+        html += '<div class="reply-item"><span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + stars + ' ' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div></div>';
+    });
+    html += '</div><p>我要评价：</p><div class="rating-stars" id="ratingStars"></div><textarea id="reviewContent" placeholder="写下你的评价..." style="margin-top:10px;"></textarea><button class="close-btn" onclick="submitTeacherReview(' + teacherId + ')">提交评价</button><br><button class="link-btn" onclick="showTeacherList()">← 返回列表</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+    window._selectedRating = 5;
+    var stars = document.getElementById('ratingStars');
+    stars.innerHTML = '';
+    for (var i = 1; i <= 5; i++) {
+        (function(idx) {
+            var span = document.createElement('span');
+            span.textContent = '⭐';
+            span.style.cursor = 'pointer';
+            span.style.opacity = '1';
+            span.onclick = function() { window._selectedRating = idx; var spans = stars.children; for (var j = 0; j < spans.length; j++) { spans[j].style.opacity = j < idx ? '1' : '0.3'; } };
+            stars.appendChild(span);
+        })(i);
+    }
+}
+
+async function submitTeacherReview(teacherId) {
+    if (isSubmitting) return;
+    var content = document.getElementById('reviewContent').value.trim();
+    if (!content) { showToast('(´･ω･`)', '写点什么吧'); return; }
+    isSubmitting = true;
+    var now = new Date();
+    var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    var randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    var result = await supabaseClient.from('teacher_reviews').insert([{ teacher_id: String(teacherId), rating: window._selectedRating || 5, content: content, author: randomEmoji, time: timeStr }]);
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '评价成功'); showTeacherReviews(teacherId, ''); }
+    isSubmitting = false;
+}
+
 function showAbout() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>✦ 活动 — 参与校园活动<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>✦ 活动 — 参与校园活动<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>🔥 热门 — 点赞榜 + 浏览量榜</p><p>🎵 歌单 — 公共歌单 + 我的歌单</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p>';
+    html += '<button class="gray-btn" onclick="closeModal();showDevelopers()">💻 开发者名单</button><br>';
+    html += '<button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = html;
     document.body.appendChild(overlay);
 }
+
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v9.2（当前版本）</div><div class="update-item">· 置顶排序修复</div><div class="update-item">· 活动分类上线</div><div class="update-item">· 二中拟人计划启动</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· 美食删除</div><div class="update-item">· 防重复提交</div><div class="update-item">· 回复提醒升级</div><div class="update-item">· QQ/微信登录</div><div class="update-item">· 用户中心</div><div class="update-item">· Toast动画修复</div><div class="update-item">· 开屏动画停留</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v10.0（当前版本）</div><div class="update-item">· 点赞 / 收藏</div><div class="update-item">· 私信系统</div><div class="update-item">· 举报处理</div><div class="update-item">· 编辑帖子</div><div class="update-item">· 头像 + 个性签名</div><div class="update-item">· 用户主页</div><div class="update-item">· 热门榜（点赞 / 浏览量）</div><div class="update-item">· 歌单（公共 / 我的）</div><div class="update-item">· 开发者名单</div><div class="update-item">· 图片自动压缩</div><div class="update-item">· 置顶排序修复</div><div class="update-version">v9.2</div><div class="update-item">· 活动分类上线</div><div class="update-item">· 二中拟人计划</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· QQ/微信登录</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
-function closeModal() { var overlay = document.querySelector('.modal-overlay'); if (overlay) overlay.remove(); }
+
+function closeModal() { var overlays = document.querySelectorAll('.modal-overlay'); overlays.forEach(function(o) { o.remove(); }); }
+
 var savedUid = localStorage.getItem('erzhong_uid');
 var savedPassword = localStorage.getItem('erzhong_password');
 if (savedUid && savedPassword) {
-    supabaseClient.from('users').select('*').eq('uid', savedUid).single().then(function(result) {
+    supabaseClient.from('users').select('*').eq('uid', savedUid).single().then(async function(result) {
         if (result.data && result.data.password === savedPassword) {
             userNickname = result.data.nickname;
             userUid = result.data.uid;
@@ -1205,10 +1836,13 @@ if (savedUid && savedPassword) {
             socialUid = result.data.social_uid || '';
             socialType = result.data.social_type || '';
             updateRegisterBtn();
+            await loadMyProfile();
+            await loadMyLikes();
             setTimeout(function() { showWelcomeToast(); }, 1500);
         }
     });
 }
+
 handleSocialCallback();
 loadPosts();
 loadFoods();
