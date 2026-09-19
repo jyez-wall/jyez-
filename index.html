@@ -24,10 +24,10 @@ body { background: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Pin
 .loading-title { font-size: 32px; letter-spacing: 6px; color: #8b1a1a; font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; }
 .loading-text { position: absolute; bottom: 60px; font-size: 12px; color: #bbb; letter-spacing: 2px; }
 .top-bar { position: sticky; top: 0; z-index: 100; padding: 10px 15px 35px; background: linear-gradient(to bottom, rgba(250,250,250,0) 0%, rgba(250,250,250,0.7) 30%, rgba(250,250,250,0.9) 60%, rgba(250,250,250,0.5) 80%, transparent 100%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 65%, transparent 100%); margin: -40px -20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-.top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; }
-.music-bar { font-size: 11px; color: #999; letter-spacing: 1px; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 10px; display: inline-block; cursor: pointer; }
-.activity-bar { font-size: 11px; color: #888; letter-spacing: 1px; background: rgba(255,255,255,0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 5px 10px; border-radius: 10px; display: inline-block; cursor: pointer; margin-top: 4px; }
+.top-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.site-title { font-family: 'ZhiMangXing', 'STXingkai', 'KaiTi', serif; font-size: 32px; color: #8b1a1a; letter-spacing: 3px; line-height: 1.1; white-space: nowrap; }
+.music-bar { font-size: 11px; color: #999; letter-spacing: 1px; background: rgba(255,255,255,0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 4px 10px; border-radius: 10px; display: inline-block; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.activity-bar { font-size: 11px; color: #888; letter-spacing: 1px; background: rgba(255,255,255,0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 5px 10px; border-radius: 10px; display: inline-block; cursor: pointer; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .top-right { text-align: right; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
 .register-row { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
 #countdown { font-size: 10px; color: #999; letter-spacing: 1px; white-space: nowrap; }
@@ -78,339 +78,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
 .input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
 .anonymous { font-size: 12px; color: #bbb; letter-spacing: 1px; }
 .publish-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 28px; font-size: 13px; letter-spacing: 3px; cursor: pointer; font-family: inherit; border-radius: 2px; transition: all 0.3s ease; }
-.publish-btn:hover { background: #1a1a1a; color: #fff; }
-.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-.filter-btn { border: none; background: none; color: #bbb; padding: 4px 10px; font-size: 12px; letter-spacing: 1px; cursor: pointer; font-family: inherit; }
-.filter-btn.active { color: #1a1a1a; font-weight: 600; }
-.posts-list, .food-list { display: flex; flex-direction: column; gap: 14px; }
-.post-card, .food-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 18px 22px; animation: fadeIn 0.4s ease; position: relative; border-left: 2px solid transparent; transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease; }
-.post-card:hover, .food-card:hover { box-shadow: 0 4px 16px rgba(139,26,26,0.06); transform: translateY(-2px); border-left-color: #8b1a1a; }
-.post-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; margin-right: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
-.tag-表白 { background: #fff0f0; color: #d4677a; }
-.tag-吐槽 { background: #f0f0f0; color: #888; }
-.tag-祝福 { background: #fff8e8; color: #c9a44a; }
-.tag-树洞 { background: #f0f5ff; color: #6a8cc9; }
-.tag-寻人 { background: #f0fff4; color: #5aa86a; }
-.tag-出物 { background: #f0f0f0; color: #1a1a1a; }
-.tag-其他 { background: #f5f0ff; color: #9a7ac9; }
-.tag-活动 { background: #f0f0f0; color: #555; }
-.pin-tag { background: #fff8e8; color: #c9a44a; }
-.edited-tag { font-size: 10px; color: #ccc; letter-spacing: 1px; margin-left: 6px; }
-.post-content { font-size: 14px; line-height: 1.8; color: #333; word-break: break-word; white-space: pre-wrap; }
-.post-author { font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.post-author.nickname { color: #6a8cc9; }
-.post-author.anon { color: #ccc; }
-.post-author.admin { color: #b8860b; }
-.post-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
-.replies-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
-.reply-item { padding: 6px 0; border-bottom: 1px solid #fafafa; }
-.reply-author { font-size: 10px; color: #ccc; letter-spacing: 1px; }
-.reply-content { font-size: 12px; color: #666; line-height: 1.6; word-break: break-word; }
-.reply-time { font-size: 9px; color: #ddd; }
-.reply-quote { font-size: 10px; color: #bbb; margin-bottom: 2px; }
-.reply-input-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
-.reply-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 6px 10px; outline: none; font-family: inherit; color: #333; }
-.reply-send-btn { border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 4px 12px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
-.action-row { display: flex; gap: 12px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; align-items: center; flex-wrap: wrap; }
-.action-btn { border: none; background: none; color: #bbb; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 2px 0; }
-.action-btn.liked { color: #d4677a; }
-.action-btn.faved { color: #c9a44a; }
-.admin-actions { display: flex; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5; flex-wrap: wrap; }
-.admin-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
-.admin-btn.delete { color: #d4677a; border-color: #f0c0c8; }
-.admin-btn.pin { color: #c9a44a; border-color: #f0e0c0; }
-.admin-btn.edit { color: #6a8cc9; border-color: #c0d0e8; }
-.food-badge { display: inline-block; font-size: 10px; letter-spacing: 2px; padding: 2px 10px; border-radius: 10px; margin-bottom: 10px; background: #fff5e8; color: #c98a4a; }
-.food-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.food-tag { font-size: 10px; letter-spacing: 1px; padding: 2px 8px; border-radius: 10px; background: #f5f5f5; color: #888; }
-.food-tag.distance { background: #f0f5ff; color: #6a8cc9; }
-.food-tag.rating { background: #fff8e8; color: #c9a44a; }
-.food-name { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
-.food-detail { font-size: 13px; color: #666; line-height: 1.8; margin-bottom: 4px; }
-.food-comment { font-size: 13px; color: #888; line-height: 1.8; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f5f5f5; }
-.post-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
-.post-time { font-size: 11px; color: #ccc; letter-spacing: 1px; }
-.post-number { font-size: 11px; color: #ddd; letter-spacing: 1px; }
-.post-image { margin-top: 12px; max-width: 60px; border-radius: 4px; cursor: pointer; }
-.reply-image { margin-top: 6px; max-width: 40px; border-radius: 4px; cursor: pointer; display: block; }
-.image-upload-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; margin-top: 6px; }
-.image-preview { max-width: 40px; border-radius: 4px; margin-top: 8px; display: inline-block; margin-right: 6px; }
-.post-highlight { animation: highlightFlash 2s ease; }
-@keyframes highlightFlash { 0% { background: #fff8e8; } 100% { background: #fff; } }
-.empty-state { text-align: center; padding: 40px 20px; color: #ccc; }
-.empty-icon { font-size: 15px; margin-bottom: 12px; letter-spacing: 2px; animation: breathe 3s ease-in-out infinite; }
-@keyframes breathe { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
-.empty-state p { font-size: 13px; letter-spacing: 2px; }
-.empty-state .empty-sub { font-size: 11px; color: #ddd; margin-top: 6px; letter-spacing: 1px; }
-.bottle-area { text-align: center; padding: 30px 0; }
-.bottle-icon { font-size: 60px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
-@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-.footer { text-align: center; margin-top: 30px; font-size: 11px; color: #ccc; letter-spacing: 2px; }
-.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid #e8e8e8; border-radius: 12px; padding: 24px 32px; text-align: center; z-index: 2000; animation: toastFadeIn 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-.toast .toast-icon { font-size: 20px; margin-bottom: 8px; }
-.toast .toast-text { font-size: 13px; color: #666; letter-spacing: 1px; }
-.toast.fade-out { animation: toastFadeOut 0.4s ease forwards; }
-.toast .toast-action { margin-top: 10px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 4px 16px; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 2px; }
-@keyframes toastFadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes toastFadeOut { from { opacity: 1; } to { opacity: 0; } }
-.welcome-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid #e8e8e8; border-radius: 16px; padding: 32px 40px; text-align: center; z-index: 3000; animation: simpleFadeIn 0.5s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
-.welcome-toast .welcome-icon { font-size: 28px; margin-bottom: 12px; }
-.welcome-toast .welcome-title { font-size: 14px; color: #999; letter-spacing: 2px; margin-bottom: 6px; }
-.welcome-toast .welcome-name { font-size: 20px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; }
-.welcome-toast .welcome-uid { font-size: 11px; color: #ccc; letter-spacing: 1px; margin-top: 6px; }
-@keyframes simpleFadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal { background: #fff; border-radius: 8px; padding: 28px 24px; max-width: 350px; width: 90%; text-align: center; max-height: 80vh; overflow-y: auto; position: relative; }
-.modal-close-x { position: absolute; top: 10px; right: 12px; font-size: 18px; color: #ccc; cursor: pointer; }
-.modal h3 { font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8e8e8; }
-.modal p { font-size: 12px; color: #999; line-height: 2; letter-spacing: 1px; margin-bottom: 8px; }
-.modal .close-btn { margin-top: 16px; border: 1px solid #1a1a1a; background: none; color: #1a1a1a; padding: 6px 24px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
-.modal .gray-btn { margin-top: 12px; border: 1px solid #888; background: none; color: #666; padding: 6px 20px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; }
-.modal input, .modal select, .modal textarea { width: 100%; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; margin-bottom: 10px; text-align: center; font-size: 14px !important; }
-.modal textarea { min-height: 80px; text-align: left; }
-.modal .link-btn { border: none; background: none; color: #8ecae6; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; margin-top: 8px; }
-.modal .social-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #ddd; background: none; color: #666; padding: 8px 20px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 4px; margin: 4px; }
-.modal .social-btn.qq { color: #6a8cc9; border-color: #c0d0e8; }
-.modal .social-btn.wx { color: #5aa86a; border-color: #c0e8c8; }
-.uid-tab-btn { font-size: 10px !important; color: #999; }
-.rank-tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
-.rank-tab { border: none; background: none; font-size: 12px; color: #bbb; letter-spacing: 1px; cursor: pointer; font-family: inherit; padding: 6px 12px; border-bottom: 2px solid transparent; }
-.rank-tab.active { color: #1a1a1a; border-bottom: 2px solid #1a1a1a; }
-.rank-list { display: flex; flex-direction: column; gap: 10px; }
-.rank-item { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 14px 18px; }
-.rank-num { font-size: 13px; color: #c9a44a; font-weight: 600; margin-right: 8px; }
-.rank-content { font-size: 13px; color: #333; line-height: 1.6; word-break: break-word; }
-.rank-meta { font-size: 10px; color: #ccc; margin-top: 6px; }
-.user-list, .teacher-list, .class-list, .msg-list, .report-list, .dev-list { max-height: 300px; overflow-y: auto; text-align: left; }
-.user-item, .teacher-item, .class-item, .msg-item, .report-item, .dev-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; }
-.user-info, .teacher-info, .class-info, .msg-info, .report-info, .dev-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-.user-name, .teacher-name, .class-name, .dev-name { font-size: 13px; color: #333; letter-spacing: 1px; }
-.user-uid, .teacher-subject, .class-desc, .dev-role { font-size: 11px; color: #ccc; }
-.user-action-btn, .teacher-action-btn, .class-action-btn, .msg-action-btn, .report-action-btn, .dev-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
-.user-action-btn.set { color: #6a8cc9; border-color: #c0d0e8; }
-.user-action-btn.remove { color: #c9a44a; border-color: #f0e0c0; }
-.rating-stars { font-size: 16px; cursor: pointer; letter-spacing: 2px; }
-.update-log { text-align: left; }
-.update-version { font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 1px; margin: 12px 0 6px; }
-.update-item { font-size: 12px; color: #888; line-height: 2; letter-spacing: 1px; padding-left: 12px; }
-.tea-room-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
-.tea-room-card { flex: 1 1 45%; background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 20px 16px; text-align: center; cursor: pointer; transition: box-shadow 0.3s ease, transform 0.3s ease; }
-.tea-room-card:hover { box-shadow: 0 4px 16px rgba(139,26,26,0.06); transform: translateY(-2px); }
-.tea-room-icon { font-size: 28px; margin-bottom: 8px; }
-.tea-room-name { font-size: 14px; letter-spacing: 3px; color: #1a1a1a; margin-bottom: 4px; }
-.tea-room-desc { font-size: 11px; color: #bbb; letter-spacing: 1px; }
-.chat-box { background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; margin-bottom: 12px; min-height: 150px; }
-.chat-message { animation: fadeIn 0.3s ease; }
-.chat-name { font-size: 11px; color: #999; letter-spacing: 1px; }
-.chat-name.admin { color: #b8860b; }
-.chat-text { font-size: 13px; color: #333; line-height: 1.6; word-break: break-word; }
-.chat-time { font-size: 10px; color: #ddd; }
-.chat-input-row { display: flex; gap: 8px; }
-.chat-input { flex: 1; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px 14px; outline: none; font-family: inherit; color: #333; }
-.chat-send-btn { background: none; border: 1px solid #1a1a1a; color: #1a1a1a; padding: 8px 18px; font-size: 12px; letter-spacing: 2px; cursor: pointer; font-family: inherit; border-radius: 2px; white-space: nowrap; }
-.back-link { font-size: 12px; color: #bbb; letter-spacing: 1px; cursor: pointer; margin-bottom: 12px; display: inline-block; }
-.chat-spacer { height: 250px; }
-.food-spacer { height: 150px; }
-.profile-card { text-align: center; padding: 20px 0; }
-.profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; }
-.profile-name { font-size: 18px; font-weight: 600; color: #1a1a1a; letter-spacing: 2px; margin-bottom: 6px; }
-.profile-bio { font-size: 12px; color: #999; letter-spacing: 1px; margin-bottom: 12px; }
-.profile-uid { font-size: 10px; color: #ccc; letter-spacing: 1px; }
-.song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f5f5f5; }
-.song-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-.song-name { font-size: 13px; color: #333; letter-spacing: 1px; }
-.song-uploader { font-size: 10px; color: #ccc; }
-.song-action-btn { border: 1px solid #ddd; background: none; color: #999; padding: 3px 10px; font-size: 10px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 10px; }
-.song-tab-row { display: flex; justify-content: center; gap: 8px; margin: 12px 0; }
-.song-tab-btn { border: 1px solid #ddd; background: none; color: #999; padding: 4px 14px; font-size: 11px; letter-spacing: 1px; cursor: pointer; font-family: inherit; border-radius: 20px; }
-.song-tab-btn.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-</style>
-</head>
-<body>
-<div class="loading-screen" id="loadingScreen">
-    <div class="loading-image"></div>
-    <div class="loading-title">二中·集</div>
-    <div class="loading-text">正在进入···</div>
-</div>
-<div class="side-text left">
-    <p>二十一世紀 人類依然需要擁抱 理解 以及愛</p>
-    <p>我要發呆、靜坐、咀嚼、散步、看天、把所有沒有意義的事鄭重其事做一遍</p>
-</div>
-<div class="side-text right">
-    <p>人們傳頌勇氣 而我可不可以 愛你哭泣的心</p>
-    <p>我們不要在這裡 跟我回去十八歲 躲到台大校園杜鵑花叢下 不要被命運找到</p>
-</div>
-<div class="container">
-    <div class="top-bar">
-        <div class="top-left">
-            <div class="site-title">二中·集</div>
-            <div class="music-bar" onclick="showPlaylist()">🎵 <span id="musicLabel">One Last Kiss</span></div>
-            <div class="activity-bar" onclick="showActivityDetail()">🎨 二中拟人计划 · 为二中取一个名字</div>
-        </div>
-        <div class="top-right">
-            <div class="register-row">
-                <span id="countdown"></span>
-                <button class="register-btn" id="registerBtn" onclick="handleRegisterClick()">点击注册</button>
-            </div>
-            <div class="top-btns-row">
-                <button class="top-btn" onclick="showMessages()">✉️ 私信</button>
-                <button class="top-btn" onclick="showUpdate()">📢 更新</button>
-                <button class="top-btn" onclick="showTeacherList()">👨‍🏫 评价</button>
-                <button class="top-btn" onclick="showAbout()">关于</button>
-            </div>
-        </div>
-    </div>
-    <audio id="bgm" autoplay loop style="display:none;"></audio>
-    <div class="header">
-        <div class="header-icon" id="headerIcon">📮</div>
-        <h1 id="headerTitle">二中心事箱</h1>
-        <div class="line"></div>
-        <p class="subtitle" id="headerSubtitle">把不敢说的话，悄悄放进这里</p>
-    </div>
-    <div class="stats-bar">
-        <span>📮 小纸条 <span id="postCount">0</span> 张</span>
-        <span>·</span>
-        <span>🍜 美食 <span id="foodCount">0</span> 家</span>
-    </div>
-    <div class="mode-switch">
-        <button class="mode-btn active" data-mode="post" onclick="switchMode('post')">📮 心事箱</button>
-        <button class="mode-btn" data-mode="food" onclick="switchMode('food')">🍜 必吃榜</button>
-        <button class="mode-btn" data-mode="chat" onclick="switchMode('chat')">💬 小茶馆</button>
-        <button class="mode-btn" data-mode="bottle" onclick="switchMode('bottle')">🍾 漂流瓶</button>
-        <button class="mode-btn" data-mode="rank" onclick="switchMode('rank')">🔥 热门榜</button>
-    </div>
-    <div id="postSection">
-        <div class="search-bar">
-            <input type="text" class="search-input" id="searchInput" placeholder="搜索帖子关键词...">
-            <button class="search-btn" onclick="searchPosts()">搜索</button>
-        </div>
-        <div class="input-area">
-            <div class="categories" id="categories">
-                <button class="category-btn active" data-tag="表白">♥ 表白</button>
-                <button class="category-btn" data-tag="吐槽">! 吐槽</button>
-                <button class="category-btn" data-tag="祝福">✦ 祝福</button>
-                <button class="category-btn" data-tag="树洞">◌ 树洞</button>
-                <button class="category-btn" data-tag="寻人">? 寻人</button>
-                <button class="category-btn" data-tag="出物">◆ 出物</button>
-                <button class="category-btn" data-tag="活动">✦ 活动</button>
-                <button class="category-btn" data-tag="其他">· 其他</button>
-            </div>
-            <div class="identity-switch" id="identitySwitch">
-                <button class="identity-btn active" data-identity="anon">🕊️ 匿名</button>
-                <button class="identity-btn" data-identity="nickname">✏️ 昵称</button>
-            </div>
-            <textarea id="postContent" placeholder="说点什么... 勇敢一点！" maxlength="500"></textarea>
-            <div id="postImagePreview"></div>
-            <div class="input-footer">
-                <span class="anonymous" id="currentIdentityLabel">🕊️ 匿名发布</span>
-                <button class="publish-btn" id="publishBtn" onclick="submitPost()">悄悄送出</button>
-            </div>
-            <button class="image-upload-btn" onclick="document.getElementById('postImageInput').click()">📷 添加图片（可多选）</button>
-            <input type="file" id="postImageInput" accept="image/*" multiple style="display:none;" onchange="handlePostImageSelect(event)">
-        </div>
-        <div class="filter-bar" id="filterBar">
-            <button class="filter-btn active" data-filter="全部">全部</button>
-            <button class="filter-btn" data-filter="表白">♥ 表白</button>
-            <button class="filter-btn" data-filter="吐槽">! 吐槽</button>
-            <button class="filter-btn" data-filter="祝福">✦ 祝福</button>
-            <button class="filter-btn" data-filter="树洞">◌ 树洞</button>
-            <button class="filter-btn" data-filter="寻人">? 寻人</button>
-            <button class="filter-btn" data-filter="出物">◆ 出物</button>
-            <button class="filter-btn" data-filter="活动">✦ 活动</button>
-            <button class="filter-btn" data-filter="其他">· 其他</button>
-        </div>
-        <div class="posts-list" id="postsList">
-            <div class="empty-state">
-                <div class="empty-icon">(´･ω･`)</div>
-                <p>加载中...</p>
-                <p class="empty-sub">请稍等</p>
-            </div>
-        </div>
-    </div>
-    <div id="foodSection" style="display:none;">
-        <div class="input-area">
-            <div class="food-inputs">
-                <input type="text" id="foodName" placeholder="🏪 店名（比如：老王麻辣烫）">
-                <input type="text" id="foodRecommend" placeholder="⭐ 推荐菜（比如：招牌麻辣烫）">
-                <input type="text" id="foodPrice" placeholder="💰 人均（比如：15元）">
-                <span class="food-select-label">🚶 距离</span>
-                <div class="food-select-group" id="distanceGroup">
-                    <button class="food-select-btn active" data-distance="校门口">校门口</button>
-                    <button class="food-select-btn" data-distance="步行5分钟">步行5分钟</button>
-                    <button class="food-select-btn" data-distance="骑车10分钟">骑车10分钟</button>
-                    <button class="food-select-btn" data-distance="稍远但值得">稍远但值得</button>
-                </div>
-                <span class="food-select-label">⭐ 推荐度</span>
-                <div class="food-select-group" id="ratingGroup">
-                    <button class="food-select-btn active" data-rating="必吃">必吃</button>
-                    <button class="food-select-btn" data-rating="不错">不错</button>
-                    <button class="food-select-btn" data-rating="还行">还行</button>
-                </div>
-                <textarea id="foodComment" placeholder="📝 评价一下...好吃吗？"></textarea>
-            </div>
-            <div class="input-footer">
-                <span class="anonymous">🍜 美食推荐</span>
-                <button class="publish-btn" id="foodBtn" onclick="submitFood()">推荐</button>
-            </div>
-        </div>
-        <div class="food-list" id="foodList">
-            <div class="empty-state">
-                <div class="empty-icon">(´･ω･`)</div>
-                <p>加载中...</p>
-                <p class="empty-sub">请稍等</p>
-            </div>
-        </div>
-        <div class="food-spacer"></div>
-    </div>
-    <div id="chatSection" style="display:none;">
-        <div id="teaRoomList">
-            <div class="tea-room-grid">
-                <div class="tea-room-card" onclick="enterRoom('八卦桌')"><div class="tea-room-icon">🍵</div><div class="tea-room-name">八卦桌</div><div class="tea-room-desc">东家长西家短</div></div>
-                <div class="tea-room-card" onclick="enterRoom('学习桌')"><div class="tea-room-icon">📚</div><div class="tea-room-name">学习桌</div><div class="tea-room-desc">讨论作业考试</div></div>
-                <div class="tea-room-card" onclick="enterRoom('游戏桌')"><div class="tea-room-icon">🎮</div><div class="tea-room-name">游戏桌</div><div class="tea-room-desc">开黑组队</div></div>
-                <div class="tea-room-card" onclick="enterRoom('音乐桌')"><div class="tea-room-icon">🎵</div><div class="tea-room-name">音乐桌</div><div class="tea-room-desc">分享歌曲</div></div>
-                <div class="tea-room-card" onclick="enterRoom('深夜桌')"><div class="tea-room-icon">🌙</div><div class="tea-room-name">深夜桌</div><div class="tea-room-desc">睡不着来聊</div></div>
-                <div class="tea-room-card" onclick="showClassList()"><div class="tea-room-icon">🏠</div><div class="tea-room-name">班级小窝</div><div class="tea-room-desc">找到你的班级</div></div>
-            </div>
-            <div class="chat-spacer"></div>
-        </div>
-        <div id="chatRoom" style="display:none;">
-            <span class="back-link" onclick="backToRooms()">← 返回小茶馆</span>
-            <div class="chat-box" id="chatBox"></div>
-            <div class="chat-input-row">
-                <input type="text" class="chat-input" id="chatInput" placeholder="说点什么...">
-                <button class="chat-send-btn" id="chatBtn" onclick="sendChat()">发送</button>
-            </div>
-            <div class="chat-spacer"></div>
-        </div>
-    </div>
-    <div id="bottleSection" style="display:none;">
-        <div class="bottle-area">
-            <div class="bottle-icon">🍾</div>
-            <p style="font-size:13px;color:#999;letter-spacing:2px;margin-bottom:20px;">把心事装进瓶子，扔进海里</p>
-            <div class="input-area" style="text-align:left;">
-                <textarea id="bottleContent" placeholder="写下想说的话..." maxlength="300"></textarea>
-                <div class="input-footer">
-                    <span class="anonymous">🕊️ 匿名</span>
-                    <button class="publish-btn" id="bottleBtn" onclick="throwBottle()">扔瓶子</button>
-                </div>
-            </div>
-            <button class="publish-btn" onclick="pickBottle()" style="margin-top:10px;">🌊 捞一个瓶子</button>
-        </div>
-    </div>
-    <div id="rankSection" style="display:none;">
-        <div class="rank-tabs">
-            <button class="rank-tab active" data-rank="like" onclick="switchRank('like')">❤️ 点赞榜</button>
-            <button class="rank-tab" data-rank="view" onclick="switchRank('view')">👁️ 浏览量榜</button>
-        </div>
-        <div class="rank-list" id="rankList"></div>
-        <div class="food-spacer"></div>
-    </div>
-    <div class="footer">
-        <p>(｡•̀ᴗ-)✧ 勇敢的人先享受世界</p>
-    </div>
-</div><script>
+.publish-btn:hover { background: #1a1a1a; color: #fff; }<script>
 var supabaseClient = window.supabase.createClient('https://byokxdqvxtdshsdoagtm.supabase.co', 'sb_publishable_nadYCZZneDKNjFTb5edh2A_Q3tS18h4');
 var selectedTag = '表白';
 var currentFilter = '全部';
@@ -524,70 +192,61 @@ playRandomSong();
 function showPlaylist() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal" style="max-width:380px;"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 歌单</h3>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🎵 歌单</h3>';
     html += '<div class="song-tab-row"><button class="song-tab-btn active" id="songTabPublic" onclick="switchSongTabInModal(\'public\')">🌍 公共歌单</button><button class="song-tab-btn" id="songTabMine" onclick="switchSongTabInModal(\'mine\')">🎧 我的歌单</button></div>';
-    html += '<div id="playlistContent" style="text-align:left;max-height:300px;overflow-y:auto;"></div>';
-    html += '<div style="margin-top:12px;"><input type="text" id="modalSongIdInput" placeholder="输入网易云歌曲 ID" style="width:100%;border:1px solid #e8e8e8;border-radius:4px;padding:8px 12px;outline:none;font-family:inherit;color:#333;margin-bottom:8px;font-size:12px !important;"><button class="gray-btn" onclick="addSongFromModal()">添加歌曲</button></div>';
+    html += '<div id="songModalList" style="max-height:250px;overflow-y:auto;text-align:left;"></div>';
+    html += '<div class="input-area" style="padding:12px 16px;margin-top:12px;margin-bottom:0;"><input type="text" id="songIdInputModal" placeholder="输入网易云歌曲 ID" style="width:100%;border:1px solid #e8e8e8;border-radius:4px;padding:8px 12px;outline:none;font-family:inherit;color:#333;margin-bottom:8px;font-size:14px !important;"><div class="input-footer" style="margin-top:0;"><span class="anonymous">🎵 添加歌曲</span><button class="publish-btn" onclick="addSongFromModal()">添加</button></div></div>';
     html += '<button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
     document.body.appendChild(overlay);
     currentSongTab = 'public';
-    renderPlaylistContent();
+    loadSongsInModal();
 }
 
 function switchSongTabInModal(tab) {
     currentSongTab = tab;
-    var btnPublic = document.getElementById('songTabPublic');
-    var btnMine = document.getElementById('songTabMine');
-    if (btnPublic) btnPublic.classList.remove('active');
-    if (btnMine) btnMine.classList.remove('active');
-    if (tab === 'public' && btnPublic) btnPublic.classList.add('active');
-    if (tab === 'mine' && btnMine) btnMine.classList.add('active');
-    renderPlaylistContent();
+    var pubBtn = document.getElementById('songTabPublic');
+    var mineBtn = document.getElementById('songTabMine');
+    if (pubBtn) pubBtn.classList.remove('active');
+    if (mineBtn) mineBtn.classList.remove('active');
+    if (tab === 'public' && pubBtn) pubBtn.classList.add('active');
+    if (tab === 'mine' && mineBtn) mineBtn.classList.add('active');
+    loadSongsInModal();
 }
 
-async function renderPlaylistContent() {
-    var container = document.getElementById('playlistContent');
-    if (!container) return;
-    container.innerHTML = '<div style="text-align:center;color:#ccc;font-size:12px;padding:10px;">加载中...</div>';
+async function loadSongsInModal() {
+    var list = document.getElementById('songModalList');
+    if (!list) return;
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>加载中...</p></div>';
     var html = '';
     if (currentSongTab === 'public') {
-        html += '<div style="font-size:11px;color:#999;letter-spacing:1px;padding:6px 0;">本地歌</div>';
+        html += '<div style="font-size:11px;color:#bbb;padding:8px 0;letter-spacing:1px;">本地歌曲</div>';
         songNames.forEach(function(name, index) {
-            html += '<div class="reply-item" style="cursor:pointer;font-size:12px;color:#666;" onclick="playSong(' + index + ')">' + (index === currentSong ? '▶ ' : '') + escapeHtml(name) + '</div>';
+            html += '<div class="reply-item" style="cursor:pointer;" onclick="playSong(' + index + ');closeModal();"><div class="reply-content">' + (index === currentSong ? '▶ ' : '') + escapeHtml(name) + '</div></div>';
         });
+        html += '<div style="font-size:11px;color:#bbb;padding:8px 0;letter-spacing:1px;">云端歌曲</div>';
         var result = await supabaseClient.from('songs').select('*').eq('is_public', true).order('id', { ascending: false }).limit(100);
         var songs = result.data || [];
-        html += '<div style="font-size:11px;color:#999;letter-spacing:1px;padding:6px 0;margin-top:8px;">用户上传</div>';
-        if (songs.length === 0) {
-            html += '<div style="font-size:11px;color:#ccc;padding:4px 0;">暂无</div>';
-        } else {
-            songs.forEach(function(s) {
-                var canDelete = (isAdmin || isOwner || s.uploader_uid === userUid);
-                html += '<div class="song-item" style="padding:8px 0;border-bottom:1px solid #f5f5f5;"><div class="song-info"><span class="song-name" style="font-size:12px;">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删</button>' : '') + '</div>';
-            });
-        }
+        if (songs.length === 0) { html += '<div style="font-size:11px;color:#ccc;padding:6px 0;">还没有云端歌曲</div>'; }
+        songs.forEach(function(s) {
+            var canDelete = (isAdmin || isOwner || s.uploader_uid === userUid);
+            html += '<div class="song-item"><div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删除</button>' : '') + '</div>';
+        });
     } else {
-        if (!userUid) {
-            html += '<div style="text-align:center;color:#ccc;font-size:12px;padding:20px;">请先登录</div>';
-        } else {
-            var result2 = await supabaseClient.from('songs').select('*').eq('uploader_uid', userUid).order('id', { ascending: false });
-            var mySongs = result2.data || [];
-            if (mySongs.length === 0) {
-                html += '<div style="text-align:center;color:#ccc;font-size:12px;padding:20px;">还没有上传</div>';
-            } else {
-                mySongs.forEach(function(s) {
-                    html += '<div class="song-item" style="padding:8px 0;border-bottom:1px solid #f5f5f5;"><div class="song-info"><span class="song-name" style="font-size:12px;">' + escapeHtml(s.name) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button> <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删</button></div>';
-                });
-            }
-        }
+        if (!userUid) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>请先登录</p></div>'; return; }
+        var result2 = await supabaseClient.from('songs').select('*').eq('uploader_uid', userUid).order('id', { ascending: false });
+        var songs2 = result2.data || [];
+        if (songs2.length === 0) { html += '<div style="font-size:11px;color:#ccc;padding:6px 0;">还没有添加歌曲</div>'; }
+        songs2.forEach(function(s) {
+            html += '<div class="song-item"><div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.time) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + escapeHtml(s.name) + '\')">播放</button> <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删除</button></div>';
+        });
     }
-    container.innerHTML = html;
+    list.innerHTML = html;
 }
 
 async function addSongFromModal() {
     if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
-    var input = document.getElementById('modalSongIdInput');
+    var input = document.getElementById('songIdInputModal');
     var neteaseId = input.value.trim();
     if (!neteaseId) { showToast('(´･ω･`)', '请输入歌曲 ID'); return; }
     if (!/^\d+$/.test(neteaseId)) { showToast('(｡•́︿•̀｡)', 'ID 必须是数字'); return; }
@@ -602,13 +261,13 @@ async function addSongFromModal() {
     if (result.error) { showToast('(｡•́︿•̀｡)', '添加失败'); return; }
     input.value = '';
     showToast('(｡•̀ᴗ-)✧', '已添加');
-    renderPlaylistContent();
+    loadSongsInModal();
 }
 
 async function deleteSongFromModal(id) {
-    if (!confirm('确认删除？')) return;
+    if (!confirm('确认删除这首歌？')) return;
     var result = await supabaseClient.from('songs').delete().eq('id', id);
-    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); renderPlaylistContent(); }
+    if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已删除'); loadSongsInModal(); }
 }
 
 function playNetease(neteaseId, name) {
@@ -624,10 +283,8 @@ function playSong(index) {
     bgm.src = playlist[index];
     document.getElementById('musicLabel').textContent = songNames[index];
     bgm.play();
-    renderPlaylistContent();
-}
-
-function showActivityDetail() {
+    closeModal();
+}function showActivityDetail() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>二中拟人 · 名字征集</h3>';
@@ -761,7 +418,9 @@ async function submitPost() {
     var author = randomEmoji;
     var authorClass = 'anon';
     if (identityMode === 'nickname' && userNickname) { author = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); authorClass = 'admin'; }
-    var result = await supabaseClient.from('posts').insert([{ content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr, pinned: false, author_uid: userUid || '', image: imageUrls.join(',') }]);
+    var insertData = { content: content, tag: selectedTag, author: author, authorclass: authorClass, time: timeStr, pinned: false, author_uid: userUid || '', image: imageUrls.join(',') };
+    if (authorClass === 'admin') { insertData.author_avatar = userAvatar || ''; }
+    var result = await supabaseClient.from('posts').insert([insertData]);
     if (result.error) { isSubmitting = false; btn.textContent = '悄悄送出'; showToast('(｡•́︿•̀｡)', '发布失败'); return; }
     document.getElementById('postContent').value = '';
     pendingPostImages = [];
@@ -786,7 +445,7 @@ async function loadPosts() {
     var pinnedPosts = pinnedResult.data || [];
     var normalPosts = normalResult.data || [];
     var allData = pinnedPosts.concat(normalPosts);
-    allPosts = allData.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '', image: p.image || null, edited: p.edited || false, views: p.views || 0 }; });
+    allPosts = allData.map(function(p) { return { id: p.id, tag: p.tag, author: p.author, authorClass: p.authorclass || 'anon', content: p.content, time: p.time, pinned: p.pinned, author_uid: p.author_uid || '', image: p.image || null, edited: p.edited || false, views: p.views || 0, author_avatar: p.author_avatar || '' }; });
     allPosts.sort(function(a, b) {
         if (a.pinned && b.pinned) return b.id - a.id;
         if (a.pinned) return -1;
@@ -861,7 +520,15 @@ async function renderPostCard(post, container) {
     card.className = 'post-card';
     card.setAttribute('data-post-id', post.id);
     var editedTag = post.edited ? '<span class="edited-tag">已编辑</span>' : '';
-    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + escapeHtml(post.tag) + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + editedTag + '<div class="post-author ' + post.authorClass + '">' + escapeHtml(post.author) + '</div><div class="post-content">' + escapeHtml(post.content) + '</div>';
+    var authorHtml = escapeHtml(post.author);
+    if (post.authorClass === 'admin' && post.author_uid) {
+        authorHtml = '<span style="cursor:pointer;" onclick="showUserProfile(\'' + escapeHtml(post.author_uid) + '\')">' + escapeHtml(post.author) + '</span>';
+    }
+    var avatarHtml = '';
+    if (post.authorClass === 'admin' && post.author_uid && post.author_avatar) {
+        avatarHtml = '<img src="' + escapeHtml(post.author_avatar) + '" class="post-avatar">';
+    }
+    card.innerHTML = '<span class="post-tag tag-' + post.tag + '">' + escapeHtml(post.tag) + '</span>' + (post.pinned ? '<span class="post-tag pin-tag">📌置顶</span>' : '') + editedTag + '<div class="post-author ' + post.authorClass + '">' + avatarHtml + authorHtml + '</div><div class="post-content">' + escapeHtml(post.content) + '</div>';
     if (post.image) {
         var images = post.image.split(',');
         images.forEach(function(imgUrl) {
@@ -1198,9 +865,7 @@ async function replyBottle(bottleId) {
     var timeStr = now.getMonth() + 1 + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
     var result = await supabaseClient.from('bottles').update({ is_replied: true, reply: content, reply_time: timeStr }).eq('id', bottleId);
     if (!result.error) { showToast('(｡•̀ᴗ-)✧', '已回复'); closeModal(); }
-}
-
-function renderPosts() {
+}function renderPosts() {
     var postsList = document.getElementById('postsList');
     postsList.innerHTML = '';
     var filteredPosts = allPosts.filter(function(post) { if (currentFilter === '全部') return true; return post.tag === currentFilter; });
@@ -1331,7 +996,9 @@ async function enterClassRoom(classId, className) {
     var result = await supabaseClient.from('class_messages').select('*').eq('class_id', String(classId)).order('id', { ascending: true }).limit(50);
     var msgs = result.data || [];
     msgs.forEach(function(msg) { var div = document.createElement('div'); div.className = 'chat-message'; div.innerHTML = '<span class="chat-name">' + escapeHtml(msg.author) + '</span> <span class="chat-text">' + escapeHtml(msg.content) + '</span> <span class="chat-time">' + escapeHtml(msg.time) + '</span>'; chatBox.appendChild(div); });
-}function handleRegisterClick() { if (userNickname) { showUserCenter(); } else { showRegister(); } }
+}
+
+function handleRegisterClick() { if (userNickname) { showUserCenter(); } else { showRegister(); } }
 
 function showRegister() {
     var overlay = document.createElement('div');
@@ -1556,9 +1223,7 @@ async function saveNickname() {
 function updateRegisterBtn() {
     var btn = document.getElementById('registerBtn');
     if (userNickname) { btn.textContent = userNickname + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')); btn.classList.add('logged-in'); if (isAdmin || isOwner) btn.classList.add('admin'); } else { btn.textContent = '点击注册'; btn.classList.remove('logged-in'); btn.classList.remove('admin'); }
-}
-
-async function loadMyProfile() {
+}async function loadMyProfile() {
     if (!userUid) return;
     var result = await supabaseClient.from('profiles').select('*').eq('uid', userUid).single();
     if (result.data) {
@@ -1624,6 +1289,30 @@ async function saveBio() {
     showToast('(｡•̀ᴗ-)✧', '已保存');
 }
 
+async function showUserProfile(uid) {
+    var userResult = await supabaseClient.from('users').select('*').eq('uid', uid).single();
+    if (!userResult.data) { showToast('(｡•́︿•̀｡)', '用户不存在'); return; }
+    var profileResult = await supabaseClient.from('profiles').select('*').eq('uid', uid).single();
+    var avatar = profileResult.data ? profileResult.data.avatar : '';
+    var bio = profileResult.data ? profileResult.data.bio : '';
+    var postResult = await supabaseClient.from('posts').select('*').eq('author_uid', uid).order('id', { ascending: false }).limit(20);
+    var posts = postResult.data || [];
+    var avatarHtml = avatar ? '<img src="' + escapeHtml(avatar) + '" class="profile-avatar">' : '<div class="profile-avatar" style="background:#f0f0f0;"></div>';
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="profile-card">' + avatarHtml + '<div class="profile-name">' + escapeHtml(userResult.data.nickname) + (userResult.data.isowner ? ' 👑' : (userResult.data.isadmin ? ' ⭐' : '')) + '</div><div class="profile-bio">' + escapeHtml(bio || '这个人很懒') + '</div><div class="profile-uid">UID: ' + escapeHtml(uid) + '</div></div>';
+    if (userUid && uid !== userUid) {
+        html += '<button class="gray-btn" onclick="closeModal();openChat(\'' + uid + '\')">发私信</button><br>';
+    }
+    html += '<div class="user-list" style="margin-top:12px;">';
+    posts.forEach(function(p) {
+        html += '<div class="reply-item"><div class="reply-content">' + escapeHtml(p.content.slice(0, 40)) + (p.content.length > 40 ? '...' : '') + '</div><div class="reply-time">' + escapeHtml(p.time) + '</div></div>';
+    });
+    html += '</div><button class="link-btn" onclick="closeModal()">关闭</button></div>';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+}
+
 function switchRank(type) {
     currentRank = type;
     var tabs = document.querySelectorAll('.rank-tab[data-rank]');
@@ -1667,9 +1356,13 @@ async function renderRank() {
     }
 }
 
-async function showDevelopers() {
+async function loadDevelopers() {
     var result = await supabaseClient.from('developers').select('*').order('id', { ascending: true });
-    var devs = result.data || [];
+    return result.data || [];
+}
+
+async function showDevelopers() {
+    var devs = await loadDevelopers();
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>💻 开发者名单</h3><div class="dev-list">';
@@ -1787,7 +1480,7 @@ async function submitTeacherReview(teacherId) {
 function showAbout() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>✦ 活动 — 参与校园活动<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>🔥 热门榜 — 点赞榜 + 浏览量榜</p><p>🎵 歌单 — 点顶部音乐条查看</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p>';
+    var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>📮 关于二中心事箱</h3><p>这里是一个匿名的小天地</p><p>你可以：<br>♥ 表白 — 说出你的心意<br>! 吐槽 — 发泄你的情绪<br>✦ 祝福 — 送上你的祝愿<br>◌ 树洞 — 倾诉你的秘密<br>? 寻人 — 寻找那个TA<br>◆ 出物 — 二手好物分享<br>✦ 活动 — 参与校园活动<br>· 其他 — 分享任何事</p><p>🍜 必吃榜 — 推荐学校周围的美食</p><p>💬 小茶馆 — 找个桌位，坐下聊聊</p><p>🏠 班级小窝 — 找到你的班级</p><p>🍾 漂流瓶 — 把心事扔进海里</p><p>🔥 热门榜 — 点赞榜 + 浏览量榜</p><p>🎵 音乐 — 点顶部音乐条看歌单</p><p>所有内容均为匿名发布<br>请文明发言，传递温暖</p>';
     html += '<button class="gray-btn" onclick="closeModal();showDevelopers()">💻 开发者名单</button><br>';
     html += '<button class="close-btn" onclick="closeModal()">知道了</button></div>';
     overlay.innerHTML = html;
@@ -1797,7 +1490,7 @@ function showAbout() {
 function showUpdate() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v10.1（当前版本）</div><div class="update-item">· 歌单合并进音乐条</div><div class="update-item">· 本地歌曲 + 用户上传</div><div class="update-item">· 热门榜</div><div class="update-item">· 点赞 / 收藏</div><div class="update-item">· 私信系统</div><div class="update-item">· 举报处理</div><div class="update-item">· 编辑帖子</div><div class="update-item">· 头像 + 个性签名</div><div class="update-item">· 用户主页</div><div class="update-item">· 开发者名单</div><div class="update-item">· 图片自动压缩</div><div class="update-item">· 置顶排序修复</div><div class="update-version">v9.2</div><div class="update-item">· 活动分类上线</div><div class="update-item">· 二中拟人计划</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· QQ/微信登录</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
+    overlay.innerHTML = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><div class="update-log"><h3>📢 更新日志</h3><div class="update-version">v10.0（当前版本）</div><div class="update-item">· 帖子显示头像</div><div class="update-item">· 歌单合并进音乐条</div><div class="update-item">· 热门榜</div><div class="update-item">· 点赞 / 收藏</div><div class="update-item">· 私信系统</div><div class="update-item">· 举报处理</div><div class="update-item">· 编辑帖子</div><div class="update-item">· 头像 + 个性签名</div><div class="update-item">· 用户主页</div><div class="update-item">· 开发者名单</div><div class="update-item">· 图片自动压缩</div><div class="update-item">· 置顶排序修复</div><div class="update-item">· 标题不换行</div><div class="update-version">v9.2</div><div class="update-item">· 活动分类上线</div><div class="update-item">· 二中拟人计划</div><div class="update-item">· 美食接入云端数据库</div><div class="update-item">· 新增八首歌曲</div><div class="update-item">· 发帖多图上传</div><div class="update-item">· 回复多图上传</div><div class="update-item">· QQ/微信登录</div><div class="update-version">v1.0</div><div class="update-item">· 心事箱分类发帖</div><div class="update-item">· 必吃榜美食推荐</div><div class="update-item">· 小茶馆多桌聊天</div></div><button class="close-btn" onclick="closeModal()">知道了</button></div>';
     document.body.appendChild(overlay);
 }
 
