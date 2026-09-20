@@ -573,7 +573,8 @@ async function loadSongsInModal() {
         if (songs.length === 0) { html += '<div style="font-size:11px;color:#ccc;padding:6px 0;">还没有云端歌曲</div>'; }
         songs.forEach(function(s) {
             var canDelete = (isAdmin || isOwner || s.uploader_uid === userUid);
-            var songNameSafe = (s.name || '').replace(/'/g, "\'"); html += '<div class="song-item"><div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + songNameSafe + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删除</button>' : '') + '</div>';
+            var songNameSafe = (s.name || '').replace(/'/g, "\\'");
+            html += '<div class="song-item"><div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.uploader_name || '匿名') + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + songNameSafe + '\')">播放</button>' + (canDelete ? ' <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删除</button>' : '') + '</div>';
         });
     } else {
         if (!userUid) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">(´･ω･`)</div><p>请先登录</p></div>'; return; }
@@ -581,12 +582,12 @@ async function loadSongsInModal() {
         var songs2 = result2.data || [];
         if (songs2.length === 0) { html += '<div style="font-size:11px;color:#ccc;padding:6px 0;">还没有添加歌曲</div>'; }
         songs2.forEach(function(s) {
-            var songNameSafe2 = (s.name || '').replace(/'/g, "\'"); html += '<div class="song-item"><div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.time) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + songNameSafe2 + '\')">播放</button> <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删除</button></div>';
+            var songNameSafe2 = (s.name || '').replace(/'/g, "\\'");
+            html += '<div class="song-item"><div class="song-info"><span class="song-name">' + escapeHtml(s.name) + '</span><span class="song-uploader">' + escapeHtml(s.time) + '</span></div><button class="song-action-btn" onclick="playNetease(\'' + escapeHtml(s.netease_id) + '\',\'' + songNameSafe2 + '\')">播放</button> <button class="song-action-btn" onclick="deleteSongFromModal(' + s.id + ')">删除</button></div>';
         });
     }
     list.innerHTML = html;
 }
-
 async function addSongFromModal() {
     if (!userUid) { showToast('(´･ω･`)', '请先登录'); return; }
     var input = document.getElementById('songIdInputModal');
