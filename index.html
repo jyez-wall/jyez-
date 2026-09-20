@@ -891,7 +891,7 @@ function buildReplyHtml(r) {
             if (imgUrl.trim()) { imageHtml += '<img src="' + escapeHtml(imgUrl.trim()) + '" class="reply-image" onclick="window.open(\'' + escapeHtml(imgUrl.trim()) + '\',\'_blank\')">'; }
         });
     }
-    return '<div class="reply-item">' + quoteHtml + '<span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div>' + imageHtml + '<button class="reply-send-btn" style="font-size:9px;padding:2px 8px;" onclick="setReplyTarget(' + r.id + ',\'' + escapeHtml(r.author) + '\',' + r.post_id + ')">回复</button> <button class="reply-send-btn" style="font-size:9px;padding:2px 8px;" onclick="showReportReply(' + r.id + ')">举报</button></div>';
+    var replyAuthorSafe = (r.author || '').replace(/'/g, "\'"); return '<div class="reply-item">' + quoteHtml + '<span class="reply-author">' + escapeHtml(r.author) + '</span> <span class="reply-time">' + escapeHtml(r.time) + '</span><div class="reply-content">' + escapeHtml(r.content) + '</div>' + imageHtml + '<button class="reply-send-btn" style="font-size:9px;padding:2px 8px;" onclick="setReplyTarget(' + r.id + ',\'' + replyAuthorSafe + '\',' + r.post_id + ')">回复</button> <button class="reply-send-btn" style="font-size:9px;padding:2px 8px;" onclick="showReportReply(' + r.id + ')">举报</button></div>';
 }
 
 function handleReplyImageSelect(event, postId) {
@@ -1300,7 +1300,7 @@ async function showClassList() {
     overlay.className = 'modal-overlay';
     var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span><h3>🏠 班级小窝</h3><div class="class-list">';
     classes.forEach(function(c) {
-        html += '<div class="class-item"><div class="class-info"><span class="class-name">' + escapeHtml(c.name) + '</span></div><button class="class-action-btn" onclick="enterClassRoom(\'' + c.id + '\',\'' + escapeHtml(c.name) + '\')">进入</button></div>';
+        var classNameSafe = (c.name || '').replace(/'/g, "\'"); html += '<div class="class-item"><div class="class-info"><span class="class-name">' + escapeHtml(c.name) + '</span></div><button class="class-action-btn" onclick="enterClassRoom(\'' + c.id + '\',\'' + classNameSafe + '\')">进入</button></div>';
     });
     html += '</div><input type="text" id="newClassName" placeholder="创建新班级（如：高一1班）"><button class="close-btn" onclick="createClass()">创建班级</button><br><button class="link-btn" onclick="closeModal()">关闭</button></div>';
     overlay.innerHTML = html;
