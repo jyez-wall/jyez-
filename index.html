@@ -243,7 +243,7 @@ textarea::placeholder { color: #ccc; letter-spacing: 1px; }
         <div class="top-left">
             <div class="site-title">二中·集</div>
             <div class="music-bar" onclick="showPlaylist()">🎵 <span id="musicLabel">One Last Kiss</span></div>
-            <div class="activity-bar" onclick="showActivityDetail()">🎨 二中拟人计划 · 为二中取一个名字</div>
+            <div class="activity-bar" id="activityBar" onclick="showActivityDetail()"></div>
         </div>
         <div class="top-right">
             <div class="register-row">
@@ -447,7 +447,7 @@ var mapayAppkey = '251f50340c05184bec75a98dfdb7b1d6';
 var mapayRedirect = 'https://jyez-wall.github.io/jyez-/';
 var mapayProxyUrl = 'https://byokxdqvxtdshsdoagtm.supabase.co/functions/v1/hyper-responder';
 var isSubmitting = false;
-var activityTopic = '#二中拟人';
+var activityTopic = '#二中拟人'; var currentActivity = {     title: '🎨 二中拟人计划 · 为二中取一个名字',     endDate: '2026-09-20T23:59:59',     topic: '#二中拟人',     detailTitle: '二中拟人 · 名字征集',     detailBody: '如果二中变成一个人，<br>会叫什么名字？<br><br>心事箱发帖，开头带上：<br>#二中拟人',     deadline: '9 月 20 日' };  function renderActivity() {     var bar = document.getElementById('activityBar');     if (!bar) return;     if (new Date() > new Date(currentActivity.endDate)) {         bar.style.display = 'none';         return;     }     bar.style.display = '';     bar.textContent = currentActivity.title;     activityTopic = currentActivity.topic; } var currentActivity = {     title: '🎨 二中拟人计划 · 为二中取一个名字',     endDate: '2026-09-20T23:59:59',     topic: '#二中拟人',     detailTitle: '二中拟人 · 名字征集',     detailBody: '如果二中变成一个人，<br>会叫什么名字？<br><br>心事箱发帖，开头带上：<br>#二中拟人',     deadline: '9 月 20 日' };  function renderActivity() {     var bar = document.getElementById('activityBar');     if (!bar) return;     if (new Date() > new Date(currentActivity.endDate)) {         bar.style.display = 'none';         return;     }     bar.style.display = '';     bar.textContent = currentActivity.title;     activityTopic = currentActivity.topic; } var currentActivity = {     title: '🎨 二中拟人计划 · 为二中取一个名字',     endDate: '2026-09-20T23:59:59',     topic: '#二中拟人',     detailTitle: '二中拟人 · 名字征集',     detailBody: '如果二中变成一个人，<br>会叫什么名字？<br><br>心事箱发帖，开头带上：<br>#二中拟人',     deadline: '9 月 20 日' };  function renderActivity() {     var bar = document.getElementById('activityBar');     if (!bar) return;     if (new Date() > new Date(currentActivity.endDate)) {         bar.style.display = 'none';         return;     }     bar.style.display = '';     bar.textContent = currentActivity.title;     activityTopic = currentActivity.topic; } var currentActivity = {     title: '🎨 二中拟人计划 · 为二中取一个名字',     endDate: '2026-09-20T23:59:59',     topic: '#二中拟人',     detailTitle: '二中拟人 · 名字征集',     detailBody: '如果二中变成一个人，<br>会叫什么名字？<br><br>心事箱发帖，开头带上：<br>#二中拟人',     deadline: '9 月 20 日' };  function renderActivity() {     var bar = document.getElementById('activityBar');     if (!bar) return;     if (new Date() > new Date(currentActivity.endDate)) {         bar.style.display = 'none';         return;     }     bar.style.display = '';     bar.textContent = currentActivity.title;     activityTopic = currentActivity.topic; }
 var neteaseApi = 'https://api.injahow.cn/meting/';
 
 function updateCountdown() {
@@ -1347,7 +1347,7 @@ function showUidLogin() {
 function showUserCenter() {
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    var socialStatus = socialUid ? (socialType === 'qq' ? '已绑定 QQ' : '已绑定微信') : '未绑定第三方';
+    var socialStatus = ''; if (userQQ) socialStatus += '已绑定 QQ '; if (userWX) socialStatus += '已绑定微信'; if (!socialStatus) socialStatus = '未绑定第三方';
     var avatarHtml = userAvatar ? '<img src="' + escapeHtml(userAvatar) + '" class="profile-avatar" style="width:50px;height:50px;">' : '';
     var html = '<div class="modal"><span class="modal-close-x" onclick="closeModal()">×</span>' + avatarHtml + '<h3>' + escapeHtml(userNickname) + (isOwner ? ' 👑' : (isAdmin ? ' ⭐' : '')) + '</h3><p>UID: ' + escapeHtml(userUid) + '</p><p>身份：' + (isOwner ? '站长' : (isAdmin ? '管理员' : '普通用户')) + '</p><p>第三方：' + socialStatus + '</p>';
     html += '<button class="gray-btn" onclick="closeModal();showMyProfile()">👤 我的主页</button><br>';
@@ -1620,6 +1620,15 @@ async function saveBio() {
     showToast('(｡•̀ᴗ-)✧', '已保存');
 }
 
+async function showUserProfileByName(nickname) {
+    var cleanName = nickname.replace(/ 👑| ⭐/g, '');
+    var result = await supabaseClient.from('users').select('*').eq('nickname', cleanName).single();
+    if (result.data) {
+        showUserProfile(result.data.uid);
+    } else {
+        showToast('(｡•́︿•̀｡)', '找不到这个用户');
+    }
+}
 async function showUserProfile(uid) {
     var userResult = await supabaseClient.from('users').select('*').eq('uid', uid).single();
     if (!userResult.data) { showToast('(｡•́︿•̀｡)', '用户不存在'); return; }
